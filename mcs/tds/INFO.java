@@ -5,10 +5,8 @@ package mcs.tds;
 
 /**
  * Element d'une TDS
- * 
+ *
  * @author marcel
- * 
+ *
  */
-public interface INFO {
-
-}
+public interface INFO {}
