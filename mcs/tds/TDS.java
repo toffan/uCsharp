@@ -1,77 +1,39 @@
 package mcs.tds;
 
 import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
 
-/**
- * une TDS hiérarchique.
- *
- * @author marcel
- *
- */
-public class TDS extends HashMap<String, INFO> {
+public class TDS {
 
-    private static final long serialVersionUID = 1L;
+    ///   Attributs   ///
+    private TDS parent;
+    private HashMap<String, VAR> vars;
 
-    /**
-     * La TDS parente
-     */
-    private TDS parente;
-
-    /**
-     * Constructeur pour une TDS sans parente
-     */
+    ///   Constucteurs   ///
     public TDS() { this(null); }
-
-    /**
-     * Constructeur pour une TDS fille de p
-     *
-     * @param p
-     */
-    public TDS(TDS p) {
+    public TDS(TDS parent) {
         super();
-        parente = p;
+        this.parent = parent;
     }
 
-    public TDS getParente() { return parente; }
-
+    ///   Methodes   ///
     /**
-     * Recherche de n dans la TDS courante uniquement
-     *
-     * @param n
-     * @return
+     * Recherche une variable dans la TDS et la renvoie.
+     * @param id identifiant a rechercher
+     * @param local recherche dans la TDS courante
+     * @return variable trouvee ou null sinon
      */
-    public INFO chercherLocalement(String n) { return get(n); }
-
-    /**
-     * Recherche de n dans la TDS courante et ses parentes.
-     *
-     * @param n
-     * @return
-     */
-    public INFO chercherGlobalement(String n) {
-        INFO i = chercherLocalement(n);
-        if (i == null)
-            if (parente != null)
-                return parente.chercherGlobalement(n);
-        return i;
-    }
-
-    /**
-     * Ajoute le nom n et son information i dans la TDS
-     *
-     * @param n
-     * @param i
-     */
-    public void inserer(String n, INFO i) { put(n, i); }
-
-    public String toString() {
-        StringBuffer sb = new StringBuffer();
-        Set<Map.Entry<String, INFO>> s = entrySet();
-        for (Map.Entry<String, INFO> e : s) {
-            sb.append("; " + e.getKey() + " : " + e.getValue() + '\n');
+    public VAR searchVar(String id) { return searchVar(id, false); }
+    public VAR searchVar(String id, boolean local) {
+        VAR res = this.vars.get(id);
+        if (res == null && !local && parent != null) {
+            return this.parent.searchVar(id);
+        } else {
+            return res;
         }
-        return sb.toString();
     }
+
+    /**
+     * Ajoute ou mets a jour une variable
+     */
+    public void putVar(String id, VAR var) { this.vars.put(id, var); }
 }
