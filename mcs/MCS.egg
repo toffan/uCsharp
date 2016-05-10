@@ -24,8 +24,8 @@ syn code_asm : STRING for ASM;
 inh tds_asm : TDS for ASM;
 
 -- Custom attributes
-inh tds    : TDS     for ENTITE, ENTITES, PROGRAMME ;
-syn type   : TYPE   for TYPE ;
+inh tds : TDS for PROGRAMME, ENTITES, ENTITE, BLOC ;
+syn type : TYPE for TYPE, FONCTION, PARFS, DECL ;
 
 --terminals
 space separateur is  "[\r\n\t ]+";     
@@ -134,7 +134,30 @@ end
 }
 -- definition d'une variable globale ou d'une fonction
 -- (commence par une minuscule)
-ENTITE ->  TYPE ident DECL ;
+ENTITE ->  TYPE ident DECL #record ;
+-- Enregistrement de la déclaration dans la table des symboles.
+#record {
+local
+    v : VAR ;
+    t : TYPE ;
+do
+  -- Vérifier qu'aucune fonction/variable du même nom n'est pas déjà définie localement.
+  v := ENTITE^tds.searchVar(ident^txt,true);
+  if v /= null then
+    error(MCS_DAE, ident^txt);
+  else
+    -- Calcul du type de la variable/fonction.
+    if DECL^type = null then
+      t := TYPE^type;
+    else
+      -- TODO calcul du type d'une fonction.
+      t := ...
+    end
+    -- Enregistrement effectif de la déclaration.
+    ENTITE^tds.putVar(ident^txt, t);
+  end
+end
+}
 -- Variable
 DECL -> pv;
 DECL -> FONCTION ;
