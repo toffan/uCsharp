@@ -6,7 +6,7 @@ public class TYPE {
     private String name;
     private int size;
 
-    ///   Constructeur   ///
+    ///   Constructeurs   ///
     public TYPE(String name, int size) {
         assert(size > 0);
         this.name = name;
