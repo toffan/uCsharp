@@ -3,12 +3,12 @@ package mcs.tds;
 public class TYPE {
 
     ///   Attributs   ///
-    private String name;
-    private int size;
+    protected String name;
+    protected int size;
 
     ///   Constructeurs   ///
     public TYPE(String name, int size) {
-        assert(size > 0);
+        assert(size >= 0); // Une struct peut initialement être vide
         this.name = name;
         this.size = size;
     }
