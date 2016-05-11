@@ -24,7 +24,9 @@ syn code_asm : STRING for ASM;
 inh tds_asm : TDS for ASM;
 
 -- Custom attributes
-inh tds : TDS for PROGRAMME, ENTITES, ENTITE, DECL, BLOC, PARF, PARFS, PARFSX ;
+inh tds : TDS for PROGRAMME, ENTITES, ENTITE, DECL,
+                  PARF, PARFS, PARFSX, BLOC,
+		  INSTS, INST ;
 syn type : TYPE for TYPE, FONCTION, PARF, PARFS, PARFSX, DECL ;
 
 --terminals
