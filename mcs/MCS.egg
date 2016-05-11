@@ -173,8 +173,26 @@ do
   DECL^type := FONCTION^type;
 end
 }
+
 -- Fonction
-FONCTION ->  paro PARFS parf BLOC ;
+FONCTION ->  #tds paro PARFS parf #type BLOC ;
+#tds {
+local
+  tdsFunction : TDS;
+do
+  tdsFunction := new TDS(FONCTION^tds);
+  -- L'évaluation de PARFS va compléter la TDS de la fonction.
+  PARFS^tds := tdsFunction;
+  BLOC^tds := tdsFunction;
+end
+}
+#type {
+local
+do
+  FONCTION^type := PARFS^type;
+end
+}
+
 -- parametres de fonctions
 PARFS ->  ;
 PARFS ->  PARF PARFSX ;
