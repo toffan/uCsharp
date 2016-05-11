@@ -159,8 +159,20 @@ do
 end
 }
 -- Variable
-DECL -> pv;
-DECL -> FONCTION ;
+DECL -> #type pv ;
+#type {
+local
+do
+  DECL^type := null;
+end
+}
+DECL -> #type FONCTION ;
+#type {
+local
+do
+  DECL^type := FONCTION^type;
+end
+}
 -- Fonction
 FONCTION ->  paro PARFS parf BLOC ;
 -- parametres de fonctions
