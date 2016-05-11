@@ -12,4 +12,7 @@ public class TYPE {
         this.name = name;
         this.size = size;
     }
+
+    ///   Methodes   ///
+    public int size() { return this.size; }
 }

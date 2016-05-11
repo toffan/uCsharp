@@ -5,6 +5,7 @@ import java.util.HashMap;
 public class TDS {
 
     ///   Attributs   ///
+    private Address nxtAddr;
     private TDS parent;
     private HashMap<String, VAR> vars;
     private HashMap<String, TYPE> types;
@@ -12,6 +13,7 @@ public class TDS {
     ///   Constucteurs   ///
     public TDS() { this(null); }
     public TDS(TDS parent) {
+        this.nxtAddr = parent == null ? new Address() : parent.nxtAddr;
         this.parent = parent;
         this.vars = new HashMap<String, VAR>();
         this.types = new HashMap<String, TYPE>();
@@ -37,7 +39,11 @@ public class TDS {
     /**
      * Ajoute ou mets a jour une variable
      */
-    public void putVar(String id, VAR var) { this.vars.put(id, var); }
+    public void putVar(String id, TYPE type) {
+        VAR var = new VAR(type, this.nxtAddr);
+        this.nxtAddr = this.nxtAddr.next(type.size());
+        this.vars.put(id, var);
+    }
 
     /**
      * Recherche un type dans la TDS et la renvoie.
