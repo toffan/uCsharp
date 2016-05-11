@@ -24,8 +24,8 @@ syn code_asm : STRING for ASM;
 inh tds_asm : TDS for ASM;
 
 -- Custom attributes
-inh tds : TDS for PROGRAMME, ENTITES, ENTITE, BLOC ;
-syn type : TYPE for TYPE, FONCTION, PARFS, DECL ;
+inh tds : TDS for PROGRAMME, ENTITES, ENTITE, DECL, BLOC, PARF, PARFS, PARFSX ;
+syn type : TYPE for TYPE, FONCTION, PARF, PARFS, PARFSX, DECL ;
 
 --terminals
 space separateur is  "[\r\n\t ]+";     
@@ -198,7 +198,22 @@ PARFS ->  ;
 PARFS ->  PARF PARFSX ;
 PARFSX ->  ;
 PARFSX ->  virg PARF PARFSX ;
-PARF ->  TYPE ident ;
+PARF ->  TYPE ident #type #record ;
+-- Enregistrement du paramètre dans la table des symboles de la fonction.
+#record {
+local
+    v : VAR ;
+do
+  -- Vérifier qu'aucun paramètre du même nom n'est pas déjà défini localement.
+  v := PARF^tds.searchVar(ident^txt,true);
+  if v /= null then
+    error(MCS_PAE, ident^txt);
+  else
+    -- Enregistrement effectif du paramètre.
+    PARF^tds.putVar(ident^txt, TYPE^type);
+  end
+end
+}
 -- les types (de base, noms, struct et pointeurs)
 TYPE -> STYPE  PTRS ;
 -- type de base
