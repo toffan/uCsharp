@@ -194,11 +194,48 @@ end
 }
 
 -- parametres de fonctions
-PARFS ->  ;
-PARFS ->  PARF PARFSX ;
-PARFSX ->  ;
-PARFSX ->  virg PARF PARFSX ;
+PARFS -> #type ;
+-- Évaluation du type d'une liste de paramètres.
+#type {
+local
+do
+  PARFSX^type := null;
+end
+}
+PARFS ->  PARF PARFSX #type ;
+-- Évaluation du type d'une liste de paramètres.
+#type {
+local
+do
+  PARFSX1^type.put(PARF^type);
+  PARFSX^type := PARFSX1^type;
+end
+}
+PARFSX ->  #type ;
+-- Évaluation du type d'une liste de paramètres.
+#type {
+local
+do
+  PARFSX^type := null;
+end
+}
+PARFSX ->  virg PARF PARFSX #type ;
+-- Évaluation du type d'une liste de paramètres.
+#type {
+local
+do
+  PARFSX1^type.put(PARF^type);
+  PARFSX^type := PARFSX1^type;
+end
+}
 PARF ->  TYPE ident #type #record ;
+-- Évaluation du type d'un paramètre.
+#type {
+local
+do
+  PARF^type := TYPE^type;
+end
+}
 -- Enregistrement du paramètre dans la table des symboles de la fonction.
 #record {
 local
