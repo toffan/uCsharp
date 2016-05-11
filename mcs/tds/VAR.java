@@ -1,7 +1,5 @@
 package mcs.tds;
 
-import mcs.gc.Address;
-
 public class VAR {
 
     ///   Attributs   ///
