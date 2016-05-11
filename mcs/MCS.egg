@@ -99,6 +99,7 @@ do
    else
      ENTITES^machine := machine;
    end
+   PROGRAMME^tds := new TDS();
 end
 }
 -- ecrit le code dans un fichier
