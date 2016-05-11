@@ -12,8 +12,9 @@ public class TDS {
     ///   Constucteurs   ///
     public TDS() { this(null); }
     public TDS(TDS parent) {
-        super();
         this.parent = parent;
+        this.vars = new HashMap<String, VAR>();
+        this.types = new HashMap<String, TYPE>();
     }
 
     ///   Methodes   ///
