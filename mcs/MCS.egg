@@ -322,7 +322,14 @@ do
 end
 }
 -- instruction expression (affectation et appel de procedure)
-INST -> E pv ;
+INST -> E pv #type ;
+#type {
+local
+do
+  -- Une expression non récupérée est un effet de bord : pas de type associé.
+  INST^type := null;
+end
+}
 -- bloc d'instructions
 INST ->  BLOC  ;
 -- conditionnelle
