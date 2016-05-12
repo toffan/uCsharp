@@ -310,7 +310,17 @@ do
 end
 }
 -- declaration de variable locale avec ou sans init 
-INST ->  TYPE ident AFFX pv ;
+INST ->  TYPE ident AFFX pv #type ;
+#type {
+local
+do
+  -- Une déclaration locale ou affectation est un effet de bord : pas de type associé.
+  INST^type := null;
+
+  -- TODO: Vérification cohérence de type ident/expression affectée.
+
+end
+}
 -- instruction expression (affectation et appel de procedure)
 INST -> E pv ;
 -- bloc d'instructions
