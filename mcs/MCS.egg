@@ -384,8 +384,14 @@ do
 end
 }
 -- retour de fonction
-INST ->  retour  E pv ;
-
+INST ->  retour  E pv #type ;
+#type {
+local
+do
+  -- Instruction return : on transfère le type de l'expression renvoyée.
+  INST^type := E^type;
+end
+}
 
 -- les expressions -------------
 -----------------------------------------------------------------------
