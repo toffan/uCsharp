@@ -339,7 +339,36 @@ do
 end
 }
 -- conditionnelle
-INST ->   si paro E parf BLOC SIX ;
+INST ->   si paro E parf BLOC SIX #type ;
+#type {
+local
+do
+  if E^type /= BOOLEAN then
+    -- TODO: Compléter le message d'erreur avec du texte représentant l'expression.
+    -- TODO: Vérifier l'utilisation du type boolean (pas de boolean dans la première version).
+    error(MCS_NOT_BOOLEAN);
+  else
+    if BLOC^type /= null then
+      if SIX^type /= null then
+	if BLOC^type /= SIX^type then 
+	  -- Les deux bloc renvoient des types différents, ce qui ne peut donc pas être compatible avec le type de la fonction.
+	  error(MCS_BAD_TYPE);
+	else
+	  -- Les deux blocs existent et renvoient le même type.
+	  INST^type := BLOC^type;
+	end
+      else
+	-- Pas de deuxième bloc ou alors il ne contient que des effets de bord.
+	INST^type := BLOC^type;
+      end
+    else
+      -- Le premier bloc ne contient que des effets de bord.
+      INST^type := SIX^type;
+    end
+  end
+end
+}
+
 SIX ->    sinon BLOC ;
 SIX -> ;
 -- retour de fonction
