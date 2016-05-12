@@ -331,7 +331,13 @@ do
 end
 }
 -- bloc d'instructions
-INST ->  BLOC  ;
+INST ->  BLOC #type ;
+#type {
+local
+do
+  INST^type := BLOC^type;
+end
+}
 -- conditionnelle
 INST ->   si paro E parf BLOC SIX ;
 SIX ->    sinon BLOC ;
