@@ -369,8 +369,20 @@ do
 end
 }
 
-SIX ->    sinon BLOC ;
-SIX -> ;
+SIX -> sinon BLOC #type ;
+#type {
+local
+do
+  SIX^type := BLOC^type;
+end
+}
+SIX -> #type ;
+#type {
+local
+do
+  SIX^type := null;
+end
+}
 -- retour de fonction
 INST ->  retour  E pv ;
 
