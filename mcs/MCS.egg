@@ -27,7 +27,8 @@ inh tds_asm : TDS for ASM;
 inh tds : TDS for PROGRAMME, ENTITES, ENTITE, DECL,
                   PARF, PARFS, PARFSX, BLOC,
 		  INSTS, INST ;
-syn type : TYPE for TYPE, FONCTION, PARF, PARFS, PARFSX, DECL ;
+syn type : TYPE for TYPE, FONCTION, PARF, PARFS, PARFSX, DECL,
+                    BLOC, INSTS, INST, E ;
 
 --terminals
 space separateur is  "[\r\n\t ]+";     
@@ -253,6 +254,7 @@ do
   end
 end
 }
+
 -- les types (de base, noms, struct et pointeurs)
 TYPE -> STYPE  PTRS ;
 -- type de base
@@ -272,11 +274,41 @@ CHAMPS -> ;
 -- un nom de champ commence par une minuscule
 CHAMPS -> CHAMP CHAMPS ;
 CHAMP -> TYPE ident pv;
+
 -- corps de fonction et bloc d'instructions
-BLOC ->  aco INSTS acf ;
+BLOC ->  aco INSTS acf #type ;
+#type {
+local
+do
+  BLOC^type := INSTS^type;
+end
+}
+
 -- instructions
-INSTS ->   ;
-INSTS ->  INST INSTS  ;
+INSTS -> #type ;
+#type {
+local
+do
+  INSTS^type := null;
+end
+}
+
+INSTS ->  INST INSTS #type ;
+-- Le type d'une instruction INST (différent d'une expression E) est soit :
+--  - null (effet de bord)
+--  - résultat d'un return
+#type {
+local
+do
+  -- Le type d'une lite d'instructions INSTS et le type de la première INST
+  -- de type non null (ie du premier return de la séquence).
+  if INST^type /= null then
+    INSTS^type := INST^type;
+  else
+    INSTS^type := INSTS1^type;
+  end
+end
+}
 -- declaration de variable locale avec ou sans init 
 INST ->  TYPE ident AFFX pv ;
 -- instruction expression (affectation et appel de procedure)
