@@ -327,7 +327,20 @@ end
 }
 
 -- nom de type (commence par une majuscule)
-STYPE -> identc;
+STYPE -> identc #type ;
+#type {
+local
+  t : TYPE;
+do
+  t := STYPE^tds.searchType(identc^txt);
+  if t = null then
+    error(MCS_TUN, identc^txt);
+  else
+    STYPE^type := t;
+  end
+end
+}
+
 -------------  
 -- et struct
 STYPE -> struct aco CHAMPS acf ;
