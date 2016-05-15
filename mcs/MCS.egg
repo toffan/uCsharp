@@ -26,9 +26,10 @@ inh tds_asm : TDS for ASM;
 -- Custom attributes
 inh tds : TDS for PROGRAMME, ENTITES, ENTITE, DECL,
                   PARF, PARFS, PARFSX, BLOC,
-		  INSTS, INST, STYPE ;
+		  INSTS, INST, STYPE, PTRS ;
 syn type : TYPE for TYPE, FONCTION, PARF, PARFS, PARFSX, DECL,
-                    BLOC, INSTS, INST, E, STYPE ;
+                    BLOC, INSTS, INST, E, STYPE, PTRS ;
+inh typePT : TYPE for PTRS ;
 
 --terminals
 space separateur is  "[\r\n\t ]+";     
@@ -256,11 +257,50 @@ end
 }
 
 -- les types (de base, noms, struct et pointeurs)
-TYPE -> STYPE  PTRS ;
+TYPE -> STYPE #type1 PTRS #type2 ;
+#type1 {
+local
+do
+  PTRS^typePT := STYPE^type;
+end
+}
+#type2 {
+local
+do
+  TYPE^type := PTRS^type;
+end
+}
+
 -- type de base
 -- des * pour definir un pointeur
-PTRS -> ;
-PTRS -> mult PTRS ;
+PTRS -> #type ;
+#type {
+local
+do
+  PTRS^type := PTRS^typePT;
+end
+}
+PTRS -> mult PTRS #type ;
+#type {
+local
+  t : PTR;
+  o : PTR;
+do
+  -- Instanciation d'un type pointeur.
+  t := new PTR(PTRS1^type);
+  -- Recherche du type pointeur dans la table des types.
+  o := PTRS^tds.searchType(t.name());
+  -- Propagation du type.
+  if o /= null then
+    -- L'instance précédemment créée.
+    PTRS^type := o;
+  else
+    -- L'instance nouvellement créée.
+    PTRS^type := t;
+  end
+end
+}
+
 -- types de base
 STYPE-> void #type ;
 #type {
