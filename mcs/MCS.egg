@@ -26,9 +26,9 @@ inh tds_asm : TDS for ASM;
 -- Custom attributes
 inh tds : TDS for PROGRAMME, ENTITES, ENTITE, DECL,
                   PARF, PARFS, PARFSX, BLOC,
-		  INSTS, INST ;
+		  INSTS, INST, STYPE ;
 syn type : TYPE for TYPE, FONCTION, PARF, PARFS, PARFSX, DECL,
-                    BLOC, INSTS, INST, E ;
+                    BLOC, INSTS, INST, E, STYPE ;
 
 --terminals
 space separateur is  "[\r\n\t ]+";     
@@ -262,9 +262,30 @@ TYPE -> STYPE  PTRS ;
 PTRS -> ;
 PTRS -> mult PTRS ;
 -- types de base
-STYPE-> void  ;
-STYPE-> int ;
-STYPE-> char ;
+STYPE-> void #type ;
+#type {
+local
+do
+  STYPE^type := STYPE^tds.searchType(void^txt);
+end
+}
+
+STYPE-> int #type ;
+#type {
+local
+do
+  STYPE^type := STYPE^tds.searchType(int^txt);
+end
+}
+
+STYPE-> char #type ;
+#type {
+local
+do
+  STYPE^type := STYPE^tds.searchType(char^txt);
+end
+}
+
 -- nom de type (commence par une majuscule)
 STYPE -> identc;
 -------------  
