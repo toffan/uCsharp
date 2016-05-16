@@ -26,10 +26,12 @@ inh tds_asm : TDS for ASM;
 -- Custom attributes
 inh tds : TDS for PROGRAMME, ENTITES, ENTITE, DECL,
                   PARF, PARFS, PARFSX, BLOC,
-		  INSTS, INST, STYPE, PTRS ;
+		  INSTS, INST, STYPE, PTRS,
+		  CHAMPS, CHAMP ;
 syn type : TYPE for TYPE, FONCTION, PARF, PARFS, PARFSX, DECL,
-                    BLOC, INSTS, INST, E, STYPE, PTRS ;
+                    BLOC, INSTS, INST, E, STYPE, PTRS, CHAMPS ;
 inh typePT : TYPE for PTRS ;
+inh typeCHP : TYPE for CHAMPS, CHAMP ;
 
 --terminals
 space separateur is  "[\r\n\t ]+";     
@@ -343,11 +345,65 @@ end
 
 -------------  
 -- et struct
-STYPE -> struct aco CHAMPS acf ;
-CHAMPS -> ;
 -- un nom de champ commence par une minuscule
-CHAMPS -> CHAMP CHAMPS ;
-CHAMP -> TYPE ident pv;
+STYPE -> #type1 struct aco CHAMPS acf #type2 ;
+-- Création du type struct initial (vide).
+#type1 {
+local
+do
+  CHAMPS^typeCHP := new STRUCT();
+end
+}
+-- Propagation du type struct complété.
+#type2 {
+local
+do
+  STYPE^type := CHAMPS^type;
+end
+}
+
+-- Fin de l'évaluation du type struct, propagation du type.
+CHAMPS -> #type ;
+#type {
+local
+do
+  CHAMPS^type := CHAMPS^typeCHP;
+end
+}
+
+-- Évaluation du type struct.
+CHAMPS -> #type1 CHAMP CHAMPS #type2 ;
+-- Enregistrement de plusieurs champs.
+#type1 {
+local
+do
+  CHAMP^typeCHP := CHAMPS^typeCHP;
+  CHAMPS1^typeCHP := CHAMPS^typeCHP;
+end
+}
+#type2 {
+local
+do
+  CHAMPS^type := CHAMPS1^type;
+end
+}
+
+CHAMP -> TYPE ident pv #type ;
+-- Enregistrement du type d'un champ.
+#type {
+local
+  v : VAR ;
+do
+  -- Vérifier qu'aucune fonction/variable du même nom n'est pas déjà définie localement.
+  v := CHAMP^typeCHP.searchVar(ident^txt,true);
+  if v /= null then
+    error(MCS_DAE, ident^txt);
+  else
+    -- Enregistrement effectif de la déclaration.
+    CHAMP^typeCHP.putVar(ident^txt, TYPE^type);
+  end
+end
+}
 
 -- corps de fonction et bloc d'instructions
 BLOC ->  aco INSTS acf #type ;
