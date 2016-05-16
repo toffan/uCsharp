@@ -743,7 +743,21 @@ do
 end
 }
 
-F -> mult F ;
+F -> mult F #type ;
+-- Typage d'une expression contenant *.
+#type {
+local
+  p : PTR;
+do
+  if !(F1^type instanceof PTR) then
+    error(MCS_NOT_PTR);
+  else
+    p := (PTR) F1^type;
+    F^type := p.getPtype();
+  end
+end
+}
+
 F -> ident FX ;
 FX -> ;
 -- acces champ
