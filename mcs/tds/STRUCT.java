@@ -5,7 +5,7 @@ public class STRUCT extends TYPE {
     ///   Attributs   ///
     private TDS tds;
 
-    /// Constructeurs   ///
+    ///   Constructeurs   ///
     public STRUCT() { super(null, 0); };
 }
 

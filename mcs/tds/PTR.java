@@ -1,7 +1,7 @@
 package mcs.tds;
 
 public class PTR extends TYPE {
- 
+
     ///   Attributs   ///
     private TYPE ptype;
 
