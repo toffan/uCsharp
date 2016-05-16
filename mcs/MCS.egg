@@ -27,7 +27,8 @@ inh tds_asm : TDS for ASM;
 inh tds : TDS for PROGRAMME, ENTITES, ENTITE, DECL,
                   PARF, PARFS, PARFSX, BLOC,
 		  INSTS, INST, STYPE, PTRS,
-		  CHAMPS, CHAMP ;
+		  CHAMPS, CHAMP,
+		  A, AFFX, R, AX, T, TX, F ;
 syn type : TYPE for TYPE, FONCTION, PARF, PARFS, PARFSX, DECL,
                     BLOC, INSTS, INST, E, STYPE, PTRS, CHAMPS,
 		    A, AFFX, R, AX, T, TX, F ;
@@ -681,13 +682,33 @@ OPMUL -> mult ;
 OPMUL -> div ;
 OPMUL -> mod ;
 OPMUL -> et ;
+
 -- expressions de base
 -- Constante entiere
-F -> entier   ;
+F -> entier #type ;
+#type {
+local
+do
+  F^type := F^tds.searchType(int^txt);
+end
+}
 -- Constante chaine
-F -> chaine ;
+F -> chaine #type ;
+#type {
+local
+do
+  F^type := new PTR(F^tds.searchType(char^txt));
+end
+}
 -- Constante caractere
-F -> caractere ;
+F -> caractere #type ;
+#type {
+local
+do
+  F^type := F^tds.searchType(char^txt);
+end
+}
+
 -- expression unaire
 F ->  OPUN  F  ;
 -- operateurs unaires
