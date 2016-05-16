@@ -30,7 +30,7 @@ inh tds : TDS for PROGRAMME, ENTITES, ENTITE, DECL,
 		  CHAMPS, CHAMP ;
 syn type : TYPE for TYPE, FONCTION, PARF, PARFS, PARFSX, DECL,
                     BLOC, INSTS, INST, E, STYPE, PTRS, CHAMPS,
-		    A, AFFX, R, AX, T, TX ;
+		    A, AFFX, R, AX, T, TX, F ;
 inh typePT : TYPE for PTRS ;
 inh typeCHP : TYPE for CHAMPS, CHAMP ;
 
@@ -641,10 +641,41 @@ end
 OPADD -> plus ;
 OPADD -> moins ;
 OPADD -> ou ;
+
 -- multiplication, ...
-T ->  F  TX  ;
-TX ->   OPMUL  F TX  ;
-TX ->  ;
+T -> F TX #type ;
+-- Vérification du type d'une opération multiplicative.
+#type {
+local
+do
+  if TX^type /= null && TX^type /= F^type then
+      error(MCS_BAD_TYPE_5);
+  else
+    T^type := F^type;
+  end
+end
+}
+TX -> OPMUL F TX #type ;
+-- Vérification du type d'une opération multiplicative (suite).
+#type {
+local
+do
+  if TX1^type /= null && TX1^type /= F^type then
+      error(MCS_BAD_TYPE_5);
+  else
+    TX^type := F^type;
+  end
+end
+}
+TX -> #type ;
+-- Vérification du type d'une opération multiplicative (fin).
+#type {
+local
+do
+  TX^type := null;
+end
+}
+
 -- operateurs multiplicatifs
 OPMUL -> mult ;
 OPMUL -> div ;
