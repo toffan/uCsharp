@@ -28,12 +28,13 @@ inh tds : TDS for PROGRAMME, ENTITES, ENTITE, DECL,
                   PARF, PARFS, PARFSX, BLOC,
 		  INSTS, INST, STYPE, PTRS,
 		  CHAMPS, CHAMP,
-		  A, AFFX, R, AX, T, TX, F ;
+		  A, AFFX, R, AX, T, TX, F, FX ;
 syn type : TYPE for TYPE, FONCTION, PARF, PARFS, PARFSX, DECL,
                     BLOC, INSTS, INST, E, STYPE, PTRS, CHAMPS,
-		    A, AFFX, R, AX, T, TX, F ;
+		    A, AFFX, R, AX, T, TX, F, FX ;
 inh typePT : TYPE for PTRS ;
 inh typeCHP : TYPE for CHAMPS, CHAMP ;
+inh typeR : TYPE for FX ;
 
 --terminals
 space separateur is  "[\r\n\t ]+";     
@@ -758,8 +759,36 @@ do
 end
 }
 
-F -> ident FX ;
-FX -> ;
+F -> ident #type1 FX #type2 ;
+#type1 {
+local
+  v : VAR;
+do
+  v := F^tds.searchVar(ident^txt);
+  if v = null then
+    error(MCS_VUN, ident^txt);
+  else
+    FX^typeR := v.getType();
+    -- Modification de FX^tds ?
+  end
+end
+}
+-- Récupération du type évalué.
+#type2 {
+local
+do
+  F^type := FX^type;
+end
+}
+
+FX -> #type ;
+#type {
+local
+do
+  FX^type := FX^typeR;
+end
+}
+
 -- acces champ
 FX ->   pt  ident FX ;
 -- acces champ pointeur
