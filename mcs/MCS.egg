@@ -710,11 +710,18 @@ end
 }
 
 -- expression unaire
-F ->  OPUN  F  ;
+F -> OPUN F #type ;
+#type {
+local
+do
+  F^type := F1^type;
+end
+}
 -- operateurs unaires
 OPUN -> plus ;
 OPUN -> moins ;
 OPUN -> non;
+
 -- pointeur NULL
 F -> null  ;
 -- expression parenthesee
