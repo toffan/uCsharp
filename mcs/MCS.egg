@@ -30,7 +30,7 @@ inh tds : TDS for PROGRAMME, ENTITES, ENTITE, DECL,
 		  CHAMPS, CHAMP ;
 syn type : TYPE for TYPE, FONCTION, PARF, PARFS, PARFSX, DECL,
                     BLOC, INSTS, INST, E, STYPE, PTRS, CHAMPS,
-		    A, AFFX ;
+		    A, AFFX, R, AX ;
 inh typePT : TYPE for PTRS ;
 inh typeCHP : TYPE for CHAMPS, CHAMP ;
 
@@ -474,9 +474,8 @@ INST ->   si paro E parf BLOC SIX #type ;
 #type {
 local
 do
-  if E^type /= BOOLEAN then
+  if E^type /= INST^tds.searchType(int^txt) then
     -- TODO: Compléter le message d'erreur avec du texte représentant l'expression.
-    -- TODO: Vérifier l'utilisation du type boolean (pas de boolean dans la première version).
     error(MCS_NOT_BOOLEAN);
   else
     if BLOC^type /= null then
@@ -562,9 +561,40 @@ end
 }
 
 -- relation
-A ->   R AX  ;
-AX -> OPREL R;
-AX ->  ;
+A -> R AX #type ;
+-- Vérification du type d'une relation.
+#type {
+local
+do
+  if AX^type /= null then
+    if AX^type /= R^type then
+      error(MCS_BAD_TYPE_3);
+    else
+      -- Condition : type int ou bool selon la version.
+      A^type := A^tds.searchType(int^txt);
+    end
+  else
+    A^type := R^type;
+  end
+end
+}
+AX -> OPREL R #type ;
+-- Vérification du type d'une relation (suite).
+#type {
+local
+do
+  AX^type := R^type;
+end
+}
+AX -> #type ;
+-- Vérification du type d'une relation (fin).
+#type {
+local
+do
+  AX^type := null;
+end
+}
+
 -- operateurs relationnels
 OPREL -> inf ;
 OPREL -> sup ;
