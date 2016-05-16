@@ -723,7 +723,15 @@ OPUN -> moins ;
 OPUN -> non;
 
 -- pointeur NULL
-F -> null  ;
+F -> null #type ;
+#type {
+local
+do
+  -- TODO: Vérifier le bon fonctionnement : type null compatible avec les autres dans la vérification de type ?
+  F^type := null;
+end
+}
+
 -- expression parenthesee
 F ->  paro E parf FX ;
 F ->  paro TYPE parf  F ;
