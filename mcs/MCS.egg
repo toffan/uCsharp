@@ -29,7 +29,8 @@ inh tds : TDS for PROGRAMME, ENTITES, ENTITE, DECL,
 		  INSTS, INST, STYPE, PTRS,
 		  CHAMPS, CHAMP ;
 syn type : TYPE for TYPE, FONCTION, PARF, PARFS, PARFSX, DECL,
-                    BLOC, INSTS, INST, E, STYPE, PTRS, CHAMPS ;
+                    BLOC, INSTS, INST, E, STYPE, PTRS, CHAMPS,
+		    A, AFFX ;
 inh typePT : TYPE for PTRS ;
 inh typeCHP : TYPE for CHAMPS, CHAMP ;
 
@@ -531,10 +532,35 @@ end
 -- T = expression figurant dans une expression additive (TERME)
 -- F = expression figurant dans une expression multiplicative (FACTEUR)
 -----------------------------------------------------------------------
-E ->   A  AFFX ;
+E ->   A  AFFX #type ;
+-- Vérification du type des affectations.
+#type {
+local
+do
+  if AFFX^type /= null && AFFX^type /= A^type then
+    error(MCS_BAD_TYPE_2);
+  end
+  E^type := A^type;
+end
+}
 -- affectation
-AFFX -> affect  A  ;
-AFFX -> ;
+AFFX -> affect  A #type ;
+-- Vérification du type des affectations (suite).
+#type {
+local
+do
+  AFFX^type := A^type;
+end
+}
+AFFX -> #type ;
+-- Vérification du type des affectations (fin).
+#type {
+local
+do
+  AFFX^type := null;
+end
+}
+
 -- relation
 A ->   R AX  ;
 AX -> OPREL R;
