@@ -734,7 +734,15 @@ end
 
 -- expression parenthesee
 F ->  paro E parf FX ;
-F ->  paro TYPE parf  F ;
+F ->  paro TYPE parf F #type ;
+-- Cast explicite : on n'utilise pas le type de F.
+#type {
+local
+do
+  F^type := TYPE^type;
+end
+}
+
 F -> mult F ;
 F -> ident FX ;
 FX -> ;
