@@ -1021,7 +1021,6 @@ F ->  paro E parf #type1 FX #type2 ;
 local
 do
   FX^typeR := E^type;
-  -- Modification de FX^tds ?
 end
 }
 -- Récupération du type évalué.
@@ -1087,7 +1086,6 @@ do
     error(MCS_VUN, ident^txt);
     else
     FX^typeR := v.getType();
-    -- Modification de FX^tds ?
     end
 end
 }
@@ -1115,7 +1113,33 @@ end
 --
 --
 -- Acces champ
-FX ->   pt  ident FX ;
+FX ->   pt  ident #type1 FX #type2 ;
+-- Vérification du type racine.
+#type1 {
+local
+  p : STRUCT;
+  c : VAR;
+do
+  if !(FX^typeR instanceof STRUCT) then
+    error(MCS_NOT_STRUCT);
+  else
+    p := (STRUCT) FX^typeR;
+    c := p.searchVar(ident^txt, true);
+    if c = null then
+      error(MCS_UNKNOWN_FIELD);
+    else
+      FX1^typeR := c.type();
+    end
+  end
+end
+}
+-- Récupération du type
+#type2 {
+local
+do
+  FX^type := FX1^type;
+end
+}
 
 --
 --
