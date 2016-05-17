@@ -1,61 +1,75 @@
 -----------------------------------------------------
--- Grammaires de MC  et MCS                       --
+-- Grammaires de MC  et MCS                        --
 -----------------------------------------------------
---options
+
+--
+-- Options
 option auto = true;
 option version = 0.0.1;
 option k=2;
---attributes 
 
--- le fichier source
+--
+-- Attributes
+
+-- Le fichier source
 inh source : MCSSourceFile for PROGRAMME;
--- la machine cible pour la generation de code
-inh machine : IMachine for 
-         ENTITES, ENTITE, DECL, FONCTION, INST, BLOC, INSTS, SIX,
-         PARFS, PARF, PARFSX, ES, ESX, 
-         E, AFFX, A, AX, R, RX, T, TX, F,FX
---         -- decommenter la ligne suivante pour MCS
---       , BASE, DEFS, DEF
---         -- fin extension MCS
-         ;
--- ces attributs permettent de recuperer les instructions du code ASM inline       
+
+-- La machine cible pour la generation de code.
+inh machine : IMachine for
+        ENTITES, ENTITE, DECL, FONCTION, INST, BLOC, INSTS, SIX,
+        PARFS, PARF, PARFSX, ES, ESX,
+        E, AFFX, A, AX, R, RX, T, TX, F, FX
+--      -- Décommenter la ligne suivante pour MCS
+--      , BASE, DEFS, DEF
+--      -- Fin extension MCS
+        ;
+
+-- Ces attributs permettent de récupérer les instructions du code ASM inline.
 syn code_asm : STRING for ASM;
--- la TDS courante
+
+-- La TDS courante.
 inh tds_asm : TDS for ASM;
 
--- Custom attributes
-inh tds : TDS for PROGRAMME, ENTITES, ENTITE, DECL,
-                  PARF, PARFS, PARFSX, BLOC,
-		  INSTS, INST, STYPE, PTRS,
-		  CHAMPS, CHAMP,
-		  A, AFFX, R, AX, T, TX, F, FX ;
-syn type : TYPE for TYPE, FONCTION, PARF, PARFS, PARFSX, DECL,
-                    BLOC, INSTS, INST, E, STYPE, PTRS, CHAMPS,
-		    A, AFFX, R, AX, T, TX, F, FX ;
-inh typePT : TYPE for PTRS ;
-inh typeCHP : TYPE for CHAMPS, CHAMP ;
-inh typeR : TYPE for FX ;
+-- Custom attributes.
+inh tds : TDS for
+        PROGRAMME, ENTITES, ENTITE, DECL,
+        PARF, PARFS, PARFSX, BLOC,
+        INSTS, INST, STYPE, PTRS,
+        CHAMPS, CHAMP,
+        A, AFFX, R, AX, T, TX, F, FX;
 
---terminals
-space separateur is  "[\r\n\t ]+";     
-space comm is  "\/\/[^\n]*\n";
-sugar paro is  "\(";
-sugar parf is  "\)";
-sugar aco is  "\{";     
-sugar acf is  "\}"; 
-sugar virg is  ",";
+syn type : TYPE for
+        TYPE, FONCTION, PARF, PARFS, PARFSX, DECL,
+        BLOC, INSTS, INST, E, STYPE, PTRS, CHAMPS,
+		A, AFFX, R, AX, T, TX, F, FX;
+
+inh typePT : TYPE for PTRS;
+
+inh typeCHP : TYPE for CHAMPS, CHAMP;
+
+inh typeR : TYPE for FX;
+
+-- Terminaux
+space separateur is    "[\r\n\t ]+";
+space comm is    "\/\/[^\n]*\n";
+sugar paro is    "\(";
+sugar parf is    "\)";
+sugar aco is    "\{";
+sugar acf is    "\}";
+sugar virg is    ",";
 sugar pt is "\.";
-sugar pv is  "\;";
-sugar affect is  "=";
-sugar si is  "if";
-sugar sinon is  "else";
-sugar void is  "void";
-sugar asm is  "asm";
-sugar int is  "int";
-sugar char is  "char";
+sugar pv is    "\;";
+sugar affect is    "=";
+sugar si is    "if";
+sugar sinon is    "else";
+sugar void is    "void";
+sugar asm is    "asm";
+sugar int is    "int";
+sugar char is    "char";
 sugar struct is "struct";
 sugar typedef is "typedef";
--- decommenter pour MCS
+
+-- Décommenter pour MCS
 --sugar ref is "ref" ;
 --sugar out is "out";
 --sugar namespace is "namespace";
@@ -71,533 +85,748 @@ sugar typedef is "typedef";
 --sugar new is "new" ;
 --sugar null2 is "null";
 --sugar base is "base" ;
--- 
-sugar retour is  "return";
-sugar arrow is "\-\>";
-sugar null is  "NULL";
-sugar inf is  "\<";
-sugar infeg is  "\<=";
-sugar sup is  "\>";
-sugar supeg is  "\>=";
-sugar eg is  "==";
-sugar neg is  "\!=";
-sugar plus is  "\+";
-sugar moins is  "\-";
-sugar ou is  "\|\|";
-sugar mult is  "\*";
-sugar div is  "\/";
-sugar mod is  "\%" ; 
-sugar et is  "\&\&";
-sugar non is  "\!";
-term entier is  "[0-9]+";
-term caractere is  "\'[^\']\'";
-term chaine is  "\"[^\"]*\"";
-term ident is  "[a-z][_0-9A-Za-z]*";
-term identc is  "[A-Z][_0-9A-Za-z]*";
 
--- pour les instructions en assembleur TAM 'inline'
+sugar retour is    "return";
+sugar arrow is "\-\>";
+sugar null is    "NULL";
+sugar inf is    "\<";
+sugar infeg is    "\<=";
+sugar sup is    "\>";
+sugar supeg is    "\>=";
+sugar eg is    "==";
+sugar neg is    "\!=";
+sugar plus is    "\+";
+sugar moins is    "\-";
+sugar ou is    "\|\|";
+sugar mult is    "\*";
+sugar div is    "\/";
+sugar mod is    "\%" ;
+sugar et is    "\&\&";
+sugar non is    "\!";
+term entier is    "[0-9]+";
+term caractere is    "\'[^\']\'";
+term chaine is    "\"[^\"]*\"";
+term ident is    "[a-z][_0-9A-Za-z]*";
+term identc is    "[A-Z][_0-9A-Za-z]*";
+
+-- Pour les instructions en assembleur TAM 'inline'.
 compil ASM;
 
---production rules
+-- Règle de production, point d'entrée.
 PROGRAMME -> #init ENTITES #gen;
 global
-   machine : IMachine;
--- transmission de la machine cible  (choisie par l'option -m au lancement) 
+    machine : IMachine;
+-- Transmission de la machine cible (choisie par l'option -m au lancement)
 #init {
 local
 do
-   machine := PROGRAMME^source.getMachine();
-   if machine = null then
-     error(NO_MACH, PROGRAMME^source.getMachName());
-   else
-     ENTITES^machine := machine;
-   end
-   PROGRAMME^tds := new TDS();
+    machine := PROGRAMME^source.getMachine();
+    if machine = null then
+        error(NO_MACH, PROGRAMME^source.getMachName());
+    else
+        ENTITES^machine := machine;
+    end
+    PROGRAMME^tds := new TDS();
+    -- TODO: Ajouter à la TDS les types natifs, et les const char.
 end
 }
--- ecrit le code dans un fichier
+
+-- Écrit le code dans un fichier.
 #gen {
 local
 do
-   machine.writeCode(PROGRAMME^source.getFileName(),"; no code\n");  
+    machine.writeCode(PROGRAMME^source.getFileName(),"; no code\n");
 end
 }
+
+--
+--
+-- -- Entités
+--
+--
+
 ENTITES -> ;
 ENTITES -> ENTITE ENTITES ;
--- definition d'un nom de type (commence par une majuscule)
+
+--
+--
+-- Définition d'un nom de type (commence par une majuscule).
 ENTITE -> typedef TYPE identc pv #record ;
+
 -- Enregistrement du nouveau type dans la table des symboles.
 #record {
 local
-    t : TYPE ;
+        t : TYPE ;
 do
-  -- Vérifier qu'aucun type du même nom n'est pas déjà défini localement.
-  t := ENTITE^tds.searchType(identc^txt,true);
-  if t /= null then
-    error(MCS_TAE, identc^txt);
-  else
-    -- Enregistrement effectif du type.
-    ENTITE^tds.putType(identc^txt, TYPE^type);
-  end
+    -- Vérifier qu'aucun type du même nom n'est pas déjà défini localement.
+    t := ENTITE^tds.searchType(identc^txt, true);
+    if t /= null then
+        error(MCS_TAE, identc^txt);
+    else
+        -- Enregistrement effectif du type.
+        ENTITE^tds.putType(identc^txt, TYPE^type);
+    end
 end
 }
--- definition d'une variable globale ou d'une fonction
--- (commence par une minuscule)
-ENTITE ->  TYPE ident DECL #record ;
+
+--
+--
+-- Définition d'une variable globale ou d'une fonction.
+-- (Commence par une minuscule)
+ENTITE -> TYPE ident DECL #record ;
+
 -- Enregistrement de la déclaration dans la table des symboles.
 #record {
 local
-    v : VAR ;
-    t : TYPE ;
+        v : VAR ;
+        t : TYPE ;
 do
-  -- Vérifier qu'aucune fonction/variable du même nom n'est pas déjà définie localement.
-  v := ENTITE^tds.searchVar(ident^txt,true);
-  if v /= null then
-    error(MCS_DAE, ident^txt);
-  else
-    -- Calcul du type de la variable/fonction.
-    if DECL^type = null then
-      t := TYPE^type;
+    -- Vérifier qu'aucune fonction/variable du même nom n'est pas déjà définie localement.
+    v := ENTITE^tds.searchVar(ident^txt,true);
+    if v /= null then
+        error(MCS_DAE, ident^txt);
     else
-      -- TODO calcul du type d'une fonction.
-      t := ...
+        -- Calcul du type de la variable/fonction.
+        if DECL^type = null then
+            t := TYPE^type;
+        else
+            -- TODO calcul du type d'une fonction.
+            t := ...
+        end
+        -- Enregistrement effectif de la déclaration.
+        ENTITE^tds.putVar(ident^txt, t);
     end
-    -- Enregistrement effectif de la déclaration.
-    ENTITE^tds.putVar(ident^txt, t);
-  end
-end
-}
--- Variable
-DECL -> #type pv ;
-#type {
-local
-do
-  DECL^type := null;
-end
-}
-DECL -> #type FONCTION ;
-#type {
-local
-do
-  DECL^type := FONCTION^type;
 end
 }
 
--- Fonction
-FONCTION ->  #tds paro PARFS parf #type BLOC ;
+--
+--
+-- -- Déclaration
+--
+--
+
+--
+--
+-- Fin de la déclaration, déclaration vide.
+DECL -> #type pv ;
+
+-- Pas de type.
+#type {
+local
+do
+    DECL^type := null;
+end
+}
+
+--
+--
+-- Fonction.
+DECL -> #type FONCTION ;
+
+-- Définition du champ type.
+#type {
+local
+do
+    DECL^type := FONCTION^type;
+end
+}
+
+--
+--
+-- -- Fonction
+--
+--
+
+--
+--
+-- Début de la première ligne d'une fonction.
+FONCTION -> #tds paro PARFS parf #type BLOC ;
+
+-- Création de la TDS interne à la fonction.
 #tds {
 local
-  tdsFunction : TDS;
+    tdsFunction : TDS;
 do
-  tdsFunction := new TDS(FONCTION^tds);
-  -- L'évaluation de PARFS va compléter la TDS de la fonction.
-  PARFS^tds := tdsFunction;
-  BLOC^tds := tdsFunction;
-end
-}
-#type {
-local
-do
-  FONCTION^type := PARFS^type;
+    tdsFunction := new TDS(FONCTION^tds);
+
+    -- L'évaluation de PARFS va compléter la TDS de la fonction.
+    PARFS^tds := tdsFunction;
+    BLOC^tds := tdsFunction;
 end
 }
 
--- parametres de fonctions
+-- Ajout du type de la fonction.
+#type {
+local
+do
+    FONCTION^type := PARFS^type;
+end
+}
+
+--
+--
+-- Pas de paramètre à la fonction.
 PARFS -> #type ;
--- Évaluation du type d'une liste de paramètres.
+
+-- Pas de type pour pas de paramètre.
 #type {
 local
 do
-  PARFSX^type := null;
+    PARFSX^type := null;
 end
 }
-PARFS ->  PARF PARFSX #type ;
--- Évaluation du type d'une liste de paramètres.
+
+--
+--
+-- Un paramètre de plus à la fonction.
+PARFS -> PARF PARFSX #type ;
+
+-- Ajout du paramètre courant au type.
 #type {
 local
 do
-  PARFSX1^type.put(PARF^type);
-  PARFSX^type := PARFSX1^type;
+    PARFSX1^type.put(PARF^type);
+    PARFSX^type := PARFSX1^type;
 end
 }
-PARFSX ->  #type ;
--- Évaluation du type d'une liste de paramètres.
+
+--
+--
+-- Fin de la liste de paramètres.
+PARFSX -> #type ;
+
+-- Pas de type.
 #type {
 local
 do
-  PARFSX^type := null;
+    PARFSX^type := null;
 end
 }
-PARFSX ->  virg PARF PARFSX #type ;
--- Évaluation du type d'une liste de paramètres.
+
+--
+--
+-- Un élément supplémentaire à la liste des paramètres (avec virgule).
+PARFSX -> virg PARF PARFSX #type ;
+
+-- Ajout du paramètre courant au type.
 #type {
 local
 do
-  PARFSX1^type.put(PARF^type);
-  PARFSX^type := PARFSX1^type;
+    PARFSX1^type.put(PARF^type);
+    PARFSX^type := PARFSX1^type;
 end
 }
-PARF ->  TYPE ident #type #record ;
--- Évaluation du type d'un paramètre.
+
+--
+--
+-- Décomposition d'un paramètre de fonction.
+PARF -> TYPE ident #type #record ;
+
+-- Définition du type du paramètre de la fonction.
 #type {
 local
 do
-  PARF^type := TYPE^type;
+    PARF^type := TYPE^type;
 end
 }
+
 -- Enregistrement du paramètre dans la table des symboles de la fonction.
 #record {
 local
-    v : VAR ;
+        v : VAR ;
 do
-  -- Vérifier qu'aucun paramètre du même nom n'est pas déjà défini localement.
-  v := PARF^tds.searchVar(ident^txt,true);
-  if v /= null then
-    error(MCS_PAE, ident^txt);
-  else
-    -- Enregistrement effectif du paramètre.
-    PARF^tds.putVar(ident^txt, TYPE^type);
-  end
+    -- Vérifier qu'aucun paramètre du même nom n'est pas déjà défini localement.
+    v := PARF^tds.searchVar(ident^txt,true);
+    if v /= null then
+        error(MCS_PAE, ident^txt);
+    else
+        -- Enregistrement effectif du paramètre.
+        PARF^tds.putVar(ident^txt, TYPE^type);
+    end
 end
 }
 
--- les types (de base, noms, struct et pointeurs)
+--
+--
+-- -- Types
+--
+--
+
+--
+--
+-- Structure d'un type, pointeur ou non.
 TYPE -> STYPE #type1 PTRS #type2 ;
+
+-- Propagation du premier type.
 #type1 {
 local
 do
-  PTRS^typePT := STYPE^type;
+    PTRS^typePT := STYPE^type;
 end
 }
+
+-- Propagation du second type.
 #type2 {
 local
 do
-  TYPE^type := PTRS^type;
+    TYPE^type := PTRS^type;
 end
 }
 
--- type de base
--- des * pour definir un pointeur
+--
+--
+-- Pointeur, fin de la liste d'étoile.
 PTRS -> #type ;
+
+-- Propagation du type du pointeur.
 #type {
 local
 do
-  PTRS^type := PTRS^typePT;
+    PTRS^type := PTRS^typePT;
 end
 }
+
+--
+--
+-- Pointeur, une étoile de plus dans la liste d'étoiles.
 PTRS -> mult PTRS #type ;
+
+-- Ajout du type à la table des symboles.
 #type {
 local
-  t : PTR;
-  o : PTR;
+    t : PTR;
+    o : PTR;
 do
-  -- Instanciation d'un type pointeur.
-  t := new PTR(PTRS1^type);
-  -- Recherche du type pointeur dans la table des types.
-  o := PTRS^tds.searchType(t.name());
-  -- Propagation du type.
-  if o /= null then
-    -- L'instance précédemment créée.
-    PTRS^type := o;
-  else
-    -- L'instance nouvellement créée.
-    PTRS^type := t;
-  end
+    -- Instanciation d'un type pointeur.
+    t := new PTR(PTRS1^type);
+
+    -- Recherche du type pointeur dans la table des types.
+    o := PTRS^tds.searchType(t.name());
+
+    -- Propagation du type.
+    if o /= null then
+        -- L'instance précédemment créée.
+        PTRS^type := o;
+    else
+        -- L'instance nouvellement créée.
+        PTRS^type := t;
+    end
 end
 }
 
--- types de base
+--
+--
+-- Types de base (void)
 STYPE-> void #type ;
+
+-- Les types de base sont déjà présents dans la TDS.
 #type {
 local
 do
-  STYPE^type := STYPE^tds.searchType(void^txt);
+    STYPE^type := STYPE^tds.searchType(void^txt);
 end
 }
 
+--
+--
+-- Types de base (int)
 STYPE-> int #type ;
+
+-- Les types de base sont déjà présents dans la TDS.
 #type {
 local
 do
-  STYPE^type := STYPE^tds.searchType(int^txt);
+    STYPE^type := STYPE^tds.searchType(int^txt);
 end
 }
 
+--
+--
+-- Types de base (char)
 STYPE-> char #type ;
+
+-- Les types de base sont déjà présents dans la TDS.
 #type {
 local
 do
-  STYPE^type := STYPE^tds.searchType(char^txt);
+    STYPE^type := STYPE^tds.searchType(char^txt);
 end
 }
 
--- nom de type (commence par une majuscule)
+--
+--
+-- Identificateur d'un type (pour les types nommés par le codeur).
 STYPE -> identc #type ;
+
+-- Résolution du type nommé dans la TDS.
 #type {
 local
-  t : TYPE;
+    t : TYPE;
 do
-  t := STYPE^tds.searchType(identc^txt);
-  if t = null then
+    t := STYPE^tds.searchType(identc^txt);
+    if t = null then
     error(MCS_TUN, identc^txt);
-  else
+    else
     STYPE^type := t;
-  end
+    end
 end
 }
 
--------------  
--- et struct
--- un nom de champ commence par une minuscule
+--
+--
+-- Type d'une struct.
 STYPE -> #type1 struct aco CHAMPS acf #type2 ;
+
 -- Création du type struct initial (vide).
 #type1 {
 local
 do
-  CHAMPS^typeCHP := new STRUCT();
+    CHAMPS^typeCHP := new STRUCT();
 end
 }
+
 -- Propagation du type struct complété.
 #type2 {
 local
 do
-  STYPE^type := CHAMPS^type;
+    STYPE^type := CHAMPS^type;
 end
 }
 
+--
+--
 -- Fin de l'évaluation du type struct, propagation du type.
 CHAMPS -> #type ;
+
+-- Propagation du type.
 #type {
 local
 do
-  CHAMPS^type := CHAMPS^typeCHP;
+    CHAMPS^type := CHAMPS^typeCHP;
 end
 }
 
--- Évaluation du type struct.
+--
+--
+-- Évaluation du type struct, liste de champ.
 CHAMPS -> #type1 CHAMP CHAMPS #type2 ;
--- Enregistrement de plusieurs champs.
+
+-- Enregistrement d'un champ.
 #type1 {
 local
 do
-  CHAMP^typeCHP := CHAMPS^typeCHP;
-  CHAMPS1^typeCHP := CHAMPS^typeCHP;
+    CHAMP^typeCHP := CHAMPS^typeCHP;
+    CHAMPS1^typeCHP := CHAMPS^typeCHP;
 end
 }
+
+-- Propagation du type.
 #type2 {
 local
 do
-  CHAMPS^type := CHAMPS1^type;
+    CHAMPS^type := CHAMPS1^type;
 end
 }
 
+--
+--
+-- Décomposition du contenu d'un champ.
 CHAMP -> TYPE ident pv #type ;
--- Enregistrement du type d'un champ.
-#type {
-local
-  v : VAR ;
-do
-  -- Vérifier qu'aucune fonction/variable du même nom n'est pas déjà définie localement.
-  v := CHAMP^typeCHP.searchVar(ident^txt,true);
-  if v /= null then
-    error(MCS_DAE, ident^txt);
-  else
-    -- Enregistrement effectif de la déclaration.
-    CHAMP^typeCHP.putVar(ident^txt, TYPE^type);
-  end
-end
-}
 
--- corps de fonction et bloc d'instructions
-BLOC ->  aco INSTS acf #type ;
+-- Enregistrement du type d'un champ dans la TPS de la struct.
 #type {
 local
+    v : VAR ;
 do
-  BLOC^type := INSTS^type;
-end
-}
-
--- instructions
-INSTS -> #type ;
-#type {
-local
-do
-  INSTS^type := null;
-end
-}
-
-INSTS ->  INST INSTS #type ;
--- Le type d'une instruction INST (différent d'une expression E) est soit :
---  - null (effet de bord)
---  - résultat d'un return
-#type {
-local
-do
-  -- Le type d'une lite d'instructions INSTS et le type de la première INST
-  -- de type non null (ie du premier return de la séquence).
-  if INST^type /= null then
-    INSTS^type := INST^type;
-  else
-    INSTS^type := INSTS1^type;
-  end
-end
-}
--- declaration de variable locale avec ou sans init 
-INST ->  TYPE ident AFFX pv #type ;
-#type {
-local
-do
-  -- Une déclaration locale ou affectation est un effet de bord : pas de type associé.
-  INST^type := null;
-
-  -- TODO: Vérification cohérence de type ident/expression affectée.
-
-end
-}
--- instruction expression (affectation et appel de procedure)
-INST -> E pv #type ;
-#type {
-local
-do
-  -- Une expression non récupérée est un effet de bord : pas de type associé.
-  INST^type := null;
-end
-}
--- bloc d'instructions
-INST ->  BLOC #type ;
-#type {
-local
-do
-  INST^type := BLOC^type;
-end
-}
--- conditionnelle
-INST ->   si paro E parf BLOC SIX #type ;
-#type {
-local
-do
-  if E^type /= INST^tds.searchType(int^txt) then
-    -- TODO: Compléter le message d'erreur avec du texte représentant l'expression.
-    error(MCS_NOT_BOOLEAN);
-  else
-    if BLOC^type /= null then
-      if SIX^type /= null then
-	if BLOC^type /= SIX^type then 
-	  -- Les deux bloc renvoient des types différents, ce qui ne peut donc pas être compatible avec le type de la fonction.
-	  error(MCS_BAD_TYPE);
-	else
-	  -- Les deux blocs existent et renvoient le même type.
-	  INST^type := BLOC^type;
-	end
-      else
-	-- Pas de deuxième bloc ou alors il ne contient que des effets de bord.
-	INST^type := BLOC^type;
-      end
+    -- Vérifier qu'aucune fonction/variable du même nom n'est pas déjà définie localement dans la struct.
+    v := CHAMP^typeCHP.searchVar(ident^txt,true);
+    if v /= null then
+        error(MCS_DAE, ident^txt);
     else
-      -- Le premier bloc ne contient que des effets de bord.
-      INST^type := SIX^type;
+        -- Enregistrement effectif de la déclaration.
+        CHAMP^typeCHP.putVar(ident^txt, TYPE^type);
     end
-  end
 end
 }
 
+--
+--
+-- -- Bloc de code
+--
+--
+
+--
+--
+-- Délimitation d'un bloc de code.
+BLOC ->  aco INSTS acf #type ;
+
+-- Le type propagé est non-null si le bloc contient une instruction « return ».
+#type {
+local
+do
+    BLOC^type := INSTS^type;
+end
+}
+
+--
+--
+-- Instruction vide, effet de bord.
+INSTS -> #type ;
+
+-- Un effet de bord ne retourne rien, type null.
+#type {
+local
+do
+    INSTS^type := null;
+end
+}
+
+--
+--
+-- Ajout d'une instruction dans le bloc.
+INSTS ->  INST INSTS #type ;
+
+-- Le type d'une instruction INST (différente d'une expression E) est soit :
+--    - null (effet de bord).
+--    - Résultat d'un return.
+#type {
+local
+do
+    -- Le type d'une liste d'instructions INSTS est le type de la première INST
+    --     de type non-null (i.e. du premier return de la séquence).
+    if INST^type /= null then
+        INSTS^type := INST^type;
+    else
+        INSTS^type := INSTS1^type;
+    end
+end
+}
+
+--
+--
+-- Déclaration d'une variable locale, avec ou sans initialisation.
+INST ->  TYPE ident AFFX pv #type ;
+
+-- Une déclaration ou une affectation est un effet de bord, pas de type.
+#type {
+local
+do
+    INST^type := null;
+
+    -- TODO: Vérification cohérence de type ident/expression affecté.
+    --       (dans une affectation par exemple)
+end
+}
+
+--
+--
+-- Instruction « expression » (affectation et appel de procédure).
+INST -> E pv #type ;
+
+-- Une expression seule est un effet de bord, pas de type.
+#type {
+local
+do
+    INST^type := null;
+end
+}
+
+
+--
+--
+-- Un nouveau bloc est inséré en instruction.
+INST ->  BLOC #type ;
+
+-- Un nouveau bloc est inséré en instruction, si il est doté d'un type de
+-- retour, il contient un « return », et son type se propage
+#type {
+local
+do
+    INST^type := BLOC^type;
+end
+}
+
+--
+--
+-- Bloc conditionnel.
+INST -> si paro E parf BLOC SIX #type ;
+
+-- Le type du bloc conditionnel correspond au type de retour commun.
+#type {
+local
+do
+    -- Une expression conditionnelle est de type de retour entier.
+    if E^type /= INST^tds.searchType(int^txt) then
+        -- TODO: Compléter l'erreur avec du texte représentant l'expression.
+        error(MCS_NOT_BOOLEAN);
+    else
+        if BLOC^type /= null then
+            if SIX^type /= null then
+	            if BLOC^type /= SIX^type then
+	                -- Les deux bloc renvoient des types différents, erreur.
+	                error(MCS_BAD_TYPE);
+	            else
+	                -- Les deux blocs existent et renvoient le même type.
+	                INST^type := BLOC^type;
+	            end
+            else
+	            -- Pas de deuxième bloc, ou un bloc d'effets de bord.
+	            INST^type := BLOC^type;
+            end
+        else
+            -- Le premier bloc ne contient que des effets de bord.
+            -- (On utilise le type de retour de SIX)
+            INST^type := SIX^type;
+        end
+    end
+end
+}
+
+--
+--
+-- Bloc sinon.
 SIX -> sinon BLOC #type ;
+
+-- Propagation du type.
 #type {
 local
 do
-  SIX^type := BLOC^type;
-end
-}
-SIX -> #type ;
-#type {
-local
-do
-  SIX^type := null;
-end
-}
--- retour de fonction
-INST ->  retour  E pv #type ;
-#type {
-local
-do
-  -- Instruction return : on transfère le type de l'expression renvoyée.
-  INST^type := E^type;
+    SIX^type := BLOC^type;
 end
 }
 
--- les expressions -------------
------------------------------------------------------------------------
--- E = expression (y compris l'affectation)
--- A = expression figurant dans une affectation
--- R = expression figurant dans une expresion relationnelle
--- T = expression figurant dans une expression additive (TERME)
--- F = expression figurant dans une expression multiplicative (FACTEUR)
------------------------------------------------------------------------
-E ->   A  AFFX #type ;
+--
+--
+-- Pas de bloc suivant dans la conditionnelle.
+SIX -> #type ;
+
+-- Pas de bloc, considéré comme un effet de bord.
+#type {
+local
+do
+    SIX^type := null;
+end
+}
+
+--
+--
+-- L'instruction retourne un type, un « return de fonction ».
+INST -> retour E pv #type ;
+#type {
+local
+do
+    -- Instruction return : on transfère le type de l'expression renvoyée.
+    INST^type := E^type;
+end
+}
+
+--
+--
+-- -- Expressions
+--
+--
+
+-------------------------------------------------------------------------
+-- Lexique                                                              -
+-------------------------------------------------------------------------
+-- E = expression (y compris l'affectation)                             -
+-- A = expression figurant dans une affectation                         -
+-- R = expression figurant dans une expresion relationnelle             -
+-- T = expression figurant dans une expression additive (TERME)         -
+-- F = expression figurant dans une expression multiplicative (FACTEUR) -
+-------------------------------------------------------------------------
+
+--
+--
+-- Expression qui affecte.
+E -> A AFFX #type ;
+
 -- Vérification du type des affectations.
 #type {
 local
 do
-  if AFFX^type /= null && AFFX^type /= A^type then
-    error(MCS_BAD_TYPE_2);
-  end
-  E^type := A^type;
+    if AFFX^type /= null && AFFX^type /= A^type then
+        error(MCS_BAD_TYPE_2);
+    end
+    E^type := A^type;
 end
 }
--- affectation
-AFFX -> affect  A #type ;
+
+--
+--
+-- Affectation
+AFFX -> affectA #type ;
+
 -- Vérification du type des affectations (suite).
 #type {
 local
 do
-  AFFX^type := A^type;
+    AFFX^type := A^type;
 end
 }
+
+--
+--
+-- Fin d'une affectation.
 AFFX -> #type ;
+
 -- Vérification du type des affectations (fin).
 #type {
 local
 do
-  AFFX^type := null;
+    AFFX^type := null;
 end
 }
 
--- relation
+--
+--
+-- Relation, moins prioritaire que A.
 A -> R AX #type ;
+
 -- Vérification du type d'une relation.
 #type {
 local
 do
-  if AX^type /= null then
-    if AX^type /= R^type then
-      error(MCS_BAD_TYPE_3);
+    if AX^type /= null then
+        if AX^type /= R^type then
+            error(MCS_BAD_TYPE_3);
+        else
+            -- Condition : type int ou bool selon la version.
+            A^type := A^tds.searchType(int^txt);
+        end
     else
-      -- Condition : type int ou bool selon la version.
-      A^type := A^tds.searchType(int^txt);
+        A^type := R^type;
     end
-  else
-    A^type := R^type;
-  end
 end
 }
+
+--
+--
+-- Opérateur relationnel.
 AX -> OPREL R #type ;
+
 -- Vérification du type d'une relation (suite).
 #type {
 local
 do
-  AX^type := R^type;
+    AX^type := R^type;
 end
 }
+
+--
+--
+-- Fin de la relation.
 AX -> #type ;
+
 -- Vérification du type d'une relation (fin).
 #type {
 local
 do
-  AX^type := null;
+    AX^type := null;
 end
 }
 
--- operateurs relationnels
+-- Opératieurs relationnels.
 OPREL -> inf ;
 OPREL -> sup ;
 OPREL -> infeg ;
@@ -605,233 +834,344 @@ OPREL -> supeg ;
 OPREL -> eg ;
 OPREL -> neg ;
 
+--
+--
+-- Terme.
 R ->  T RX #type ;
+
 -- Vérification du type d'une opération additive.
 #type {
 local
 do
-  if RX^type /= null && RX^type /= T^type then
-      error(MCS_BAD_TYPE_4);
-  else
-    R^type := T^type;
-  end
+    if RX^type /= null && RX^type /= T^type then
+        error(MCS_BAD_TYPE_4);
+    else
+        R^type := T^type;
+    end
 end
 }
--- additions ...
+
+--
+--
+-- Additions ...
 RX -> OPADD T RX #type ;
+
 -- Vérification du type d'une opération additive (suite).
 #type {
 local
 do
-  if RX1^type /= null && RX1^type /= T^type then
+    if RX1^type /= null && RX1^type /= T^type then
       error(MCS_BAD_TYPE_4);
-  else
+    else
     RX^type := T^type;
-  end
+    end
 end
 }
+
+--
+--
+-- Fin d'une addition.
 RX -> #type ;
 -- Vérification du type d'une opération additive (fin).
 #type {
 local
 do
-  RX^type := null;
+    RX^type := null;
 end
 }
 
--- operateurs additifs
+-- Opérateurs additifs.
 OPADD -> plus ;
 OPADD -> moins ;
 OPADD -> ou ;
 
--- multiplication, ...
+-- Multiplication, ...
 T -> F TX #type ;
+
 -- Vérification du type d'une opération multiplicative.
 #type {
 local
 do
-  if TX^type /= null && TX^type /= F^type then
+    if TX^type /= null && TX^type /= F^type then
       error(MCS_BAD_TYPE_5);
-  else
+    else
     T^type := F^type;
-  end
+    end
 end
 }
+
+-- Suite de la multiplication.
 TX -> OPMUL F TX #type ;
+
 -- Vérification du type d'une opération multiplicative (suite).
 #type {
 local
 do
-  if TX1^type /= null && TX1^type /= F^type then
+    if TX1^type /= null && TX1^type /= F^type then
       error(MCS_BAD_TYPE_5);
-  else
+    else
     TX^type := F^type;
-  end
+    end
 end
 }
+
+-- Fin de la multiplication.
 TX -> #type ;
+
 -- Vérification du type d'une opération multiplicative (fin).
 #type {
 local
 do
-  TX^type := null;
+    TX^type := null;
 end
 }
 
--- operateurs multiplicatifs
+-- Opérateurs multiplicatifs.
 OPMUL -> mult ;
 OPMUL -> div ;
 OPMUL -> mod ;
 OPMUL -> et ;
 
--- expressions de base
+--
+--
+-- -- Expressions de base
+--
+--
+
+--
+--
 -- Constante entiere
 F -> entier #type ;
+
+-- Une constante entière a un type entier.
 #type {
 local
 do
-  F^type := F^tds.searchType(int^txt);
-end
-}
--- Constante chaine
-F -> chaine #type ;
-#type {
-local
-do
-  F^type := new PTR(F^tds.searchType(char^txt));
-end
-}
--- Constante caractere
-F -> caractere #type ;
-#type {
-local
-do
-  F^type := F^tds.searchType(char^txt);
+    F^type := F^tds.searchType(int^txt);
 end
 }
 
--- expression unaire
-F -> OPUN F #type ;
+--
+--
+-- Constante chaine
+F -> chaine #type ;
+
+-- Une const-chaîne a un type de pointeur-sur-char.
 #type {
 local
 do
-  F^type := F1^type;
+    -- TODO: Ne pas dupliquer le type pointeur-sur-char (char*).
+    F^type := new PTR(F^tds.searchType(char^txt));
 end
 }
--- operateurs unaires
+
+--
+--
+-- Constante caractere
+F -> caractere #type ;
+
+-- Type char.
+#type {
+local
+do
+    F^type := F^tds.searchType(char^txt);
+end
+}
+
+--
+--
+-- Expression unaire
+F -> OPUN F #type ;
+
+-- Propagation du type.
+#type {
+local
+do
+    F^type := F1^type;
+end
+}
+
+--
+--
+-- Operateurs unaires
 OPUN -> plus ;
 OPUN -> moins ;
 OPUN -> non;
 
--- pointeur NULL
+--
+--
+-- Pointeur NULL
 F -> null #type ;
+
+-- Type du pointeur null.
 #type {
 local
 do
-  -- TODO: Vérifier le bon fonctionnement : type null compatible avec les autres dans la vérification de type ?
-  F^type := null;
+    -- TODO: Vérifier le bon fonctionnement :
+    -- -- Type null compatible avec les autres dans la vérification de type ?
+    F^type := null;
 end
 }
 
--- expression parenthesee
+--
+--
+-- Expression parenthesee
 F ->  paro E parf FX ;
+
+--
+--
+-- Cast explicite.
 F ->  paro TYPE parf F #type ;
+
 -- Cast explicite : on n'utilise pas le type de F.
 #type {
 local
 do
-  F^type := TYPE^type;
+    F^type := TYPE^type;
 end
 }
 
+--
+--
+-- Typage de la multiplication avec *.
 F -> mult F #type ;
+
 -- Typage d'une expression contenant *.
 #type {
 local
-  p : PTR;
+    p : PTR;
 do
-  if !(F1^type instanceof PTR) then
-    error(MCS_NOT_PTR);
-  else
-    p := (PTR) F1^type;
-    F^type := p.getPtype();
-  end
+    if !(F1^type instanceof PTR) then
+        error(MCS_NOT_PTR);
+    else
+        p := (PTR) F1^type;
+        F^type := p.getPtype();
+    end
 end
 }
 
+--
+--
+-- Utilisation d'un ident.
 F -> ident #type1 FX #type2 ;
+
+-- TODO: Ajouter un commentaire.
 #type1 {
 local
-  v : VAR;
+    v : VAR;
 do
-  v := F^tds.searchVar(ident^txt);
-  if v = null then
+    v := F^tds.searchVar(ident^txt);
+    if v = null then
     error(MCS_VUN, ident^txt);
-  else
+    else
     FX^typeR := v.getType();
     -- Modification de FX^tds ?
-  end
+    end
 end
 }
 -- Récupération du type évalué.
 #type2 {
 local
 do
-  F^type := FX^type;
+    F^type := FX^type;
 end
 }
 
+--
+--
+-- TODO: Ajouter un commentaire.
 FX -> #type ;
+
+-- TODO: Ajouter un commentaire.
 #type {
 local
 do
-  FX^type := FX^typeR;
+    FX^type := FX^typeR;
 end
 }
 
--- acces champ
+--
+--
+-- Acces champ
 FX ->   pt  ident FX ;
--- acces champ pointeur
+
+--
+--
+-- Acces champ pointeur.
 FX ->   arrow  ident FX ;
--- appel de sous-programme
+
+--
+--
+-- Appel de sous-programme
 FX ->   paro ES parf FX;
--- arguments appel de sous-programme
+
+--
+--
+-- Arguments appel de sous-programme
 ES -> ;
+
+--
+--
+-- TODO: Ajouter un commentaire.
 ES -> E ESX  ;
+
+--
+--
+-- TODO: Ajouter un commentaire.
 ESX ->  ;
+
+--
+--
+-- TODO: Ajouter un commentaire.
 ESX -> virg E ESX ;
 
-------------- inline asm ----------------
--- peut être utile pour implanter des sous-programmes
--- directement en assembleur TAM.
-ENTITE ->   asm #tds ASM#gen; 
+--
+--
+-- -- Inline asm
+--
+--
+
+--
+--
+-- On peut avoir en entite de l'assembleur.
+ENTITE -> asm #tds ASM #gen;
+
+-- Utilisation de la tds au sein de l'asm.
 #tds {
-do 
-  -- A faire : Remplacer 'null' par la table courante pour que
-  -- le code  ASM puisse acceder aux variables de MC ou MCS
-  ASM^tds_asm := null; 
-end
-}
-#gen {
 do
-  -- On recupere le code assembleur 'inline' dans : ASM^code_asm ;
+    -- TODO : Remplacer 'null' par la table courante pour que
+    -- le code  ASM puisse acceder aux variables de MC ou MCS
+    ASM^tds_asm := null;
 end
 }
 
-INST ->  asm   #tds ASM #gen ;
-#tds {
+-- Recuperation de l'assembleur.
+#gen {
 do
-  -- A remplacer par la table courante pour que
-  -- l'assembleur puisse acceder aux variables
-  ASM^tds_asm := null; 
+    -- On recupere le code assembleur 'inline' dans : ASM^code_asm ;
 end
 }
 
+--
+--
+-- On peut avoir en instruction de l'assembleur.
+INST -> asm #tds ASM #gen ;
+
+-- Utilisation de la tds au sein de l'asm.
+#tds {
+do
+    -- A remplacer par la table courante pour que
+    -- l'assembleur puisse acceder aux variables
+    ASM^tds_asm := null;
+end
+}
+
+-- Utilisation de la tds au sein de l'asm.
 #gen {
 do
-  -- ASM^code_asm contient le code assembleur inline
-  -- dans lequel les noms de variables ont ete remplaces
-  -- par leurs adresses.
+    -- ASM^code_asm contient le code assembleur inline
+    -- dans lequel les noms de variables ont ete remplaces
+    -- par leurs adresses.
 end
 }
 
@@ -847,7 +1187,7 @@ end
 --IDC -> pt identc IDC ;
 ---- definition d'une classe (peut etre en dehors d'un namespace)
 --ENTITE -> ACCES class identc HERITAGE aco DEFS acf ;
----- acces 
+---- acces
 --ACCES -> public;
 --ACCES -> private;
 --ACCES -> ;
@@ -866,7 +1206,7 @@ end
 ---- Mode de passage pour les fonctions et méthodes : rien : D, ref : D/R, out : R
 --PARF ->  MODE TYPE ident ;
 --MODE -> ref ;
---MODE -> out ; 
+--MODE -> out ;
 --F -> true;
 --F -> false;
 --F -> this FX;
