@@ -7,7 +7,7 @@ public class PTR extends TYPE {
 
     ///   Constructeurs   ///
     public PTR(TYPE ptype) {
-        super(null, 4);
+        super(ptype.name() + "*", 4);
         this.ptype = ptype;
     }
 }
