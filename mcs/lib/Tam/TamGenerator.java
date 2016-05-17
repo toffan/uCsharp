@@ -1,138 +1,66 @@
-package mcs.lib;
+package Tam;
 
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.PrintWriter;
 
-public class TamGenerator implements GeneratorItf{
+public class TamGenerator implements general.GeneratorItf{
     
-    // nom du fichier a compiler en TAM
-	private String filename;
-
-	// compteur pour le generateur d'etiquettes
-	private static int labelCounter = 0;
-	
 	//helpers
-	private TamFunctionsBool functionsHelper;
-	private TamFunctionsBool functionsHelper;
-	private TamFunctionsBool functionsHelper;
+	private TamHelperBool boolHelper;
+	private TamHelperChar charHelper;
+	private TamHelperInt intHelper;
+	private TamHelperMemory memoryHelper;
+	private TamHelperString stringHelper;
+	private TamHelperGeneral generalHelper;
 
+	/**
+	 * Utilisation du Generator : construction du generator avec le nom du fichier à générer.
+	 * 
+	 * Appels des différentes méthodes au travers des helpers :
+	 * EX : besoin de générer une instruction sur la mémoire, tamGenerator.getMemoryHelper().generateVoid();
+	 */
+	
 	
     /**
      * @param fname le nom du fichier à générer
      */
 	public TamGenerator(String fname) {
 		if (fname.endsWith(".c")) {
-			filename = fname.substring(0, fname.length() - 2);
+			this.generalHelper = new TamHelperGeneral(fname.substring(0, fname.length() - 2));
 		} else {
-			filename = fname;
+			this.generalHelper = new TamHelperGeneral(fname);
 		}
 		
 		//initialisation des helpers
+		this.boolHelper = new TamHelperBool();
+		this.charHelper = new TamHelperChar();
+		this.intHelper = new TamHelperInt();
+		this.memoryHelper = new TamHelperMemory();
+		this.stringHelper = new TamHelperString();
 	}
 
-	/**
-	 * Genere une déclaration de variable
-	 * @param n le nom de la variable
-	 */
-	public String generateDeclaration(String n, INFOVAR i, String t) {
-		int taille = i.getType().getTaille();
-		return "   ; declaration de " + n + " en " + i.getDep() + "/SB"
-				+ " taille = " + taille + "\n";
+	public TamHelperBool getBoolHelper() {
+		return boolHelper;
 	}
 
-	
-
-	/**
-	 * Genere une etiquette
-	 */
-	public String generateLabel() {
-		return "X" + labelCounter++;
+	public TamHelperChar getCharHelper() {
+		return charHelper;
 	}
 
-	/**
-	 * Genere la fin du programme.
-	 */
-	public String generateEnd() {
-		return "\tHALT\n";
+	public TamHelperInt getIntHelper() {
+		return intHelper;
 	}
 
-        // ecrit le code TAM dans le fichier .tam
-	public void generateAsm(String code) {
-		try {
-			PrintWriter pw = new PrintWriter(new FileOutputStream(nom + ".tam"));
-			pw.println(";;; code TAM engendre pour " + this.filename + "\n");
-			pw.print(code + "\tHALT\n");
-			pw.close();
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}
+	public TamHelperMemory getMemoryHelper() {
+		return memoryHelper;
 	}
 
-    /**
-     * @param v
-     */
-	public String generateConstante(String v) {
-		return "\tLOADL " + v + "\n";
+	public TamHelperString getStringHelper() {
+		return stringHelper;
 	}
 
-        // code pour liberer la place reservee pour les variables
-	public String generateFree(int i) {
-		return "\tPOP(0)" + i + "\n";
-	}
-
-        // code pour lire la valeur d'une expression dont on connait l'adresse 
-        //  à la compilation : variable, champ d'un struct etc
-	public String generateStaticRead(int dep, int taille) {
-		return "\tLOAD(" + taille + ") " + dep + "[SB]\n";
-	}
-
-        // code pour ecrire la valeur d'une expression dont on connait l'adresse 
-        //  à la compilation : variable, champ d'un struct etc
-	public String generateStaticWrite(int dep, int taille) {
-		return "\tSTORE(" + taille + ") " + dep + "[SB]\n";
-	}
-
-        // code pour lire la valeur d'une expression dont on connait l'adresse 
-        // à l'execution seulement : pointeurs
-	public String generateDynamicRead(int taille) {
-		return "\tLOADI(" + taille + ")\n";
-	}
-
-        // code pour ecrire la valeur d'une expression dont on connait l'adresse 
-        // à l'execution seulement : pointeurs
-	public String generateDynamicWriteMem(int taille) {
-		return "\tSTOREI(" + taille + ")\n";
-	}
-
-        // code pour une conditionnelle
-	public String generateIf(String code, String code2, String code3) {
-		String sinon = genEtiq();
-		String fin = genEtiq();
-		return "\t; if\n" + code + "\n" + "\tJUMPIF(0) " + sinon + "\n" + code2
-				+ "\n" + "\tJUMP " + fin + "\n" + sinon + "\n" + code3 + "\n"
-				+ fin + "\n" + "\t; fin if\n";
-	}
-
-      
-        // code pour allouer dans le tas
-	public String generateMalloc(int taille) {
-		return "\tLOADL " + taille + "\n" + "\tSUBR Malloc\n";
-	}
-
-        // code pour empiler une adresse
-	public String generateAdr(int dep) {
-		return "\tLOADA " + dep + "[SB]\n";
-	}
-
-        // code pour calculer l'adresse d'un champ d'un struct
-	public String genAdrField(int dep) {
-		return "\t;Calcul deplacement struct " + dep + "\n" + "\tLOADL " + dep
-				+ "\n\tSUBR Iadd\n";
-	}
-
-        // code pour generer un commentaire
-	public String generateComment(String c) {
-		return "; " + c + "\n";
+	public TamHelperGeneral getGeneralHelper() {
+		return generalHelper;
 	}
 }
