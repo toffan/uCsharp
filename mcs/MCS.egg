@@ -1016,7 +1016,29 @@ end
 --
 --
 -- Expression parenthesee
-F ->  paro E parf FX ;
+F ->  paro E parf #type1 FX #type2 ;
+#type1 {
+local
+do
+  FX^typeR := E^type;
+  -- Modification de FX^tds ?
+end
+}
+-- Récupération du type évalué.
+#type2 {
+local
+do
+  F^type := FX^type;
+end
+}
+
+FX -> #type ;
+#type {
+local
+do
+  FX^type := FX^typeR;
+end
+}
 
 --
 --
