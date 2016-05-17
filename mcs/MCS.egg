@@ -1067,7 +1067,7 @@ do
         error(MCS_NOT_PTR);
     else
         p := (PTR) F1^type;
-        F^type := p.getPtype();
+        F^type := p.ptype();
     end
 end
 }
