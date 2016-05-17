@@ -6,7 +6,11 @@ public class STRUCT extends TYPE {
     private TDS tds;
 
     ///   Constructeurs   ///
-    public STRUCT() { super(null, 0); };
+    public STRUCT() { this(null); }
+    public STRUCT(String name) {
+        super(name, 0);
+        this.tds = new TDS();
+    };
 
     ///   Méthodes   ///
     public VAR searchVar(String id) {
