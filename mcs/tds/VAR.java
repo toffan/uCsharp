@@ -11,4 +11,8 @@ public class VAR {
         this.type = type;
         this.addr = addr;
     }
+
+    ///   Methodes   ///
+    public TYPE type() { return this.type; }
+    public Address addr() { return this.addr; }
 }

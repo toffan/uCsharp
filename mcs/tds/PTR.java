@@ -10,4 +10,7 @@ public class PTR extends TYPE {
         super(ptype.name() + "*", 4);
         this.ptype = ptype;
     }
+
+    ///   Methodes   ///
+    public TYPE ptype() { return this.ptype; }
 }

@@ -15,4 +15,5 @@ public class TYPE {
 
     ///   Methodes   ///
     public int size() { return this.size; }
+    public String name() { return this.name; }
 }

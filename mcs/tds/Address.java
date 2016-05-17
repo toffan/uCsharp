@@ -13,7 +13,6 @@ public class Address {
     private Address(int val) { this.val = val; }
 
     ///   Methodes   ///
-    public Address next(int dplt) {
-        return new Address(this.val + dplt);
-    }
+    public Address next(int dplt) { return new Address(this.val + dplt); }
+    public int val() { return this.val; }
 }
