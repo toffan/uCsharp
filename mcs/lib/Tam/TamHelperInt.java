@@ -179,5 +179,27 @@ public class TamHelperInt implements HelperIntInterface {
                 "\tSUBR Ieq\n";
     }
 
+    @Override
+    public String generateDisplayInt(String value){
+        return "; affichage d'un entier sur stdout\n"+
+                "\tLOADL "+value+"\n"+
+                "\tSUBR IOut\n";
+    }
+
+    @Override
+    public String generateDisplayInt(int dep, int size){
+        return "; affichage d'un entier sur stdout\n"+
+                "\tLOAD(" + size + ") " + dep + "[LB] \n" +
+                "\tSUBR IOut\n";
+    }
+
+
+    @Override
+    public String generateReadInt(){
+        return "; lecture sur stdin d'un entier \n"+
+                "SUBR IIn\n";
+    }
+
+
 
 }

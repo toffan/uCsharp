@@ -63,6 +63,14 @@ public interface HelperIntInterface {
 	public String generateMod(String value1, String value2);
 
 	 /** modulo 2 entiers (2 adresses) **/
-	public String generateMod(int dep1, int size1, int dep2, int size2);	
+	public String generateMod(int dep1, int size1, int dep2, int size2);
 
+	/** afficher un entier sur stdout (valeur) **/
+	public String generateDisplayInt(String value);
+
+	/** afficher un entier sur stdout (adresse) **/
+	public String generateDisplayInt(int dep, int size);
+
+	/**lire un entier sur stdin **/
+	public String generateReadInt();
 }
