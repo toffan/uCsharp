@@ -405,7 +405,7 @@ do
     t := new PTR(PTRS1^type);
 
     -- Recherche du type pointeur dans la table des types.
-    o := PTRS^tds.searchType(t.name());
+    o := PTRS^tds.searchType(t.name(), true);
 
     -- Propagation du type.
     if o /= null then
@@ -661,7 +661,7 @@ INST -> si paro E parf BLOC SIX #type ;
 local
 do
     -- Une expression conditionnelle est de type de retour entier.
-    if E^type /= INST^tds.searchType(int^txt) then
+    if E^type /= INST^tds.searchType("int", true) then
         -- TODO: Completer l'erreur avec du texte representant l'expression.
         error(MCS_NOT_BOOLEAN);
     else
