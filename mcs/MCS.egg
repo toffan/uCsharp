@@ -138,7 +138,7 @@ end
 #gen {
 local
 do
-    machine.writeCode(PROGRAMME^source.getFileName(),"; no code\n");
+    machine.writeCode(PROGRAMME^source.getFileName(), "; no code\n");
 end
 }
 
@@ -162,7 +162,7 @@ local
         t : TYPE ;
 do
     -- Verifier qu'aucun type du meme nom n'est pas deja defini localement.
-    t := ENTITE^tds.searchType(identc^txt,TDS.Scope.LOCAL);
+    t := ENTITE^tds.searchType(identc^txt, false);
     if t /= null then
         error(MCS_TAE, identc^txt);
     else
@@ -186,7 +186,7 @@ local
 do
     -- Verifier qu'aucune fonction/variable du meme nom n'est pas deja definie
     -- localement.
-    v := ENTITE^tds.searchVar(ident^txt,TDS.Scope.LOCAL);
+    v := ENTITE^tds.searchVar(ident^txt, false);
     if v /= null then
         error(MCS_DAE, ident^txt);
     else
@@ -340,7 +340,7 @@ local
         v : VAR ;
 do
     -- Verifier qu'aucun parametre du meme nom n'est pas deja defini localement.
-    v := PARF^tds.searchVar(ident^txt,TDS.Scope.LOCAL);
+    v := PARF^tds.searchVar(ident^txt, false);
     if v /= null then
         error(MCS_PAE, ident^txt);
     else
@@ -427,7 +427,7 @@ STYPE-> void #type ;
 #type {
 local
 do
-    STYPE^type := STYPE^tds.searchType(void^txt, TDS.Scope.GLOBAL);
+    STYPE^type := STYPE^tds.searchType(void^txt, true);
 end
 }
 
@@ -440,7 +440,7 @@ STYPE-> int #type ;
 #type {
 local
 do
-    STYPE^type := STYPE^tds.searchType(int^txt, TDS.Scope.GLOBAL);
+    STYPE^type := STYPE^tds.searchType(int^txt, true);
 end
 }
 
@@ -453,7 +453,7 @@ STYPE-> char #type ;
 #type {
 local
 do
-    STYPE^type := STYPE^tds.searchType(char^txt, TDS.Scope.GLOBAL);
+    STYPE^type := STYPE^tds.searchType(char^txt, true);
 end
 }
 
@@ -467,7 +467,7 @@ STYPE -> identc #type ;
 local
     t : TYPE;
 do
-    t := STYPE^tds.searchType(identc^txt, TDS.Scope.GLOBAL);
+    t := STYPE^tds.searchType(identc^txt, true);
     if t = null then
         error(MCS_TUN, identc^txt);
     else
@@ -544,7 +544,7 @@ local
 do
     -- Verifier qu'aucune fonction/variable du meme nom n'est pas deja definie
     -- localement dans la struct.
-    v := CHAMP^typeCHP.searchVar(ident^txt,TDS.Scope.LOCAL);
+    v := CHAMP^typeCHP.searchVar(ident^txt, false);
     if v /= null then
         error(MCS_DAE, ident^txt);
     else
@@ -801,7 +801,7 @@ do
         end
     else
 	    -- Condition : type int ou bool selon la version.
-	    A^type := A^tds.searchType(int^txt, TDS.Scope.GLOBAL);
+	    A^type := A^tds.searchType(int^txt, true);
     end
 end
 }
@@ -966,7 +966,7 @@ F -> entier #type ;
 #type {
 local
 do
-    F^type := F^tds.searchType(int^txt, TDS.Scope.GLOBAL);
+    F^type := F^tds.searchType(int^txt, true);
 end
 }
 
@@ -993,7 +993,7 @@ F -> caractere #type ;
 #type {
 local
 do
-    F^type := F^tds.searchType(char^txt, TDS.Scope.GLOBAL);
+    F^type := F^tds.searchType(char^txt, true);
 end
 }
 
@@ -1104,7 +1104,7 @@ F -> ident #type1 FX #type2 ;
 local
     v : VAR;
 do
-    v := F^tds.searchVar(ident^txt, TDS.Scope.GLOBAL);
+    v := F^tds.searchVar(ident^txt, true);
     if v = null then
     error(MCS_VUN, ident^txt);
     else
@@ -1148,7 +1148,7 @@ do
         error(MCS_NOT_STRUCT);
     else
         p := (STRUCT) FX^typeR;
-        c := p.searchVar(ident^txt, TDS.Scope.LOCAL);
+        c := p.searchVar(ident^txt, false);
         if c = null then
             error(MCS_UNKNOWN_FIELD);
         else

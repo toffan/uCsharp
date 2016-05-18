@@ -4,9 +4,6 @@ import java.util.HashMap;
 
 public class TDS {
 
-    ///   Types   ///
-    public enum Scope { LOCAL, GLOBAL }
-
     ///   Attributs   ///
     private Address nxtAddr;
     private TDS parent;
@@ -26,12 +23,12 @@ public class TDS {
     /**
      * Recherche une variable dans la TDS et la renvoie.
      * @param id identifiant a rechercher
-     * @param scope portee de la recherche
+     * @param go_global portee de la recherche, est-ce qu'elle est globale ?
      * @return variable trouvee ou null sinon
      */
-    public VAR searchVar(String id, Scope scope) {
+    public VAR searchVar(String id, boolean go_global) {
         VAR res = this.vars.get(id);
-        if (res == null && scope == Scope.GLOBAL && parent != null) {
+        if (res == null && go_global && parent != null) {
             return this.parent.searchVar(id, Scope.GLOBAL);
         } else {
             return res;
@@ -50,12 +47,12 @@ public class TDS {
     /**
      * Recherche un type dans la TDS et la renvoie.
      * @param id identifiant a rechercher
-     * @param scope portee de la recherche
+     * @param go_global portee de la recherche, est-ce qu'elle est globale ?
      * @return type trouve ou null sinon
      */
-    public TYPE searchType(String id, Scope scope) {
+    public TYPE searchType(String id, boolean go_global) {
         TYPE res = this.types.get(id);
-        if (res == null && scope == Scope.GLOBAL && parent != null) {
+        if (res == null && go_global && parent != null) {
             return this.parent.searchType(id, Scope.GLOBAL);
         } else {
             return res;
