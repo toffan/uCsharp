@@ -13,6 +13,7 @@ public class TamGenerator implements general.GeneratorItf{
 	private TamHelperMemory memoryHelper;
 	private TamHelperString stringHelper;
 	private TamHelperGeneral generalHelper;
+	private TamHelperFunction functionHelper;
 
 	/**
 	 * Utilisation du Generator : construction du generator avec le nom du fichier à générer.
@@ -38,6 +39,7 @@ public class TamGenerator implements general.GeneratorItf{
 		this.intHelper = new TamHelperInt();
 		this.memoryHelper = new TamHelperMemory();
 		this.stringHelper = new TamHelperString();
+		this.functionHelper = new TamHelperFunction();
 	}
 
 	public TamHelperBool getBoolHelper() {
@@ -63,4 +65,6 @@ public class TamGenerator implements general.GeneratorItf{
 	public TamHelperGeneral getGeneralHelper() {
 		return generalHelper;
 	}
+
+	public TamHelperFunction getFunctionHelper() { return functionHelper; }
 }
