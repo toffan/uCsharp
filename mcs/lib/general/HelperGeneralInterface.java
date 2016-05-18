@@ -1,16 +1,19 @@
 package general;
 
+import mcs.tds.VAR;
+
 /**
  * Interface pour les actions générales (actions sur les variables et les structures de controle principalement)
  * @author antoine
  */
 public interface HelperGeneralInterface {
-	
+
 	/**
 	 * Genere une declaration de variable
+	 *
 	 * @param n le nom de la variable
 	 */
-	public String generateDeclaration(String n, INFOVAR i, String t);
+	public String generateDeclaration(String n, VAR i, String t);
 
 	/**
 	 * Genere une etiquette au nom incremental
@@ -22,15 +25,17 @@ public interface HelperGeneralInterface {
 	 */
 	public String generateEnd();
 
-    /**
-     * Ecrit le code entier dans un fichier du nom donne au debut.
-     * @param code
-     */
+	/**
+	 * Ecrit le code entier dans un fichier du nom donne au debut.
+	 *
+	 * @param code
+	 */
 	public void generateFile(String code);
 
-    
+
 	/**
-	 * Genere une constante de nom v
+	 * Charge un entier de valeur v sur le sommet de pile
+	 *
 	 * @param v
 	 * @return
 	 */
@@ -38,6 +43,7 @@ public interface HelperGeneralInterface {
 
 	/**
 	 * Code pour generer une condition.
+	 *
 	 * @param code
 	 * @param code2
 	 * @param code3
@@ -46,10 +52,11 @@ public interface HelperGeneralInterface {
 	public String generateIf(String code, String code2, String code3);
 
 
-    /**
-     * code pour generer un commentaire
-     * @param c
-     * @return
-     */
+	/**
+	 * code pour generer un commentaire
+	 *
+	 * @param c
+	 * @return
+	 */
 	public String generateComment(String c);
 }
