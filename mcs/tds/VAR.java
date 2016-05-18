@@ -1,7 +1,5 @@
 package mcs.tds;
 
-import mcs.gc.Address;
-
 public class VAR {
 
     ///   Attributs   ///
@@ -13,4 +11,8 @@ public class VAR {
         this.type = type;
         this.addr = addr;
     }
+
+    ///   Methodes   ///
+    public TYPE type() { return this.type; }
+    public Address addr() { return this.addr; }
 }
