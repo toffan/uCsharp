@@ -195,7 +195,7 @@ do
             t := TYPE^type;
         else
             -- TODO calcul du type d'une fonction.
-            t := ...
+            t := null ; -- ...
         end
         -- Enregistrement effectif de la declaration.
         ENTITE^tds.putVar(ident^txt, t);
