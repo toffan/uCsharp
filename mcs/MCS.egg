@@ -33,7 +33,7 @@ inh tds_asm : TDS for ASM;
 -- Custom attributes.
 inh tds : TDS for
         PROGRAMME, ENTITES, ENTITE, DECL,
-        PARF, PARFS, PARFSX, BLOC,
+        FONCTION, PARF, PARFS, PARFSX, BLOC,
         INSTS, INST, TYPE, STYPE, PTRS,
         CHAMPS, CHAMP,
         E, A, AFFX, R, RX, AX, T, TX, F, FX, SIX,
@@ -1179,18 +1179,20 @@ FX -> arrow  ident #type1 FX #type2 ;
 #type1 {
 local
     p : PTR;
+    pt : TYPE;
     s : STRUCT;
     c : VAR;
 do
-    if !(FX^typeR instanceof PTR) then
+    if !(FX^typeR.isPointer()) then
         error(MCS_NOT_PTR);
     else
-        p := (PTR) FX^typeR;
-        if !(p.ptype() instanceof STRUCT) then
+        p := FX^typeR.toPTR();
+        pt := p.ptype();
+        if !(pt.isStruct()) then
             error(MCS_NOT_STRUCT);
         else
-            s := (STRUCT) p.ptype();
-            c := s.searchVar(ident^txt, TDS.Scope.LOCAL);
+            s := pt.toStruct();
+            c := s.searchVar(ident^txt, false);
             if c = null then
                 error(MCS_UNKNOWN_FIELD);
             else
@@ -1218,10 +1220,10 @@ FX -> #type1 paro ES parf #type2 FX #type3 ;
 -- Verification du type racine.
 #type1 {
 do
-    if !(FX^typeR instanceof FTYPE) then
+    if !(FX^typeR.isFType()) then
         error(MCS_NOT_FUNCTION);
     else
-        ES^typeF := (FTYPE) FX^typeR;
+        ES^typeF := FX^typeR.toFType();
     end
 end
 }

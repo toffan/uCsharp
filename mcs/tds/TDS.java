@@ -29,7 +29,7 @@ public class TDS {
     public VAR searchVar(String id, boolean go_global) {
         VAR res = this.vars.get(id);
         if (res == null && go_global && parent != null) {
-            return this.parent.searchVar(id, Scope.GLOBAL);
+            return this.parent.searchVar(id, go_global);
         } else {
             return res;
         }
@@ -53,7 +53,7 @@ public class TDS {
     public TYPE searchType(String id, boolean go_global) {
         TYPE res = this.types.get(id);
         if (res == null && go_global && parent != null) {
-            return this.parent.searchType(id, Scope.GLOBAL);
+            return this.parent.searchType(id, go_global);
         } else {
             return res;
         }
