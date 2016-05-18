@@ -126,6 +126,9 @@ global
 -- Transmission de la machine cible (choisie par l'option -m au lancement)
 #init {
 local
+    void_t : TYPE;
+    char_t : TYPE;
+    int_t : TYPE;
 do
     machine := PROGRAMME^source.getMachine();
     if machine = null then
@@ -134,8 +137,16 @@ do
         ENTITES^machine := machine;
     end
 
+    void_t := new Type("void", 0);
+    char_t := new Type("char", 1)
+    int_t := new Type("int", 1);
+
     ENTITES^tds := new TDS();
-    -- TODO: Ajouter a la TDS les types natifs, et les const char.
+    ENTITES^tds.putType(void_t);
+    ENTITES^tds.putType(char_t);
+    ENTITES^tds.putType(int_t);
+
+    -- TODO: Ajouter a la TDS les const char.
 end
 }
 
@@ -172,7 +183,7 @@ do
         error(MCS_TAE, identc^txt);
     else
         -- Enregistrement effectif du type.
-        ENTITE^tds.putType(identc^txt, TYPE^type);
+        ENTITE^tds.putType(TYPE^type);
     end
 end
 }
