@@ -36,18 +36,22 @@ inh tds : TDS for
         PARF, PARFS, PARFSX, BLOC,
         INSTS, INST, TYPE, STYPE, PTRS,
         CHAMPS, CHAMP,
-        E, A, AFFX, R, RX, AX, T, TX, F, FX, SIX;
+        E, A, AFFX, R, RX, AX, T, TX, F, FX, SIX,
+        ES, ESX ;
 
 syn type : TYPE for
         TYPE, FONCTION, PARF, PARFS, PARFSX, DECL,
         BLOC, INSTS, INST, E, STYPE, PTRS, CHAMPS,
-		A, AFFX, R, AX, T, TX, F, FX, SIX, RX;
+		A, AFFX, R, AX, T, TX, F, FX, SIX, RX,
+        ES, ESX ;
 
 inh typePT : TYPE for PTRS;
 
 inh typeCHP : TYPE for CHAMPS, CHAMP;
 
 inh typeR : TYPE for FX;
+inh typeF : FTYPE for ES, ESX;
+inh numParam : Integer for ESX;
 
 -- Terminaux
 space separateur is    "[\r\n\t ]+";
@@ -1209,27 +1213,104 @@ end
 --
 --
 -- Appel de sous-programme
-FX -> paro ES parf FX;
+FX -> #type1 paro ES parf #type2 FX #type3 ;
+
+-- Verification du type racine.
+#type1 {
+do
+    if !(FX^typeR instanceof FTYPE) then
+        error(MCS_NOT_FUNCTION);
+    else
+        ES^typeF := (FTYPE) FX^typeR;
+    end
+end
+}
+
+-- Transmission du type de la fonction.
+#type2 {
+do
+    FX^typeR := ES^type;
+end
+}
+
+-- Recuperation du type.
+#type3 {
+do
+    FX^type := FX1^type;
+end
+}
 
 --
 --
--- Arguments appel de sous-programme
-ES -> ;
+-- Appel de sous-programme sans arguments.
+ES -> #type ;
+
+-- Fonction sans parametres, aucune verification necessaire.
+#type {
+do
+    ES^type := ES^typeF;
+end
+}
 
 --
 --
--- TODO: Ajouter un commentaire.
-ES -> E ESX  ;
+-- Appel de sous-programme avec arguments.
+ES -> E #type1 ESX #type2 ;
+
+-- Verification du type du parametre.
+#type1 {
+do
+    if E^type /= ES^typeF.getParam(0) then
+        error(MCS_BAD_ARGUMENT);
+    else
+        ESX^typeF := ES^typeF;
+        ESX^numParam := 1;
+    end
+end
+}
+
+-- Recuperation du type.
+#type2 {
+do
+    ES^type := ESX^type;
+end
+}
 
 --
 --
--- TODO: Ajouter un commentaire.
-ESX -> ;
+-- Appel de sous-programme avec arguments : fin de liste.
+ESX -> #type ;
+
+-- Fin de liste d'arguments, transmission du type.
+#type {
+do
+    ESX^type := ESX^typeF;
+end
+}
 
 --
 --
--- TODO: Ajouter un commentaire.
-ESX -> virg E ESX ;
+-- Appel de sous-programme avec arguments : suite.
+ESX -> virg E #type1 ESX #type2 ;
+
+-- Verification du type du parametre.
+#type1 {
+do
+    if E^type /= ESX^typeF.getParam(ESX^numParam) then
+        error(MCS_BAD_ARGUMENT);
+    else
+        ESX1^typeF := ESX^typeF;
+        ESX1^numParam := ESX^numParam + 1;
+    end
+end
+}
+
+-- Recuperation du type.
+#type2 {
+do
+    ESX^type := ESX1^type;
+end
+}
 
 --
 --
