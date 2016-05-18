@@ -1169,7 +1169,42 @@ end
 --
 --
 -- Acces champ pointeur.
-FX -> arrow  ident FX ;
+FX -> arrow  ident #type1 FX #type2 ;
+
+-- Verification du type racine.
+#type1 {
+local
+    p : PTR;
+    s : STRUCT;
+    c : VAR;
+do
+    if !(FX^typeR instanceof PTR) then
+        error(MCS_NOT_PTR);
+    else
+        p := (PTR) FX^typeR;
+        if !(p.ptype() instanceof STRUCT) then
+            error(MCS_NOT_STRUCT);
+        else
+            s := (STRUCT) p.ptype();
+            c := s.searchVar(ident^txt, TDS.Scope.LOCAL);
+            if c = null then
+                error(MCS_UNKNOWN_FIELD);
+            else
+                FX1^typeR := c.type();
+            end
+        end
+    end
+end
+}
+
+-- Recuperation du type
+#type2 {
+local
+do
+    FX^type := FX1^type;
+end
+}
+
 
 --
 --
