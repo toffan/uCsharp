@@ -34,14 +34,14 @@ inh tds_asm : TDS for ASM;
 inh tds : TDS for
         PROGRAMME, ENTITES, ENTITE, DECL,
         PARF, PARFS, PARFSX, BLOC,
-        INSTS, INST, STYPE, PTRS,
+        INSTS, INST, TYPE, STYPE, PTRS,
         CHAMPS, CHAMP,
-        A, AFFX, R, AX, T, TX, F, FX;
+        E, A, AFFX, R, RX, AX, T, TX, F, FX, SIX;
 
 syn type : TYPE for
         TYPE, FONCTION, PARF, PARFS, PARFSX, DECL,
         BLOC, INSTS, INST, E, STYPE, PTRS, CHAMPS,
-		A, AFFX, R, AX, T, TX, F, FX;
+		A, AFFX, R, AX, T, TX, F, FX, SIX, RX;
 
 inh typePT : TYPE for PTRS;
 
@@ -129,7 +129,7 @@ do
         ENTITES^machine := machine;
     end
 
-    PROGRAMME^tds := new TDS();
+    ENTITES^tds := new TDS();
     -- TODO: Ajouter a la TDS les types natifs, et les const char.
 end
 }
@@ -225,7 +225,7 @@ end
 --
 --
 -- Fonction.
-DECL -> #type FONCTION ;
+DECL -> FONCTION #type ;
 
 -- Definition du champ type.
 #type {
@@ -276,7 +276,7 @@ PARFS -> #type ;
 #type {
 local
 do
-    PARFSX^type := null;
+    PARFS^type := null;
 end
 }
 
@@ -289,8 +289,8 @@ PARFS -> PARF PARFSX #type ;
 #type {
 local
 do
-    PARFSX1^type.put(PARF^type);
-    PARFSX^type := PARFSX1^type;
+    PARFSX^type.put(PARF^type);
+    PARFS^type := PARFSX^type;
 end
 }
 
@@ -427,7 +427,7 @@ STYPE-> void #type ;
 #type {
 local
 do
-    STYPE^type := STYPE^tds.searchType(void^txt, true);
+    STYPE^type := STYPE^tds.searchType("void", true);
 end
 }
 
@@ -440,7 +440,7 @@ STYPE-> int #type ;
 #type {
 local
 do
-    STYPE^type := STYPE^tds.searchType(int^txt, true);
+    STYPE^type := STYPE^tds.searchType("int", true);
 end
 }
 
@@ -453,7 +453,7 @@ STYPE-> char #type ;
 #type {
 local
 do
-    STYPE^type := STYPE^tds.searchType(char^txt, true);
+    STYPE^type := STYPE^tds.searchType("char", true);
 end
 }
 
@@ -760,7 +760,7 @@ end
 --
 --
 -- Affectation
-AFFX -> affectA #type ;
+AFFX -> affect A #type ;
 
 -- Verification du type des affectations (suite).
 #type {
@@ -797,11 +797,11 @@ do
             error(MCS_BAD_TYPE_3);
         else
             -- Condition : type int ou bool selon la version.
-            A^type := A^tds.searchType(int^txt);
+            A^type := A^tds.searchType("int", true);
         end
     else
 	    -- Condition : type int ou bool selon la version.
-	    A^type := A^tds.searchType(int^txt, true);
+	    A^type := A^tds.searchType("int", true);
     end
 end
 }
@@ -966,7 +966,7 @@ F -> entier #type ;
 #type {
 local
 do
-    F^type := F^tds.searchType(int^txt, true);
+    F^type := F^tds.searchType("int", true);
 end
 }
 
@@ -980,7 +980,7 @@ F -> chaine #type ;
 local
 do
     -- TODO: Ne pas dupliquer le type pointeur-sur-char (char*).
-    F^type := new PTR(F^tds.searchType(char^txt));
+    F^type := new PTR(F^tds.searchType("char", true));
 end
 }
 
@@ -993,7 +993,7 @@ F -> caractere #type ;
 #type {
 local
 do
-    F^type := F^tds.searchType(char^txt, true);
+    F^type := F^tds.searchType("char", true);
 end
 }
 
