@@ -75,4 +75,18 @@ public interface HelperMemoryInterface {
 	 * @return
 	 */
 	public String generateAdrField(int dep);
+
+
+	/**
+	 * code pour réserver de la mémoire dans la pile (push)
+	 * @param size la taille à réserver
+	 */
+	public String generateReserve(int size);
+
+	/**
+	 * code pour liberer de la mémoire sur la pile
+	 * @param size la taille à liberer
+	 * @return
+     */
+	public String generateFree(int size);
 }

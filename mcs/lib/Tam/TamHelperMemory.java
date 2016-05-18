@@ -68,6 +68,16 @@ public class TamHelperMemory implements HelperMemoryInterface{
 		// TODO Auto-generated method stub
 		return null;
 	}
-	
-	
+
+	@Override
+	public String generateReserve(int size){
+		return "; reservation de "+size+" mots sur la pile\n"+
+				"\tPUSH "+size+"\n";
+	}
+
+	@Override
+	public String generateFree(int size){
+		return "; liberation de "+size+" mots sur la pile\n"+
+				"\tPOP "+size+"\n";
+	}
 }
