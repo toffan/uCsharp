@@ -62,5 +62,5 @@ public class TDS {
     /**
      * Ajoute ou mets a jour un type
      */
-    public void putType(String id, TYPE type) { this.types.put(id, type); }
+    public void putType(TYPE type) { this.types.put(type.name(), type); }
 }
