@@ -40,16 +40,17 @@ inh tds : TDS for
         ES, ESX ;
 
 syn type : TYPE for
-        TYPE, FONCTION, PARF, PARFS, PARFSX, DECL,
+        TYPE, FONCTION, PARF, DECL,
         BLOC, INSTS, INST, E, STYPE, PTRS, CHAMPS,
 		A, AFFX, R, AX, T, TX, F, FX, SIX, RX,
         ES, ESX ;
 
-inh typePT : TYPE for PTRS;
+syn typeFP : FTYPE for PARFS, PARFSX ;
 
-inh typeCHP : TYPE for CHAMPS, CHAMP;
+inh typeCHP : STRUCT for CHAMPS, CHAMP;
 
-inh typeR : TYPE for FX;
+inh typeR : TYPE for PTRS, FX;
+
 inh typeF : FTYPE for ES, ESX;
 inh numParam : Integer for ESX;
 
@@ -267,7 +268,7 @@ end
 #type {
 local
 do
-    FONCTION^type := PARFS^type;
+    FONCTION^type := PARFS^typeFP;
 end
 }
 
@@ -280,7 +281,7 @@ PARFS -> #type ;
 #type {
 local
 do
-    PARFS^type := null;
+    PARFS^typeFP := null;
 end
 }
 
@@ -293,8 +294,8 @@ PARFS -> PARF PARFSX #type ;
 #type {
 local
 do
-    PARFSX^type.put(PARF^type);
-    PARFS^type := PARFSX^type;
+    PARFSX^typeFP.putParam(PARF^type);
+    PARFS^typeFP := PARFSX^typeFP;
 end
 }
 
@@ -307,7 +308,7 @@ PARFSX -> #type ;
 #type {
 local
 do
-    PARFSX^type := null;
+    PARFSX^typeFP := null;
 end
 }
 
@@ -320,8 +321,8 @@ PARFSX -> virg PARF PARFSX #type ;
 #type {
 local
 do
-    PARFSX1^type.put(PARF^type);
-    PARFSX^type := PARFSX1^type;
+    PARFSX1^typeFP.putParam(PARF^type);
+    PARFSX^typeFP := PARFSX1^typeFP;
 end
 }
 
@@ -369,7 +370,7 @@ TYPE -> STYPE #type1 PTRS #type2 ;
 #type1 {
 local
 do
-    PTRS^typePT := STYPE^type;
+    PTRS^typeR := STYPE^type;
 end
 }
 
@@ -390,7 +391,7 @@ PTRS -> #type ;
 #type {
 local
 do
-    PTRS^type := PTRS^typePT;
+    PTRS^type := PTRS^typeR;
 end
 }
 
@@ -403,7 +404,7 @@ PTRS -> mult PTRS #type ;
 #type {
 local
     t : PTR;
-    o : PTR;
+    o : TYPE;
 do
     -- Instanciation d'un type pointeur.
     t := new PTR(PTRS1^type);
@@ -548,7 +549,7 @@ local
 do
     -- Verifier qu'aucune fonction/variable du meme nom n'est pas deja definie
     -- localement dans la struct.
-    v := CHAMP^typeCHP.searchVar(ident^txt, false);
+    v := CHAMP^typeCHP.searchVar(ident^txt);
     if v /= null then
         error(MCS_DAE, ident^txt);
     else
@@ -1057,15 +1058,6 @@ do
 end
 }
 
--- TODO: Verifier si cette regle est utilisee.
-FX -> #type ;
-#type {
-local
-do
-    FX^type := FX^typeR;
-end
-}
-
 --
 --
 -- Cast explicite.
@@ -1092,7 +1084,7 @@ do
     if !(F1^type.isPointer()) then
         error(MCS_NOT_PTR);
     else
-        p := F1^type.toPTR();
+        p := F1^type.toPointer();
         F^type := p.ptype();
     end
 end
@@ -1112,7 +1104,7 @@ do
     if v = null then
         error(MCS_VUN, ident^txt);
     else
-        FX^typeR := v.getType();
+        FX^typeR := v.type();
     end
 end
 }
@@ -1152,7 +1144,7 @@ do
         error(MCS_NOT_STRUCT);
     else
         p := FX^typeR.toStruct();
-        c := p.searchVar(ident^txt, false);
+        c := p.searchVar(ident^txt);
         if c = null then
             error(MCS_UNKNOWN_FIELD);
         else
@@ -1186,13 +1178,13 @@ do
     if !(FX^typeR.isPointer()) then
         error(MCS_NOT_PTR);
     else
-        p := FX^typeR.toPTR();
+        p := FX^typeR.toPointer();
         pt := p.ptype();
         if !(pt.isStruct()) then
             error(MCS_NOT_STRUCT);
         else
             s := pt.toStruct();
-            c := s.searchVar(ident^txt, false);
+            c := s.searchVar(ident^txt);
             if c = null then
                 error(MCS_UNKNOWN_FIELD);
             else
@@ -1231,7 +1223,7 @@ end
 -- Transmission du type de la fonction.
 #type2 {
 do
-    FX^typeR := ES^type;
+    FX1^typeR := ES^type;
 end
 }
 
@@ -1344,7 +1336,7 @@ end
 --
 --
 -- On peut avoir en instruction de l'assembleur.
-INST -> asm #tds ASM #gen ;
+INST -> asm #tds ASM #gen #type ;
 
 -- Utilisation de la tds au sein de l'asm.
 #tds {
@@ -1361,6 +1353,14 @@ do
     -- ASM^code_asm contient le code assembleur inline
     -- dans lequel les noms de variables ont ete remplaces
     -- par leurs adresses.
+end
+}
+
+-- Evaluation du type de l'instruction
+#type {
+do
+    -- TODO: Verifier la validite de null pour une instruction ASM.
+    INST^type := null;
 end
 }
 

@@ -14,32 +14,32 @@ public class TYPE {
     }
 
     ///   Proxy InstanceOf   ///
-    boolean isStruct()
+    public boolean isStruct()
     {
         return (this instanceof STRUCT);
     }
 
-    boolean isPointer()
+    public boolean isPointer()
     {
         return (this instanceof PTR);
     }
 
-    boolean isFType()
+    public boolean isFType()
     {
         return (this instanceof FTYPE);
     }
 
-    STRUCT toStruct()
+    public STRUCT toStruct()
     {
         return (STRUCT) this;
     }
 
-    PTR toPointer()
+    public PTR toPointer()
     {
         return (PTR) this;
     }
 
-    FTYPE toFType()
+    public FTYPE toFType()
     {
         return (FTYPE) this;
     }
