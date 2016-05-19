@@ -140,16 +140,12 @@ do
         ENTITES^machine := machine;
     end
 
-    void_t := new Type("void", 0);
-    char_t := new Type("char", 1)
-    int_t := new Type("int", 1);
-
     ENTITES^tds := new TDS();
-    ENTITES^tds.putType(void_t);
-    ENTITES^tds.putType(char_t);
-    ENTITES^tds.putType(int_t);
-
-    -- TODO: Ajouter a la TDS les const char.
+    -- Ajouter a la TDS les types natifs.
+    -- TODO: Ajouter a la TDS les const char*.
+    ENTITES^tds.putType("void", new TYPE("void", 0));
+    ENTITES^tds.putType("int", new TYPE("int", 4));
+    ENTITES^tds.putType("char", new TYPE("char", 1));
 end
 }
 
