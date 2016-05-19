@@ -13,7 +13,7 @@
   >
     <import    lib="mcs.compiler.*"/>
     <import    lib="mcs.tds.*"/>
-    <import    lib="mcs.type.*"/>
+    <!--<import    lib="mcs.type.*"/>-->
     <import    lib="mcs.gc.*"/>
     <import    lib="java.util.*"/>
   </egg>

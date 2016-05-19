@@ -3,7 +3,7 @@ option k = 2;
 option auto = true;
 -- attributs
 syn code_asm :STRING  for TAM, INST, CINST, ADR, INSTS, CSTE;
-inh tds_asm : TDS for TAM, INST, INSTS, ADR, CSTE;
+inh tds_asm : ASMTDS for TAM, INST, INSTS, ADR, CSTE;
 
 space  separ  is "[\t ]+";
 sugar  dpts   is "\:";
@@ -77,7 +77,7 @@ local
 do
 -- remplace var^txt par l'emplacement de la variable
   if ADR^tds_asm = null then
-    -- write "pas de TDS\n"
+    -- write "pas de ASMTDS\n"
   else
     i := ADR^tds_asm.chercherGlobalement(var^txt.substring(1));
     if i /= nil then
