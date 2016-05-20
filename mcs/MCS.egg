@@ -42,7 +42,7 @@ inh tds : TDS for
 syn type : TYPE for
         TYPE, FONCTION, PARF, DECL,
         BLOC, INSTS, INST, E, STYPE, PTRS, CHAMPS,
-		A, AFFX, R, AX, T, TX, F, FX, SIX, RX,
+        A, AFFX, R, AX, T, TX, F, FX, SIX, RX,
         ES, ESX ;
 
 syn typeFP : FTYPE for PARFS, PARFSX ;
@@ -723,16 +723,16 @@ do
     else
         if BLOC^type /= null then
             if SIX^type /= null then
-	            if BLOC^type /= SIX^type then
-	                -- Les deux bloc renvoient des types differents, erreur.
-	                error(MCS_BAD_TYPE);
-	            else
-	                -- Les deux blocs existent et renvoient le meme type.
-	                INST^type := BLOC^type;
-	            end
+                if BLOC^type /= SIX^type then
+                    -- Les deux bloc renvoient des types differents, erreur.
+                    error(MCS_BAD_TYPE);
+                else
+                    -- Les deux blocs existent et renvoient le meme type.
+                    INST^type := BLOC^type;
+                end
             else
-	            -- Pas de deuxieme bloc, ou un bloc d'effets de bord.
-	            INST^type := BLOC^type;
+                -- Pas de deuxieme bloc, ou un bloc d'effets de bord.
+                INST^type := BLOC^type;
             end
         else
             -- Le premier bloc ne contient que des effets de bord.
@@ -856,8 +856,8 @@ do
             A^type := A^tds.searchType("int", true);
         end
     else
-	    -- Condition : type int ou bool selon la version.
-	    A^type := A^tds.searchType("int", true);
+        -- Condition : type int ou bool selon la version.
+        A^type := A^tds.searchType("int", true);
     end
 end
 }
