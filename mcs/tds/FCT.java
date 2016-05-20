@@ -21,7 +21,7 @@ public class FCT extends VAR {
     public String getParam(int i) { return this.params.get(i); }
     public boolean contains(String id) {
         boolean res = false;
-        for (p : params) {
+        for (String p : params) {
             res = id.equals(p);
             if(res) break;
         }
@@ -31,7 +31,7 @@ public class FCT extends VAR {
     public TDS tds() { return this.tds; }
     public FTYPE type() {
         // Si le cast echoue, c'est du a une erreur de conception.
-        return (FTYPE) this.type;
+        return (FTYPE) super.type();
     }
 }
 
