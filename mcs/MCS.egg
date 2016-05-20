@@ -181,7 +181,7 @@ do
         error(MCS_TAE, identc^txt);
     else
         -- Enregistrement effectif du type.
-        ENTITE^tds.putType(TYPE^type);
+        ENTITE^tds.putType(identc^txt, TYPE^type);
     end
 end
 }

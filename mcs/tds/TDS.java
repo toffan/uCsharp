@@ -71,5 +71,9 @@ public class TDS {
     /**
      * Ajoute ou mets a jour un type
      */
-    public void putType(TYPE type) { this.types.put(type.name(), type); }
+    public void putType(String id, TYPE type) {
+        // Si le type est anonyme (struct par exemple), on le nomme d'apres son id.
+        if (type.name().isEmpty()) type.setName(id);
+        this.types.put(id, type);
+    }
 }
