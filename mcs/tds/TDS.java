@@ -47,8 +47,9 @@ public class TDS {
     /**
      * Ajout ou mets à jour une fonction
      */
-    public void putFct(String id, FTYPE ftype) {
-        FCT fct = new FCT(ftype);
+    public void putVar(String id, FCT fct) {
+        fct.setAddr(this.nxtAddr);
+        this.nxtAddr = this.nxtAddr.next(fct.type().size());
         this.vars.put(id, fct);
     }
 
