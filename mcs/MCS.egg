@@ -45,11 +45,11 @@ syn type : TYPE for
         A, AFFX, R, AX, T, TX, F, FX, SIX, RX,
         ES, ESX ;
 
+-- Typage d'un enregistrement.
 inh typeCHP : STRUCT for CHAMPS, CHAMP;
 
--- TODO: Reunir ces deux attributs en un seul typeLeft.
-inh typeR : TYPE for PTRS, FX;
-inh typeLeft : TYPE for DECL;
+-- Type a gauche d'une declaration.
+inh typeLeft : TYPE for DECL, PTRS, FX;
 
 -- Typage appel de sous-programme.
 inh typeF : FTYPE for ES, ESX ;
@@ -356,7 +356,7 @@ TYPE -> STYPE #type1 PTRS #type2 ;
 #type1 {
 local
 do
-    PTRS^typeR := STYPE^type;
+    PTRS^typeLeft := STYPE^type;
 end
 }
 
@@ -377,7 +377,7 @@ PTRS -> #type ;
 #type {
 local
 do
-    PTRS^type := PTRS^typeR;
+    PTRS^type := PTRS^typeLeft;
 end
 }
 
@@ -1032,7 +1032,7 @@ F -> paro E parf #type1 FX #type2 ;
 #type1 {
 local
 do
-    FX^typeR := E^type;
+    FX^typeLeft := E^type;
 end
 }
 
@@ -1090,7 +1090,7 @@ do
     if v = null then
         error(MCS_VUN, ident^txt);
     else
-        FX^typeR := v.type();
+        FX^typeLeft := v.type();
     end
 end
 }
@@ -1111,7 +1111,7 @@ FX -> #type ;
 #type {
 local
 do
-    FX^type := FX^typeR;
+    FX^type := FX^typeLeft;
 end
 }
 
@@ -1126,15 +1126,15 @@ local
     p : STRUCT;
     c : VAR;
 do
-    if !(FX^typeR.isStruct()) then
+    if !(FX^typeLeft.isStruct()) then
         error(MCS_NOT_STRUCT);
     else
-        p := FX^typeR.toStruct();
+        p := FX^typeLeft.toStruct();
         c := p.searchVar(ident^txt);
         if c = null then
             error(MCS_UNKNOWN_FIELD);
         else
-            FX1^typeR := c.type();
+            FX1^typeLeft := c.type();
         end
     end
 end
@@ -1161,10 +1161,10 @@ local
     s : STRUCT;
     c : VAR;
 do
-    if !(FX^typeR.isPointer()) then
+    if !(FX^typeLeft.isPointer()) then
         error(MCS_NOT_PTR);
     else
-        p := FX^typeR.toPointer();
+        p := FX^typeLeft.toPointer();
         pt := p.ptype();
         if !(pt.isStruct()) then
             error(MCS_NOT_STRUCT);
@@ -1174,7 +1174,7 @@ do
             if c = null then
                 error(MCS_UNKNOWN_FIELD);
             else
-                FX1^typeR := c.type();
+                FX1^typeLeft := c.type();
             end
         end
     end
@@ -1198,10 +1198,10 @@ FX -> #type1 paro ES parf #type2 FX #type3 ;
 -- Verification du type racine.
 #type1 {
 do
-    if !(FX^typeR.isFType()) then
+    if !(FX^typeLeft.isFType()) then
         error(MCS_NOT_FUNCTION);
     else
-        ES^typeF := FX^typeR.toFType();
+        ES^typeF := FX^typeLeft.toFType();
     end
 end
 }
@@ -1209,7 +1209,7 @@ end
 -- Transmission du type de la fonction.
 #type2 {
 do
-    FX1^typeR := ES^type;
+    FX1^typeLeft := ES^type;
 end
 }
 
