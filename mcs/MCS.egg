@@ -320,16 +320,11 @@ PARFS -> #type1 PARF PARFSX #type2 ;
 #type1 {
 local
 do
-<<<<<<< HEAD
-    PARFSX^typeFP.putParam(PARF^type);
-    PARFS^typeFP := PARFSX^typeFP;
-=======
     PARFSX^fct := PARFS^fct;
     PARF^fct := PARFS^fct;
 
     PARFSX^type.putType(PARF^type);
     PARFS^type := PARFSX^type;
->>>>>>> 21f62c3... Non fini, commence le typage des fonctions
 end
 }
 
@@ -342,11 +337,7 @@ PARFSX -> #type ;
 #type {
 local
 do
-<<<<<<< HEAD
-    PARFSX^typeFP := null;
-=======
     -- TODO: nothing to do
->>>>>>> 21f62c3... Non fini, commence le typage des fonctions
 end
 }
 
@@ -359,13 +350,8 @@ PARFSX -> virg #type1 PARF PARFSX #type2 ;
 #type1 {
 local
 do
-<<<<<<< HEAD
-    PARFSX1^typeFP.putParam(PARF^type);
-    PARFSX^typeFP := PARFSX1^typeFP;
-=======
     PARF^fct := PARFSX^fct;
     PARFSX1^fct := PARFSX^fct;
->>>>>>> 21f62c3... Non fini, commence le typage des fonctions
 end
 }
 
