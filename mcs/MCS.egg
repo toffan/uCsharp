@@ -40,22 +40,25 @@ inh tds : TDS for
         ES, ESX ;
 
 syn type : TYPE for
-        TYPE, FONCTION, PARF, DECL,
+        TYPE,
         BLOC, INSTS, INST, E, STYPE, PTRS, CHAMPS,
         A, AFFX, R, AX, T, TX, F, FX, SIX, RX,
         ES, ESX ;
 
-syn typeFP : FTYPE for PARFS, PARFSX ;
-
 inh typeCHP : STRUCT for CHAMPS, CHAMP;
 
+-- TODO: Reunir ces deux attributs en un seul typeLeft.
 inh typeR : TYPE for PTRS, FX;
+inh typeLeft : TYPE for DECL;
 
-inh typeF : FTYPE for ES, ESX;
+-- Typage appel de sous-programme.
+inh typeF : FTYPE for ES, ESX ;
 inh numParam : Integer for ESX;
 
-inh typeLeft : TYPE for DECL;
-inh typeFct : TYPE for FONCTION;
+-- Typage declaration de fonction.
+syn varF : FCT for DECL ;
+inh fct : FCT for FONCTION, PARFS, PARFSX, PARF ;
+
 
 -- Terminaux
 space separateur is    "[\r\n\t ]+";
@@ -187,13 +190,12 @@ end
 --
 -- Definition d'une variable globale ou d'une fonction.
 -- (Commence par une minuscule)
-ENTITE -> TYPE ident DECL #record ;
+ENTITE -> TYPE ident #prerecord DECL #record ;
 
--- Enregistrement de la declaration dans la table des symboles.
-#record {
+-- Verification de la non existence de l'ident dans la tds locale.
+#prerecord {
 local
     v : VAR ;
-    t : TYPE ;
 do
     -- Verifier qu'aucune fonction/variable du meme nom n'est pas deja definie
     -- localement.
@@ -201,16 +203,27 @@ do
     if v /= null then
         error(MCS_DAE, ident^txt);
     else
-        DECL^typeRet = TYPE^type;
-        -- Calcul du type de la variable/fonction.
-        if DECL^type = null then
-            t := TYPE^type;
-        else
-            -- TODO calcul du type d'une fonction.
-            t := null ; -- ...
-        end
-        -- Enregistrement effectif de la declaration.
-        ENTITE^tds.putVar(ident^txt, t);
+        -- Propagation du type declare.
+        DECL^typeLeft := TYPE^type;
+    end
+end
+}
+
+-- Enregistrement de la declaration dans la table des symboles.
+#record {
+local
+    t : TYPE;
+do
+    -- Calcul du type de la variable/fonction.
+    if DECL^varF = null then
+        -- Enregistrement effectif de la variable dans la tds.
+        ENTITE^tds.putVar(ident^txt, TYPE^type);
+    else
+        t := DECL^varF.type();
+        -- Enregistrement du type de la fonction dans la table des types.
+        ENTITE^tds.putType(t.name(), t);
+        -- Enregistrement effectif de la fonction dans la tds.
+        ENTITE^tds.putVar(ident^txt, DECL^varF);
     end
 end
 }
@@ -223,35 +236,35 @@ end
 
 --
 --
--- Fin de la declaration, declaration vide.
+-- Fin de la declaration (variable).
 DECL -> #type pv ;
 
--- Pas de type.
+-- Pas de fonction sous-jacente.
+#type {
+do
+    DECL^varF := null;
+end
+}
+
+--
+--
+-- Fin de la declaration (fonction).
+DECL -> #type FONCTION ;
+
+-- Creation du type de la fonction et de la VAR correspondante.
 #type {
 local
+    f : FCT;
+    t : FTYPE;
 do
-    DECL^type := null;
-end
-}
-
---
---
--- Fonction.
-DECL -> #type1 FONCTION #type2 ;
-
--- Definition du champ type.
-#type1 {
-local
-do
-    FONCTION^typeFtc := new FTYPE(FONCTION^typeLeft);
-    FONCTION^fct := new FCT(FONCTION^typeFct);
-end
-}
-
-#type2 {
-local
-do
-    DECL^type := FONCTION^type;
+    -- Creation du type a partir du type de retour de la fonction.
+    t := new FTYPE(DECL^typeLeft);
+    -- Creation de la VAR representant la fonction.
+    f := new FCT(t, DECL^tds);
+    -- Propagation de la VAR a DECL pour enregistrement dans la TDS (de la VAR ET du type associe).
+    DECL^varF := f;
+    -- Transmission de la VAR a FONCTION pour reellement generer la fonction et son type
+    FONCTION^fct := f;
 end
 }
 
@@ -264,122 +277,66 @@ end
 --
 --
 -- Debut de la premiere ligne d'une fonction.
-FONCTION -> #type1 paro PARFS parf #type2 BLOC ;
+FONCTION -> paro PARFS parf #type BLOC ;
 
--- Creation de la TDS interne a la fonction.
-#type1 {
-local
-    -- tdsFunction : TDS;
-do
-    PARFS^typeFct := FONCTION^typeFct;
-    -- ty
-    -- FONCTION^tds.putFct(
-    -- tdsFunction := new TDS(FONCTION^tds);
-
-    -- -- L'evaluation de PARFS va completer la TDS de la fonction.
-    -- PARFS^tds := tdsFunction;
-    -- BLOC^tds := tdsFunction;
-end
-}
-
--- Ajout du type de la fonction.
-#type2 {
-local
-do
-    -- FONCTION^type := PARFS^typeFP;
-end
-}
-
---
---
--- Pas de parametre a la fonction.
-PARFS -> #type ;
-
--- Pas de type pour pas de parametre.
+-- Transmission de la TDS interne de la fonction au corps de fonction.
 #type {
 local
 do
-    PARFS^typeFP := null;
+    BLOC^tds := FONCTION^fct.tds();
 end
 }
 
 --
 --
--- Un parametre de plus a la fonction.
-PARFS -> #type1 PARF PARFSX #type2 ;
+-- Fonction sans aucun parametres.
+PARFS -> ;
 
--- Ajout du parametre courant au type.
-#type1 {
-local
-do
-    PARFSX^fct := PARFS^fct;
-    PARF^fct := PARFS^fct;
-
-    PARFSX^type.putType(PARF^type);
-    PARFS^type := PARFSX^type;
-end
-}
+--
+--
+-- Premier parametre la fonction.
+PARFS -> PARF PARFSX ;
+-- Transmission implicite de PARFS^fct.
 
 --
 --
 -- Fin de la liste de parametres.
-PARFSX -> #type ;
-
--- Pas de type.
-#type {
-local
-do
-    -- TODO: nothing to do
-end
-}
+PARFSX -> ;
 
 --
 --
--- Un element supplementaire a la liste des parametres (avec virgule).
-PARFSX -> virg #type1 PARF PARFSX #type2 ;
-
--- Ajout du parametre courant au type.
-#type1 {
-local
-do
-    PARF^fct := PARFSX^fct;
-    PARFSX1^fct := PARFSX^fct;
-end
-}
-
-#type2 { -- TODO
-}
+-- Fonction : parametre supplémentaire.
+PARFSX -> virg PARF PARFSX ;
+-- Transmission implicite de PARFSX^fct.
 
 --
 --
--- Decomposition d'un parametre de fonction.
+-- Evaluation d'un parametre de fonction (typage et enregistrement).
 PARF -> TYPE ident #type #record ;
 
--- Definition du type du parametre de la fonction.
+-- Enregistrement du type du parametre de la fonction.
 #type {
 local
-    f : FCT;
-    tf : FTYPE;
+    t : FTYPE;
 do
-    f := PARF^fct;
-    tf := f.type();
-    f.putParam(ident^txt);
-    tf.putParam(TYPE^type);
+    t := PARF^fct.type();
+    -- Ajout du type du parametre dans le type de la fonction.
+    t.putParam(TYPE^type);
 end
 }
-
-Enregistrement du parametre dans la table des symboles de la fonction.
-#record { -- TODO
+ 
+-- Enregistrement du parametre dans la liste de parametres de la fonction.
+#record {
 local
-    v : VAR ;
+    f : FCT;
 do
-    -- Verifier qu'aucun parametre du meme nom n'est pas deja defini localement.
-    v := PARF^tds.searchVar(ident^txt, false);
-    if v /= null then
+    f := PARF^fct;
+    -- Verifier qu'aucun parametre du meme nom n'est pas deja defini.
+    if f.contains(ident^txt) then
         error(MCS_PAE, ident^txt);
     else
-        -- Enregistrement effectif du parametre.
-        PARF^tds.putVar(ident^txt, TYPE^type);
+        -- Ajout du parametre dans la liste de parametres de la fonction.
+        f.putParam(ident^txt);
     end
 end
 }
