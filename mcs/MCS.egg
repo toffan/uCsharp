@@ -1243,7 +1243,7 @@ do
     if E^type /= ES^typeF.getParam(0) then
         error(MCS_BAD_ARGUMENT);
     else
-        ESX^typeF := ES^typeF;
+        -- TODO: Pousser le parametre dans la TDS.
         ESX^numParam := 1;
     end
 end
@@ -1279,7 +1279,7 @@ do
     if E^type /= ESX^typeF.getParam(ESX^numParam) then
         error(MCS_BAD_ARGUMENT);
     else
-        ESX1^typeF := ESX^typeF;
+        -- TODO: Pousser le parametre dans la TDS.
         ESX1^numParam := ESX^numParam + 1;
     end
 end
