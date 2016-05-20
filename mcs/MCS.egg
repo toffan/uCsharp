@@ -128,10 +128,6 @@ global
     machine : IMachine;
 -- Transmission de la machine cible (choisie par l'option -m au lancement)
 #init {
-local
-    void_t : TYPE;
-    char_t : TYPE;
-    int_t : TYPE;
 do
     machine := PROGRAMME^source.getMachine();
     if machine = null then
