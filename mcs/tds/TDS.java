@@ -45,6 +45,14 @@ public class TDS {
     }
 
     /**
+     * Ajout ou mets à jour une fonction
+     */
+    public void putFct(String id, FTYPE ftype) {
+        FCT fct = new FCT(ftype);
+        this.vars.put(id, fct);
+    }
+
+    /**
      * Recherche un type dans la TDS et la renvoie.
      * @param id identifiant a rechercher
      * @param go_global portee de la recherche, est-ce qu'elle est globale ?
