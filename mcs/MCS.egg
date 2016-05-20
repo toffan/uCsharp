@@ -54,6 +54,9 @@ inh typeR : TYPE for PTRS, FX;
 inh typeF : FTYPE for ES, ESX;
 inh numParam : Integer for ESX;
 
+inh typeLeft : TYPE for DECL;
+inh typeFct : TYPE for FONCTION;
+
 -- Terminaux
 space separateur is    "[\r\n\t ]+";
 space comm is    "\/\/[^\n]*\n";
@@ -206,6 +209,7 @@ do
     if v /= null then
         error(MCS_DAE, ident^txt);
     else
+        DECL^typeRet = TYPE^type;
         -- Calcul du type de la variable/fonction.
         if DECL^type = null then
             t := TYPE^type;
@@ -241,10 +245,18 @@ end
 --
 --
 -- Fonction.
-DECL -> FONCTION #type ;
+DECL -> #type1 FONCTION #type2 ;
 
 -- Definition du champ type.
-#type {
+#type1 {
+local
+do
+    FONCTION^typeFtc := new FTYPE(FONCTION^typeLeft);
+    FONCTION^fct := new FCT(FONCTION^typeFct);
+end
+}
+
+#type2 {
 local
 do
     DECL^type := FONCTION^type;
@@ -260,26 +272,29 @@ end
 --
 --
 -- Debut de la premiere ligne d'une fonction.
-FONCTION -> #tds paro PARFS parf #type BLOC ;
+FONCTION -> #type1 paro PARFS parf #type2 BLOC ;
 
 -- Creation de la TDS interne a la fonction.
-#tds {
+#type1 {
 local
-    tdsFunction : TDS;
+    -- tdsFunction : TDS;
 do
-    tdsFunction := new TDS(FONCTION^tds);
+    PARFS^typeFct := FONCTION^typeFct;
+    -- ty
+    -- FONCTION^tds.putFct(
+    -- tdsFunction := new TDS(FONCTION^tds);
 
-    -- L'evaluation de PARFS va completer la TDS de la fonction.
-    PARFS^tds := tdsFunction;
-    BLOC^tds := tdsFunction;
+    -- -- L'evaluation de PARFS va completer la TDS de la fonction.
+    -- PARFS^tds := tdsFunction;
+    -- BLOC^tds := tdsFunction;
 end
 }
 
 -- Ajout du type de la fonction.
-#type {
+#type2 {
 local
 do
-    FONCTION^type := PARFS^typeFP;
+    -- FONCTION^type := PARFS^typeFP;
 end
 }
 
@@ -299,14 +314,22 @@ end
 --
 --
 -- Un parametre de plus a la fonction.
-PARFS -> PARF PARFSX #type ;
+PARFS -> #type1 PARF PARFSX #type2 ;
 
 -- Ajout du parametre courant au type.
-#type {
+#type1 {
 local
 do
+<<<<<<< HEAD
     PARFSX^typeFP.putParam(PARF^type);
     PARFS^typeFP := PARFSX^typeFP;
+=======
+    PARFSX^fct := PARFS^fct;
+    PARF^fct := PARFS^fct;
+
+    PARFSX^type.putType(PARF^type);
+    PARFS^type := PARFSX^type;
+>>>>>>> 21f62c3... Non fini, commence le typage des fonctions
 end
 }
 
@@ -319,22 +342,34 @@ PARFSX -> #type ;
 #type {
 local
 do
+<<<<<<< HEAD
     PARFSX^typeFP := null;
+=======
+    -- TODO: nothing to do
+>>>>>>> 21f62c3... Non fini, commence le typage des fonctions
 end
 }
 
 --
 --
 -- Un element supplementaire a la liste des parametres (avec virgule).
-PARFSX -> virg PARF PARFSX #type ;
+PARFSX -> virg #type1 PARF PARFSX #type2 ;
 
 -- Ajout du parametre courant au type.
-#type {
+#type1 {
 local
 do
+<<<<<<< HEAD
     PARFSX1^typeFP.putParam(PARF^type);
     PARFSX^typeFP := PARFSX1^typeFP;
+=======
+    PARF^fct := PARFSX^fct;
+    PARFSX1^fct := PARFSX^fct;
+>>>>>>> 21f62c3... Non fini, commence le typage des fonctions
 end
+}
+
+#type2 { -- TODO
 }
 
 --
@@ -345,13 +380,18 @@ PARF -> TYPE ident #type #record ;
 -- Definition du type du parametre de la fonction.
 #type {
 local
+    f : FCT;
+    tf : FTYPE;
 do
-    PARF^type := TYPE^type;
+    f := PARF^fct;
+    tf := f.type();
+    f.putParam(ident^txt);
+    tf.putParam(TYPE^type);
 end
 }
 
--- Enregistrement du parametre dans la table des symboles de la fonction.
-#record {
+Enregistrement du parametre dans la table des symboles de la fonction.
+#record { -- TODO
 local
     v : VAR ;
 do
