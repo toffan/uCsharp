@@ -10,6 +10,8 @@ public class TDS {
     private HashMap<String, VAR> vars;
     private HashMap<String, TYPE> types;
 
+    public Logger lg;
+
     ///   Constucteurs   ///
     public TDS() { this(null); }
     public TDS(TDS parent) {
@@ -17,6 +19,8 @@ public class TDS {
         this.parent = parent;
         this.vars = new HashMap<String, VAR>();
         this.types = new HashMap<String, TYPE>();
+
+        this.lg = new Logger(true);
     }
 
     ///   Methodes   ///
@@ -27,6 +31,8 @@ public class TDS {
      * @return variable trouvee ou null sinon
      */
     public VAR searchVar(String id, boolean go_global) {
+        this.lg.entry("recherche de la VAR '" + id + "'.");
+
         VAR res = this.vars.get(id);
         if (res == null && go_global && parent != null) {
             return this.parent.searchVar(id, go_global);
@@ -39,6 +45,8 @@ public class TDS {
      * Ajoute ou mets a jour une variable
      */
     public void putVar(String id, TYPE type) {
+        this.lg.entry("ajout de la VAR '" + id + "'.");
+
         VAR var = new VAR(type, this.nxtAddr);
         this.nxtAddr = this.nxtAddr.next(type.size());
         this.vars.put(id, var);
@@ -48,8 +56,8 @@ public class TDS {
      * Ajout ou mets à jour une fonction
      */
     public void putVar(String id, FCT fct) {
-        fct.setAddr(this.nxtAddr);
-        this.nxtAddr = this.nxtAddr.next(fct.type().size());
+        this.lg.entry("ajout de la FCT '" + id + "'.");
+
         this.vars.put(id, fct);
     }
 
@@ -60,6 +68,8 @@ public class TDS {
      * @return type trouve ou null sinon
      */
     public TYPE searchType(String id, boolean go_global) {
+        this.lg.entry("recherche du TYPE '" + id + "'.");
+
         TYPE res = this.types.get(id);
         if (res == null && go_global && parent != null) {
             return this.parent.searchType(id, go_global);
@@ -72,8 +82,10 @@ public class TDS {
      * Ajoute ou mets a jour un type
      */
     public void putType(String id, TYPE type) {
+        this.lg.entry("ajout du TYPE '" + type.name() + "'.");
+
         // Si le type est anonyme (struct par exemple), on le nomme d'apres son id.
-        if (type.name().isEmpty()) type.setName(id);
+        if (type.name().isEmpty()) { type.setName(id); }
         this.types.put(id, type);
     }
 }
