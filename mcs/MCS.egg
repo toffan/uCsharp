@@ -175,7 +175,7 @@ ENTITE -> typedef TYPE identc pv #record ;
 -- Enregistrement du nouveau type dans la table des symboles.
 #record {
 local
-        t : TYPE ;
+    t : TYPE ;
 do
     -- Verifier qu'aucun type du meme nom n'est pas deja defini localement.
     t := ENTITE^tds.searchType(identc^txt, false);
@@ -197,8 +197,8 @@ ENTITE -> TYPE ident DECL #record ;
 -- Enregistrement de la declaration dans la table des symboles.
 #record {
 local
-        v : VAR ;
-        t : TYPE ;
+    v : VAR ;
+    t : TYPE ;
 do
     -- Verifier qu'aucune fonction/variable du meme nom n'est pas deja definie
     -- localement.
@@ -353,7 +353,7 @@ end
 -- Enregistrement du parametre dans la table des symboles de la fonction.
 #record {
 local
-        v : VAR ;
+    v : VAR ;
 do
     -- Verifier qu'aucun parametre du meme nom n'est pas deja defini localement.
     v := PARF^tds.searchVar(ident^txt, false);
