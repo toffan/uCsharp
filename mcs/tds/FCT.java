@@ -15,4 +15,9 @@ public class FCT extends VAR {
         this.params = new ArrayList<String>();
         this.tds = new TDS();
     }
+
+    ///   Methodes   ///
+    public void putParam(String id) { this.params.add(id); }
+    public String getParam(int i) { return this.params.get(i); }
 }
+
