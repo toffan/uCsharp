@@ -425,6 +425,8 @@ do
     else
         -- L'instance nouvellement creee.
         PTRS^type := t;
+        -- Ajout du type dans la TDS.
+        PTRS^tds.putType(t.name(), t);
     end
 end
 }
