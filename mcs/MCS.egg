@@ -41,7 +41,7 @@ inh tds : TDS for
 
 syn type : TYPE for
         TYPE,
-        BLOC, INSTS, INST, E, STYPE, PTRS, CHAMPS,
+        BLOC, INSTS, INST, E, STYPE, PTRS,
         A, AFFX, R, AX, T, TX, F, FX, SIX, RX,
         ES, ESX ;
 
@@ -492,58 +492,28 @@ end
 --
 --
 -- Type d'une struct.
-STYPE -> #type1 struct aco CHAMPS acf #type2 ;
+STYPE -> #type struct aco CHAMPS acf ;
 
 -- Creation du type struct initial (vide).
-#type1 {
-local
-do
-    CHAMPS^typeCHP := new STRUCT();
-end
-}
-
--- Propagation du type struct complete.
-#type2 {
-local
-do
-    STYPE^type := CHAMPS^type;
-end
-}
-
---
---
--- Fin de l'evaluation du type struct, propagation du type.
-CHAMPS -> #type ;
-
--- Propagation du type.
 #type {
 local
+    s : STRUCT;
 do
-    CHAMPS^type := CHAMPS^typeCHP;
+    s := new STRUCT();
+    CHAMPS^typeCHP := s;
+    STYPE^type := s;
 end
 }
+
+--
+--
+-- Fin de l'evaluation du type struct.
+CHAMPS -> ;
 
 --
 --
 -- Evaluation du type struct, liste de champ.
-CHAMPS -> #type1 CHAMP CHAMPS #type2 ;
-
--- Enregistrement d'un champ.
-#type1 {
-local
-do
-    CHAMP^typeCHP := CHAMPS^typeCHP;
-    CHAMPS1^typeCHP := CHAMPS^typeCHP;
-end
-}
-
--- Propagation du type.
-#type2 {
-local
-do
-    CHAMPS^type := CHAMPS1^type;
-end
-}
+CHAMPS -> CHAMP CHAMPS ;
 
 --
 --
