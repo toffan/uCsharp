@@ -1,6 +1,6 @@
-package Tam;
+package mcs.gc.tam;
 
-import general.HelperCharInterface;
+import mcs.gc.general.*;
 
 /**
  * Implementation des fonctions sur la mémoire de la machine TAM

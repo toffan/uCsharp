@@ -1,4 +1,4 @@
-package general;
+package mcs.gc.general;
 
 public interface HelperCharInterface {
 

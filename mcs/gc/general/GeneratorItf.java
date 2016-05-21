@@ -1,4 +1,4 @@
-package general;
+package mcs.gc.general;
 /**
  * Interface à respecter pour un generateur de code assembleur
  */

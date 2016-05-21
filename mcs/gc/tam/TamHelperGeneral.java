@@ -1,11 +1,11 @@
-package Tam;
+package mcs.gc.tam;
 
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.io.FileOutputStream;
 
-import general.HelperGeneralInterface;
-import mcs.tds.VAR;
+import mcs.gc.general.*;
+import mcs.tds.*;
 
 public class TamHelperGeneral implements HelperGeneralInterface {
 
@@ -24,8 +24,8 @@ public class TamHelperGeneral implements HelperGeneralInterface {
 	 * {@inheritDoc}
 	 */
 	public String generateDeclaration(String n, VAR i, String t) {
-		int taille = i.addr().dplt();
-		return "   ; declaration de " + n + " en " + i.addr().dplt() + "/SB"
+		int taille = i.addr().val();
+		return "   ; declaration de " + n + " en " + i.addr().val() + "/SB"
 				+ " taille = " + taille + "\n";
 	}
 

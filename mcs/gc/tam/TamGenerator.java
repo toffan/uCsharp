@@ -1,10 +1,12 @@
-package Tam;
+package mcs.gc.tam;
 
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.PrintWriter;
+import mcs.gc.general.*;
 
-public class TamGenerator implements general.GeneratorItf{
+
+public class TamGenerator implements GeneratorItf{
     
 	//helpers
 	private TamHelperBool boolHelper;

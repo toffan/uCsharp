@@ -1,6 +1,6 @@
-package Tam;
+package mcs.gc.tam;
 
-import general.HelperIntInterface;
+import mcs.gc.general.*;
 
 /**
  * Implementation des fonctions sur les entiers de la machine TAM

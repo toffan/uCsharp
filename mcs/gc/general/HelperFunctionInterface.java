@@ -1,4 +1,4 @@
-package general;
+package mcs.gc.general;
 
 import java.util.List;
 import mcs.tds.VAR;

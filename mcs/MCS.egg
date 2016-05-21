@@ -59,6 +59,15 @@ inh numParam : Integer for ESX;
 syn varF : FCT for DECL ;
 inh fct : FCT for FONCTION, PARFS, PARFSX, PARF ;
 
+-- Le generateur de code
+inh gen : TamGenerator for
+        PROGRAMME, ENTITES, ENTITE, DECL,
+        FONCTION, PARF, PARFS, PARFSX, BLOC,
+        INSTS, INST, TYPE, STYPE, PTRS,
+        CHAMPS, CHAMP,
+        E, A, AFFX, R, RX, AX, T, TX, F, FX, SIX,
+        ES, ESX ;
+
 
 -- Terminaux
 space separateur is    "[\r\n\t ]+";

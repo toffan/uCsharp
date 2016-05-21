@@ -1,4 +1,4 @@
-package Tam;
+package mcs.gc.tam;
 
 /**
  * Implementation des fonctions sur les bools de la machine TAM

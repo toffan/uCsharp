@@ -1,6 +1,6 @@
-package general;
+package mcs.gc.general;
 
-import mcs.tds.VAR;
+import mcs.tds.*;
 
 /**
  * Interface pour les actions générales (actions sur les variables et les structures de controle principalement)

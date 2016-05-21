@@ -1,7 +1,7 @@
-package Tam;
+package mcs.gc.tam;
 
-import general.HelperFunctionInterface;
-import mcs.tds.VAR;
+import mcs.gc.general.*;
+import mcs.tds.*;
 
 import java.util.List;
 
