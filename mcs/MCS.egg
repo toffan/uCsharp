@@ -623,16 +623,33 @@ end
 --
 --
 -- Declaration d'une variable locale, avec ou sans initialisation.
-INST -> TYPE ident AFFX pv #type ;
+INST -> TYPE ident #record AFFX pv #type ;
 
--- Une declaration ou une affectation est un effet de bord, pas de type.
+-- Enregistrement de la variable dans la TDS du bloc.
+#record {
+local
+    v : VAR;
+do
+    v := INST^tds.searchVar(ident^txt, false);
+    if v /= null then
+        error(MCS_DAE);
+    else
+        INST^tds.putVar(ident^txt, TYPE^type);
+    end
+end
+}
+
+-- Typage de l'instruction et verification du type de l'affectation.
 #type {
 local
 do
+    -- Une declaration ou une affectation est un effet de bord, pas de type.
     INST^type := null;
 
-    -- TODO: Verification coherence de type ident/expression affecte.
-    --       (dans une affectation par exemple)
+    -- Verification du type de l'affectation.
+    if AFFX^type /= null && AFFX^type /= TYPE^type then
+        error(MCS_BAD_TYPE_2);
+    end
 end
 }
 
