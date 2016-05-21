@@ -29,7 +29,7 @@ public class FCT extends VAR {
         // Mise a jour de la TDS en consequences.
         try {
             this.tds.putVar(id, this.type().getParam(n));
-        } catch IndexOutOfBoundsException e {
+        } catch (IndexOutOfBoundsException e) {
             /* Erreur dans l'ordre d'enregistrement dans MCS.egg ! */
             System.err.println("Le type lie au parametre " + id + "n'a pas ete enregistre dans la fonction !");
             throw e;
