@@ -16,5 +16,8 @@ public class STRUCT extends TYPE {
     public VAR searchVar(String id) {
         return this.tds.searchVar(id, false);
     }
-    public void putVar(String id, TYPE type) { this.tds.putVar(id, type); }
+    public void putVar(String id, TYPE type) {
+        this.tds.putVar(id, type);
+        this.size += type.size();
+    }
 }

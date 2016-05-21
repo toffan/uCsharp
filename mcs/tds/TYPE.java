@@ -9,7 +9,7 @@ public class TYPE {
     ///   Constructeurs   ///
     public TYPE(String name, int size) {
         assert(size >= 0); // Une struct peut initialement être vide
-        this.name = name;
+        this.name = name == null ? "" : name;
         this.size = size;
     }
 
