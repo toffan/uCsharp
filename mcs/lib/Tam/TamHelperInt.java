@@ -180,14 +180,14 @@ public class TamHelperInt implements HelperIntInterface {
     }
 
     @Override
-    public String generateDisplayInt(String value){
+    public String generateDisplay(String value){
         return "; affichage d'un entier sur stdout\n"+
                 "\tLOADL "+value+"\n"+
                 "\tSUBR IOut\n";
     }
 
     @Override
-    public String generateDisplayInt(int dep, int size){
+    public String generateDisplay(int dep, int size){
         return "; affichage d'un entier sur stdout\n"+
                 "\tLOAD(" + size + ") " + dep + "[LB] \n" +
                 "\tSUBR IOut\n";
@@ -195,7 +195,7 @@ public class TamHelperInt implements HelperIntInterface {
 
 
     @Override
-    public String generateReadInt(){
+    public String generateRead(){
         return "; lecture sur stdin d'un entier \n"+
                 "SUBR IIn\n";
     }

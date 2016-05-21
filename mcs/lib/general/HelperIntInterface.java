@@ -66,11 +66,11 @@ public interface HelperIntInterface {
 	public String generateMod(int dep1, int size1, int dep2, int size2);
 
 	/** afficher un entier sur stdout (valeur) **/
-	public String generateDisplayInt(String value);
+	public String generateDisplay(String value);
 
 	/** afficher un entier sur stdout (adresse) **/
-	public String generateDisplayInt(int dep, int size);
+	public String generateDisplay(int dep, int size);
 
 	/**lire un entier sur stdin **/
-	public String generateReadInt();
+	public String generateRead();
 }
