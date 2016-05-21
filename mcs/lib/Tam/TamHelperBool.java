@@ -63,21 +63,21 @@ public class TamHelperBool{
 	}
 
 
-	public String generateDisplayBool(String value){
+	public String generateDisplay(String value){
 		return "; display Bool "+value+"\n"+
 				"\tLOADL " + value + "\n" +
 				"\tSUBR BOut\n";
 
 	}
 
-	public String generateDisplayBool(int dep, int size){
+	public String generateDisplay(int dep, int size){
 		return "; display Bool ("+dep+","+size+") \n"+
 				"\tLOAD(" + size + ") " + dep + "[LB] \n" +
 				"\tSUBR BOut\n";
 
 	}
 
-	public String generateReadBool(){
+	public String generateRead(){
 		return "; input 1 entier \n"+
 				"\tSUBR BIn \n";
 	}

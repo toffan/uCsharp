@@ -42,13 +42,13 @@ public interface HelperBoolInterface {
     public String generateAnd(int dep1, int size1, int dep2, int size2);
 
     /** affiche une valeur bool sur stdout **/
-    public String generateDisplayBool(String value);
+    public String generateDisplay(String value);
 
     /** affiçche une adresse bool sur stdxout **/
-    public String generateDisplayBool(int dep, int size);
+    public String generateDisplay(int dep, int size);
 
     /** input d'un bool sur stdin **/
-    public String generateReadBool();
+    public String generateRead();
 
     /** bool to char **/
     public String generateBoolToChar();
