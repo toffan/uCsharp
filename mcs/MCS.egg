@@ -344,7 +344,7 @@ do
     t.putParam(TYPE^type);
 end
 }
- 
+
 -- Enregistrement du parametre dans la liste de parametres de la fonction.
 #record {
 local
@@ -618,7 +618,7 @@ do
 
     -- Verification du type de l'affectation.
     if AFFX^type /= null && AFFX^type /= TYPE^type then
-        error(MCS_BAD_TYPE_2);
+        error(MCS_BAD_TYPE_2, TYPE^type.name(), AFFX^type.name(), ident^txt);
     end
 end
 }
@@ -669,7 +669,7 @@ do
             if SIX^type /= null then
                 if BLOC^type /= SIX^type then
                     -- Les deux bloc renvoient des types differents, erreur.
-                    error(MCS_BAD_TYPE);
+                    error(MCS_BAD_TYPE, BLOC^type.name(), SIX^type.name());
                 else
                     -- Les deux blocs existent et renvoient le meme type.
                     INST^type := BLOC^type;
@@ -751,7 +751,7 @@ E -> A AFFX #type ;
 local
 do
     if AFFX^type /= null && AFFX^type /= A^type then
-        error(MCS_BAD_TYPE_2);
+        error(MCS_BAD_TYPE_2_BIS, A^type.name(), AFFX^type.name());
     end
     E^type := A^type;
 end
@@ -794,7 +794,7 @@ local
 do
     if AX^type /= null then
         if AX^type /= R^type then
-            error(MCS_BAD_TYPE_3);
+            error(MCS_BAD_TYPE_3, R^type.name(), AX^type.name());
         else
             -- Condition : type int ou bool selon la version.
             A^type := A^tds.searchType("int", true);
@@ -852,7 +852,7 @@ R -> T RX #type ;
 local
 do
     if RX^type /= null && RX^type /= T^type then
-        error(MCS_BAD_TYPE_4);
+        error(MCS_BAD_TYPE_4, T^type.name(), RX^type.name());
     else
         R^type := T^type;
     end
@@ -869,7 +869,7 @@ RX -> OPADD T RX #type ;
 local
 do
     if RX1^type /= null && RX1^type /= T^type then
-        error(MCS_BAD_TYPE_4);
+        error(MCS_BAD_TYPE_4, T^type.name(), RX1^type.name());
     else
         RX^type := T^type;
     end
@@ -906,7 +906,7 @@ T -> F TX #type ;
 local
 do
     if TX^type /= null && TX^type /= F^type then
-        error(MCS_BAD_TYPE_5);
+        error(MCS_BAD_TYPE_5, F^type.name(), TX^type.name());
     else
         T^type := F^type;
     end
@@ -923,7 +923,7 @@ TX -> OPMUL F TX #type ;
 local
 do
     if TX1^type /= null && TX1^type /= F^type then
-        error(MCS_BAD_TYPE_5);
+        error(MCS_BAD_TYPE_5, F^type.name(), TX1^type.name());
     else
         TX^type := F^type;
     end
@@ -1247,9 +1247,12 @@ ES -> E #type1 ESX #type2 ;
 
 -- Verification du type du parametre.
 #type1 {
+local
+    tParam : TYPE;
 do
-    if E^type /= ES^typeF.getParam(0) then
-        error(MCS_BAD_ARGUMENT);
+    tParam := ES^typeF.getParam(0);
+    if E^type /= tParam then
+        error(MCS_BAD_ARGUMENT, tParam.name(), E^type.name());
     else
         -- TODO: Pousser le parametre dans la TDS.
         ESX^numParam := 1;
@@ -1283,11 +1286,13 @@ ESX -> virg E #type1 ESX #type2 ;
 
 -- Verification du type du parametre.
 #type1 {
+local
+    tParam : TYPE;
 do
-    if E^type /= ESX^typeF.getParam(ESX^numParam) then
-        error(MCS_BAD_ARGUMENT);
+    tParam := ESX^typeF.getParam(ESX^numParam);
+    if E^type /= tParam then
+        error(MCS_BAD_ARGUMENT, tParam.name(), E^type.name());
     else
-        -- TODO: Pousser le parametre dans la TDS.
         ESX1^numParam := ESX^numParam + 1;
     end
 end
