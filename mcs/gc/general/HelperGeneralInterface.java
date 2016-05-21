@@ -26,14 +26,6 @@ public interface HelperGeneralInterface {
 	public String generateEnd();
 
 	/**
-	 * Ecrit le code entier dans un fichier du nom donne au debut.
-	 *
-	 * @param code
-	 */
-	public void generateFile(String code);
-
-
-	/**
 	 * Charge un entier de valeur v sur le sommet de pile
 	 *
 	 * @param v

@@ -43,6 +43,21 @@ public class TamGenerator implements GeneratorItf{
 		this.stringHelper = new TamHelperString();
 		this.functionHelper = new TamHelperFunction();
 	}
+	
+
+    /**
+     * {@inheritDoc}
+     */
+	public void generateFile(String code) {
+		try {
+			PrintWriter pw = new PrintWriter(new FileOutputStream(this.filename + ".tam"));
+			pw.println(";;; code TAM engendre pour " + this.filename + "\n");
+			pw.print(code + "\tHALT\n");
+			pw.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+	}
 
 	public TamHelperBool getBoolHelper() {
 		return boolHelper;

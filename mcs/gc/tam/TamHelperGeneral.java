@@ -46,20 +46,6 @@ public class TamHelperGeneral implements HelperGeneralInterface {
     /**
      * {@inheritDoc}
      */
-	public void generateFile(String code) {
-		try {
-			PrintWriter pw = new PrintWriter(new FileOutputStream(this.filename + ".tam"));
-			pw.println(";;; code TAM engendre pour " + this.filename + "\n");
-			pw.print(code + "\tHALT\n");
-			pw.close();
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}
-	}
-
-    /**
-     * {@inheritDoc}
-     */
 	public String generateConstante(String v) {
 		return "\tLOADL " + v + "\n";
 	}
