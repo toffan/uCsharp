@@ -140,6 +140,9 @@ global
     machine : IMachine;
 -- Transmission de la machine cible (choisie par l'option -m au lancement)
 #init {
+local
+    string : TYPE;
+    tds : TDS;
 do
     machine := PROGRAMME^source.getMachine();
     if machine = null then
@@ -148,12 +151,15 @@ do
         ENTITES^machine := machine;
     end
 
-    ENTITES^tds := new TDS();
+    tds := new TDS();
     -- Ajouter a la TDS les types natifs.
-    -- TODO: Ajouter a la TDS les const char*.
-    ENTITES^tds.putType("void", new TYPE("void", 0));
-    ENTITES^tds.putType("int", new TYPE("int", 4));
-    ENTITES^tds.putType("char", new TYPE("char", 1));
+    tds.putType("void", new TYPE("void", 0));
+    tds.putType("int", new TYPE("int", 1));
+    tds.putType("char", new TYPE("char", 1));
+    string := new PTR(tds.searchType("char", true));
+    tds.putType(string.name(), string);
+
+    ENTITES^tds := tds;
 end
 }
 
@@ -980,8 +986,7 @@ F -> chaine #type ;
 #type {
 local
 do
-    -- TODO: Ne pas dupliquer le type pointeur-sur-char (char*).
-    F^type := new PTR(F^tds.searchType("char", true));
+    F^type := F^tds.searchType("char*", true);
 end
 }
 
