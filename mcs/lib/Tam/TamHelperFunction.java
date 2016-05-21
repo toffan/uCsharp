@@ -11,7 +11,7 @@ import java.util.List;
 public class TamHelperFunction implements HelperFunctionInterface {
 
     /**
-     * @{inheriDoc}
+     * @{inheritDoc}
      */
     public String generateFunction(String functionName, String functionTag, String code) {
         return "; code de la fonction :  " + functionName + " \n" +
@@ -20,10 +20,10 @@ public class TamHelperFunction implements HelperFunctionInterface {
                 + "; fin code fonction " + functionName + " \n";
     }
 
-    public String generateReturn(int sizeReturn, int depReturn, String codeRetour) {
+    public String generateReturn(int sizeReturn, int parameterNumber, String codeRetour) {
         return "; retour"
                 + codeRetour
-                + "\tRETURN (" + sizeReturn + ")" + depReturn + "\n";
+                + "\tRETURN (" + sizeReturn + ")" + parameterNumber + "\n";
     }
 
     public String generateCall(String functionName, String functionTag, List<VAR> parameters) {
@@ -34,6 +34,17 @@ public class TamHelperFunction implements HelperFunctionInterface {
         code += "\tCALL(SB) _" + functionTag + "\n";
         return code;
     }
+
+    /**
+     * :call
+     * push espace pour la valeur de retour selon son type
+     * push adresse de retour
+     * push le local base
+     *
+     *
+     * return :
+     * ecrit la valeur de retour, pop local
+     */
 
 
 }
