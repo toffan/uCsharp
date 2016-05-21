@@ -2,3 +2,8 @@
 *.class
 .*.swp
 mcs/egg
+/bin/
+
+#Eclipse files 
+.classpath
+.project
