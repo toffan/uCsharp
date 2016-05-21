@@ -53,7 +53,7 @@ public class TDS {
     }
 
     /**
-     * Ajout ou mets à jour une fonction
+     * Ajoute ou mets a jour une fonction
      */
     public void putVar(String id, FCT fct) {
         this.lg.entry("ajout de la FCT '" + id + "'.");

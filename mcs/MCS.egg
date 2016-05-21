@@ -321,6 +321,7 @@ local
 do
     t := PARF^fct.type();
     -- Ajout du type du parametre dans le type de la fonction.
+    -- Attention : a faire avant d'enregistrer le parametre dans la liste des parametres !
     t.putParam(TYPE^type);
 end
 }

@@ -17,7 +17,24 @@ public class FCT extends VAR {
     }
 
     ///   Methodes   ///
-    public void putParam(String id) { this.params.add(id); }
+    
+    /** 
+     * Ajoute un parametre a la fonction et met a jour sa TDS interne. 
+     */
+    public void putParam(String id) {
+        int n = this.params.size();
+        // Ajout du parametre a la liste de la fonction.
+        this.params.add(id);
+
+        // Mise a jour de la TDS en consequences.
+        try {
+            this.tds.putVar(id, this.type().getParam(n));
+        } catch IndexOutOfBoundsException e {
+            /* Erreur dans l'ordre d'enregistrement dans MCS.egg ! */
+            System.err.println("Le type lie au parametre " + id + "n'a pas ete enregistre dans la fonction !");
+            throw e;
+        } 
+    }
     public String getParam(int i) { return this.params.get(i); }
     public boolean contains(String id) {
         boolean res = false;
