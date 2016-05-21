@@ -9,19 +9,19 @@ import general.HelperCharInterface;
  */
 public class TamHelperChar implements HelperCharInterface {
 
-    public String generateDisplayChar(String value) {
+    public String generateDisplay(String value) {
         return "; affichage d'un char sur stdout \n" +
                 "\tLOADL " + value + "\n" +
                 "\tSUBR COut\n";
     }
 
-    public String generateDisplayChar(int dep, int size) {
+    public String generateDisplay(int dep, int size) {
         return "; affichage d'un char sur stdout \n" +
                 "\tLOAD(" + size + ") " + dep + "[LB] \n" +
                 "\tSUBR COut\n";
     }
 
-    public String generateReadChar() {
+    public String generateRead() {
         return "; lecture char sur stdin\n" +
                 "\tSUBR CIn\n";
     }

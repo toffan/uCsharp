@@ -5,17 +5,17 @@ public interface HelperCharInterface {
     /**
      * affiche un char sur std out (valeur)
      **/
-    public String generateDisplayChar(String value);
+    public String generateDisplay(String value);
 
     /**
      * affiche un char sur stdout (adresse)
      **/
-    public String generateDisplayChar(int dep, int size);
+    public String generateDisplay(int dep, int size);
 
     /**
      * lit un char sur stdin
      **/
-    public String generateReadChar();
+    public String generateRead();
 
     /**
      * char to bool convesion (valeur)
