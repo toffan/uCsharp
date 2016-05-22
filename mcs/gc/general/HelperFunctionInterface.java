@@ -21,8 +21,8 @@ public interface HelperFunctionInterface {
 
     /**
      * genere un return
-     * @param sizeReturn
-     * @param depReturn
+     * @param sizeReturn Le nombre de mots mémoire des résultats. Ces mots mémoires sont en sommets de pile et seront recopiés en sommet de pile après le return
+     * @param depReturn le nombre de mots mémoires des paramètres.
      * @param codeRetour
      * @return
      */
