@@ -42,4 +42,5 @@ clean :
 	rm -f mcs/gc/general/*.class
 	rm -f mcs/compiler/*.class
 	rm -rf mcs/egg/*
+	rm -rf tests/*.tam
 

@@ -176,7 +176,7 @@ end
 #gen {
 local
 do
-    gen.generateFile(";"+PROGRAMME^gen.getFileName() + "\n"+ENTITES^code+"; EOF\n");
+    gen.generateFile(";" + gen.getFileName() + "\n" + ENTITES^code + "; EOF\n");
 end
 }
 
@@ -343,8 +343,9 @@ end
 local
     h : HelperFunctionInterface;
 do
-    DECL^code := h.generateFunction(DECL^name, "__" + DECL^name + "__", FONCTION^code);
     h := DECL^gen.getFunctionHelper();
+    --DECL^code := h.generateFunction(DECL^name, "__" + DECL^name + "__", FONCTION^code);
+    DECL^code := h.generateFunction(DECL^name, "__" + DECL^name + "__", "");
 end
 }
 
