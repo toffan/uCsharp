@@ -38,9 +38,6 @@ inh tds : TDS for
         CHAMPS, CHAMP,
         E, A, AFFX, R, RX, AX, T, TX, F, FX, SIX,
         ES, ESX ;
-        
-syn code : String for
-         ENTITES, ENTITE ;
 
 syn type : TYPE for
         TYPE,
@@ -61,7 +58,7 @@ inh numParam : Integer for ESX;
 syn varF : FCT for DECL ;
 inh fct : FCT for FONCTION, PARFS, PARFSX, PARF ;
 
--- Le generateur de code
+-- Le generateur de code.
 inh gen : GeneratorItf for
         PROGRAMME, ENTITES, ENTITE, DECL,
         FONCTION, PARF, PARFS, PARFSX, BLOC,
@@ -70,6 +67,12 @@ inh gen : GeneratorItf for
         E, A, AFFX, R, RX, AX, T, TX, F, FX, SIX,
         ES, ESX ;
 
+-- Le code genere.
+syn code : String for
+         ENTITES, ENTITE, DECL ;
+
+-- Nom de l'ident a gauche d'une declaration.
+inh name : String for DECL;
 
 -- Terminaux
 space separateur is    "[\r\n\t ]+";
@@ -139,9 +142,11 @@ compil ASM;
 -- Regle de production, point d'entree.
 PROGRAMME -> #init ENTITES #gen;
 global
---    machine : IMachine;
+    -- Transmission de la machine cible (choisie par l'option -m au lancement)
+    --machine : IMachine;
     gen: GeneratorItf;
--- Transmission de la machine cible (choisie par l'option -m au lancement)
+
+-- Initialise le compilateur.
 #init {
 local
     string : TYPE;
@@ -183,6 +188,7 @@ end
 
 ENTITES -> #code;
 
+-- Fin de liste d'instructions, plus de code a generer.
 #code {
 local
 do
@@ -192,10 +198,11 @@ end
 
 ENTITES -> ENTITE ENTITES #code;
 
+-- Generetion du code d'une sequence d'entites.
 #code {
 local
 do
-	ENTITES^code := ENTITE^code+ENTITES1^code;
+	ENTITES^code := ENTITE^code + ENTITES1^code;
 end
 }
 
@@ -230,11 +237,12 @@ do
 	ENTITE^code := "; typedef de "+identc^txt+"\n";
 end
 }
+
 --
 --
 -- Definition d'une variable globale ou d'une fonction.
 -- (Commence par une minuscule)
-ENTITE -> TYPE ident #prerecord DECL #record;
+ENTITE -> TYPE ident #prerecord DECL #record #code ;
 
 -- Verification de la non existence de l'ident dans la tds locale.
 #prerecord {
@@ -249,6 +257,7 @@ do
     else
         -- Propagation du type declare.
         DECL^typeLeft := TYPE^type;
+        DECL^name := ident^txt;
     end
 end
 }
@@ -272,6 +281,13 @@ do
 end
 }
 
+-- Recuperation du code de la declaration.
+#code {
+do
+    ENTITE^code := DECL^code;
+end
+}
+
 --
 --
 -- -- Declaration
@@ -281,7 +297,7 @@ end
 --
 --
 -- Fin de la declaration (variable).
-DECL -> #type pv ;
+DECL -> #type #code pv ;
 
 -- Pas de fonction sous-jacente.
 #type {
@@ -290,10 +306,20 @@ do
 end
 }
 
+-- Generation du code pour une declaration de variable.
+#code {
+local
+    h : HelperMemoryInterface;
+do
+    h := DECL^gen.getMemoryHelper();
+    DECL^code := h.generateReserve(DECL^typeLeft.size());
+end
+}
+
 --
 --
 -- Fin de la declaration (fonction).
-DECL -> #type FONCTION ;
+DECL -> #type FONCTION #code ;
 
 -- Creation du type de la fonction et de la VAR correspondante.
 #type {
@@ -309,6 +335,16 @@ do
     DECL^varF := f;
     -- Transmission de la VAR a FONCTION pour reellement generer la fonction et son type
     FONCTION^fct := f;
+end
+}
+
+-- Generation du code pour une declaration de fonction.
+#code {
+local
+    h : HelperFunctionInterface;
+do
+    DECL^code := h.generateFunction(DECL^name, "__" + DECL^name + "__", FONCTION^code);
+    h := DECL^gen.getFunctionHelper();
 end
 }
 
@@ -1330,6 +1366,7 @@ end
 #gen {
 do
     -- On recupere le code assembleur 'inline' dans : ASM^code_asm ;
+    ENTITE^code := ASM^code_asm ;
 end
 }
 
