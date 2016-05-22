@@ -15,14 +15,14 @@ option k=2;
 inh source : MCSSourceFile for PROGRAMME;
 
 -- La machine cible pour la generation de code.
-inh machine : IMachine for
-        ENTITES, ENTITE, DECL, FONCTION, INST, BLOC, INSTS, SIX,
-        PARFS, PARF, PARFSX, ES, ESX,
-        E, AFFX, A, AX, R, RX, T, TX, F, FX
+-- inh machine : IMachine for
+--        ENTITES, ENTITE, DECL, FONCTION, INST, BLOC, INSTS, SIX,
+--        PARFS, PARF, PARFSX, ES, ESX,
+--        E, AFFX, A, AX, R, RX, T, TX, F, FX
 --      -- Decommenter la ligne suivante pour MCS
 --      , BASE, DEFS, DEF
 --      -- Fin extension MCS
-        ;
+--        ;
 
 -- Ces attributs permettent de recuperer les instructions du code ASM inline.
 syn code_asm : STRING for ASM;
@@ -59,7 +59,7 @@ syn varF : FCT for DECL ;
 inh fct : FCT for FONCTION, PARFS, PARFSX, PARF ;
 
 -- Le generateur de code
-inh gen : TamGenerator for
+inh gen : GeneratorItf for
         PROGRAMME, ENTITES, ENTITE, DECL,
         FONCTION, PARF, PARFS, PARFSX, BLOC,
         INSTS, INST, TYPE, STYPE, PTRS,
@@ -136,7 +136,7 @@ compil ASM;
 -- Regle de production, point d'entree.
 PROGRAMME -> #init ENTITES #gen;
 global
-    machine : IMachine;
+--    machine : IMachine;
     gen: GeneratorItf;
 -- Transmission de la machine cible (choisie par l'option -m au lancement)
 #init {
@@ -144,8 +144,8 @@ local
     string : TYPE;
     tds : TDS;
 do
-    machine := PROGRAMME^source.getMachine();
-    gen := new TamGenerator(); -- On reviendra sur le choix de la machine plus tard.
+--    machine := PROGRAMME^source.getMachine();
+    gen := new TamGenerator(PROGRAMME^source.getFileName()); -- On reviendra sur le choix de la machine plus tard.
     if gen = null then
         error(NO_MACH, PROGRAMME^source.getMachName());
     else
@@ -168,7 +168,7 @@ end
 #gen {
 local
 do
-    gen.generateFile(PROGRAMME^gen.getFileName(), "; no code\n");
+    gen.generateFile(PROGRAMME^gen.getFileName() + "; no code\n");
 end
 }
 

@@ -54,7 +54,7 @@ public class TamGenerator implements GeneratorItf{
      */
 	public void generateFile(String code) {
 		try {
-			PrintWriter pw = new PrintWriter(new FileOutputStream(this.getFilename() + ".tam"));
+			PrintWriter pw = new PrintWriter(new FileOutputStream(this.getFileName() + ".tam"));
 			pw.println(";;; code TAM engendre pour " + this.filename + "\n");
 			pw.print(code + "\tHALT\n");
 			pw.close();
@@ -89,7 +89,7 @@ public class TamGenerator implements GeneratorItf{
 
 	public TamHelperFunction getFunctionHelper() { return functionHelper; }
 	
-	public String getFilename(){
+	public String getFileName(){
 		return this.filename;
 	}
 }

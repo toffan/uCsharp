@@ -1,10 +1,12 @@
 package mcs.gc.tam;
 
+import mcs.gc.general.*;
+
 /**
  * Implementation des fonctions sur les bools de la machine TAM
  * @author antoine
  */
-public class TamHelperBool{
+public class TamHelperBool implements HelperBoolInterface{
 	
 	public String generateNegation(String value){
 		return "; negation bool"+
