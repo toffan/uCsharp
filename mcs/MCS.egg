@@ -662,7 +662,7 @@ do
     -- Une expression conditionnelle est de type de retour entier.
     if E^type /= INST^tds.searchType("int", true) then
         -- TODO: Completer l'erreur avec du texte representant l'expression.
-        error(MCS_NOT_BOOLEAN);
+        error(MCS_NOT_BOOLEAN, E^type.name());
     else
         if BLOC^type /= null then
             if SIX^type /= null then
@@ -1068,7 +1068,7 @@ end
 
 --
 --
--- Typage de la multiplication avec *.
+-- Typage d'un dereferencement avec *.
 F -> mult F #type ;
 
 -- Typage d'une expression contenant *.
@@ -1077,7 +1077,7 @@ local
     p : PTR;
 do
     if !(F1^type.isPointer()) then
-        error(MCS_NOT_PTR);
+        error(MCS_NOT_PTR, F1^type.name());
     else
         p := F1^type.toPointer();
         F^type := p.ptype();
@@ -1145,12 +1145,12 @@ local
     c : VAR;
 do
     if !(FX^typeLeft.isStruct()) then
-        error(MCS_NOT_STRUCT);
+        error(MCS_NOT_STRUCT, FX^typeLeft.name());
     else
         p := FX^typeLeft.toStruct();
         c := p.searchVar(ident^txt);
         if c = null then
-            error(MCS_UNKNOWN_FIELD);
+            error(MCS_UNKNOWN_FIELD, ident^txt);
         else
             FX1^typeLeft := c.type();
         end
@@ -1180,12 +1180,12 @@ local
     c : VAR;
 do
     if !(FX^typeLeft.isPointer()) then
-        error(MCS_NOT_PTR);
+        error(MCS_NOT_PTR, FX^typeLeft.name());
     else
         p := FX^typeLeft.toPointer();
         pt := p.ptype();
         if !(pt.isStruct()) then
-            error(MCS_NOT_STRUCT);
+            error(MCS_NOT_STRUCT, pt.name());
         else
             s := pt.toStruct();
             c := s.searchVar(ident^txt);
@@ -1217,7 +1217,7 @@ FX -> #type1 paro ES parf FX #type2 ;
 #type1 {
 do
     if !(FX^typeLeft.isFType()) then
-        error(MCS_NOT_FUNCTION);
+        error(MCS_NOT_FUNCTION, FX^typeLeft.name());
     else
         ES^typeF := FX^typeLeft.toFType();
         FX1^typeLeft := FX^typeLeft;
