@@ -42,8 +42,7 @@ inh tds : TDS for
 syn type : TYPE for
         TYPE,
         BLOC, INSTS, INST, E, STYPE, PTRS,
-        A, AFFX, R, AX, T, TX, F, FX, SIX, RX,
-        ES, ESX ;
+        A, AFFX, R, AX, T, TX, F, FX, SIX, RX ;
 
 -- Typage d'un enregistrement.
 inh typeCHP : STRUCT for CHAMPS, CHAMP;
@@ -1119,8 +1118,17 @@ FX -> #type ;
 -- Propagation du type racine.
 #type {
 local
+    ft : FTYPE;
 do
-    FX^type := FX^typeLeft;
+    -- En cas d'appel de fonction, le type resultant est le type de retour de la fonction
+    -- et non le type de la fonction lui-meme.
+    if (FX^typeLeft.isFType()) then
+        ft := FX^typeLeft.toFType();
+        FX^type := ft.retType();
+    else
+        -- Propagation du type.
+        FX^type := FX^typeLeft;
+    end
 end
 }
 
@@ -1202,7 +1210,7 @@ end
 --
 --
 -- Appel de sous-programme
-FX -> #type1 paro ES parf #type2 FX #type3 ;
+FX -> #type1 paro ES parf FX #type2 ;
 
 -- Verification du type racine.
 #type1 {
@@ -1211,19 +1219,13 @@ do
         error(MCS_NOT_FUNCTION);
     else
         ES^typeF := FX^typeLeft.toFType();
+        FX1^typeLeft := FX^typeLeft;
     end
 end
 }
 
--- Transmission du type de la fonction.
-#type2 {
-do
-    FX1^typeLeft := ES^type;
-end
-}
-
 -- Recuperation du type.
-#type3 {
+#type2 {
 do
     FX^type := FX1^type;
 end
@@ -1231,23 +1233,16 @@ end
 
 --
 --
--- Appel de sous-programme sans arguments.
-ES -> #type ;
-
--- Fonction sans parametres, aucune verification necessaire.
-#type {
-do
-    ES^type := ES^typeF;
-end
-}
+-- Appel de sous-programme sans arguments, aucune verification necessaire.
+ES -> ;
 
 --
 --
 -- Appel de sous-programme avec arguments.
-ES -> E #type1 ESX #type2 ;
+ES -> E #type ESX ;
 
 -- Verification du type du parametre.
-#type1 {
+#type {
 local
     tParam : TYPE;
 do
@@ -1255,38 +1250,23 @@ do
     if E^type /= tParam then
         error(MCS_BAD_ARGUMENT, tParam.name(), E^type.name());
     else
-        -- TODO: Pousser le parametre dans la TDS.
         ESX^numParam := 1;
     end
-end
-}
-
--- Recuperation du type.
-#type2 {
-do
-    ES^type := ESX^type;
 end
 }
 
 --
 --
 -- Appel de sous-programme avec arguments : fin de liste.
-ESX -> #type ;
-
--- Fin de liste d'arguments, transmission du type.
-#type {
-do
-    ESX^type := ESX^typeF;
-end
-}
+ESX -> ;
 
 --
 --
 -- Appel de sous-programme avec arguments : suite.
-ESX -> virg E #type1 ESX #type2 ;
+ESX -> virg E #type ESX ;
 
 -- Verification du type du parametre.
-#type1 {
+#type {
 local
     tParam : TYPE;
 do
@@ -1296,13 +1276,6 @@ do
     else
         ESX1^numParam := ESX^numParam + 1;
     end
-end
-}
-
--- Recuperation du type.
-#type2 {
-do
-    ESX^type := ESX1^type;
 end
 }
 
