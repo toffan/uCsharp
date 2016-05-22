@@ -38,6 +38,9 @@ inh tds : TDS for
         CHAMPS, CHAMP,
         E, A, AFFX, R, RX, AX, T, TX, F, FX, SIX,
         ES, ESX ;
+        
+syn code : String for
+         ENTITES, ENTITE ;
 
 syn type : TYPE for
         TYPE,
@@ -168,7 +171,7 @@ end
 #gen {
 local
 do
-    gen.generateFile(PROGRAMME^gen.getFileName() + "; no code\n");
+    gen.generateFile(";"+PROGRAMME^gen.getFileName() + "\n"+ENTITES^code+"; EOF\n");
 end
 }
 
@@ -178,13 +181,28 @@ end
 --
 --
 
-ENTITES -> ;
-ENTITES -> ENTITE ENTITES ;
+ENTITES -> #code;
+
+#code {
+local
+do
+	ENTITES^code := "";
+end
+}
+
+ENTITES -> ENTITE ENTITES #code;
+
+#code {
+local
+do
+	ENTITES^code := ENTITE^code+ENTITES1^code;
+end
+}
 
 --
 --
 -- Definition d'un nom de type (commence par une majuscule).
-ENTITE -> typedef TYPE identc pv #record ;
+ENTITE -> typedef TYPE identc pv #record #code;
 
 -- Enregistrement du nouveau type dans la table des symboles.
 #record {
@@ -206,11 +224,17 @@ do
 end
 }
 
+#code {
+local
+do
+	ENTITE^code := "; typedef de "+identc^txt+"\n";
+end
+}
 --
 --
 -- Definition d'une variable globale ou d'une fonction.
 -- (Commence par une minuscule)
-ENTITE -> TYPE ident #prerecord DECL #record ;
+ENTITE -> TYPE ident #prerecord DECL #record;
 
 -- Verification de la non existence de l'ident dans la tds locale.
 #prerecord {
