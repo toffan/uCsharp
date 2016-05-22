@@ -63,7 +63,8 @@ typedef struct { int x; int y; } Toto;
 // fonction illustrant les expressions arithmetiques
 int bar(int a, int b){
    Toto* pt;
-   *pt.x = 3;
+   (*pt).x = 3;
+   pt->x = 2;
    pt->y = 3;
    int u = 301;
    int v = 401;
@@ -104,7 +105,7 @@ int main(){
     char c = 'a';
     int y = 999;
     // appel fonction
-    int res = foo2 (y, (int) c);
+    int res = foo(y, (int) c);
     // appel fonction bar
     log("Hello, world ! ", bar(98,99));
     // instruction conditionnelle
