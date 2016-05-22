@@ -137,6 +137,7 @@ compil ASM;
 PROGRAMME -> #init ENTITES #gen;
 global
     machine : IMachine;
+    gen: GeneratorItf;
 -- Transmission de la machine cible (choisie par l'option -m au lancement)
 #init {
 local
@@ -144,10 +145,11 @@ local
     tds : TDS;
 do
     machine := PROGRAMME^source.getMachine();
-    if machine = null then
+    gen := new TamGenerator(); -- On reviendra sur le choix de la machine plus tard.
+    if gen = null then
         error(NO_MACH, PROGRAMME^source.getMachName());
     else
-        ENTITES^machine := machine;
+        ENTITES^gen := gen;
     end
 
     tds := new TDS();
@@ -166,7 +168,7 @@ end
 #gen {
 local
 do
-    machine.writeCode(PROGRAMME^source.getFileName(), "; no code\n");
+    gen.generateFile(PROGRAMME^gen.getFileName(), "; no code\n");
 end
 }
 

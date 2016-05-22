@@ -11,14 +11,8 @@ public class TamHelperGeneral implements HelperGeneralInterface {
 
 	// compteur pour le generateur d'etiquettes
 	private int labelCounter = 0;
-	
-    // nom du fichier a compiler en TAM
-	private String filename;
-	
-	
-	public TamHelperGeneral(String filename){
-		this.filename = filename;
-	}
+		
+	public TamHelperGeneral(){}
 	
 	/**
 	 * {@inheritDoc}

@@ -8,6 +8,9 @@ import mcs.gc.general.*;
 
 public class TamGenerator implements GeneratorItf{
     
+    // nom du fichier a compiler en TAM
+	private String filename;
+		
 	//helpers
 	private TamHelperBool boolHelper;
 	private TamHelperChar charHelper;
@@ -30,12 +33,13 @@ public class TamGenerator implements GeneratorItf{
      */
 	public TamGenerator(String fname) {
 		if (fname.endsWith(".c")) {
-			this.generalHelper = new TamHelperGeneral(fname.substring(0, fname.length() - 2));
+			this.filename = fname.substring(0, fname.length() - 2);
 		} else {
-			this.generalHelper = new TamHelperGeneral(fname);
+			this.filename = fname;
 		}
 		
 		//initialisation des helpers
+		this.generalHelper = new TamHelperGeneral();
 		this.boolHelper = new TamHelperBool();
 		this.charHelper = new TamHelperChar();
 		this.intHelper = new TamHelperInt();
@@ -50,7 +54,7 @@ public class TamGenerator implements GeneratorItf{
      */
 	public void generateFile(String code) {
 		try {
-			PrintWriter pw = new PrintWriter(new FileOutputStream(this.filename + ".tam"));
+			PrintWriter pw = new PrintWriter(new FileOutputStream(this.getFilename() + ".tam"));
 			pw.println(";;; code TAM engendre pour " + this.filename + "\n");
 			pw.print(code + "\tHALT\n");
 			pw.close();
@@ -84,4 +88,8 @@ public class TamGenerator implements GeneratorItf{
 	}
 
 	public TamHelperFunction getFunctionHelper() { return functionHelper; }
+	
+	public String getFilename(){
+		return this.filename;
+	}
 }
