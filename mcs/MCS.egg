@@ -1061,6 +1061,7 @@ F -> paro TYPE parf F #type ;
 #type {
 local
 do
+    warning(MCS_WAR_CAST, F1^type.name(), TYPE^type.name());
     F^type := TYPE^type;
 end
 }
@@ -1112,10 +1113,10 @@ end
 
 --
 --
--- TODO: Ajouter un commentaire.
+-- Fin d'evaluation du type d'un facteur.
 FX -> #type ;
 
--- TODO: Ajouter un commentaire.
+-- Propagation du type racine.
 #type {
 local
 do
