@@ -751,8 +751,9 @@ local
 do
     if AFFX^type /= null && AFFX^type /= A^type then
         error(MCS_BAD_TYPE_2_BIS, A^type.name(), AFFX^type.name());
+    else
+        E^type := A^type;
     end
-    E^type := A^type;
 end
 }
 
@@ -799,8 +800,8 @@ do
             A^type := A^tds.searchType("int", true);
         end
     else
-        -- Condition : type int ou bool selon la version.
-        A^type := A^tds.searchType("int", true);
+        -- Pas de comparaison, utilisation du type de R.
+        A^type := R^type;
     end
 end
 }
