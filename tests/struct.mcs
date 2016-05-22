@@ -1,0 +1,13 @@
+struct {
+    int n;
+    char c;
+} ano;
+
+typedef struct {
+    int age;
+    int favoriteColor;
+    char* name;
+} Fiche;
+
+Fiche test;
+

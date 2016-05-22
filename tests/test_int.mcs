@@ -1,0 +1,33 @@
+//test-int.mcs
+//effectue des tests sur les entiers.
+
+// assembleur inline en dehors d'une fonction
+asm {
+   CALL (LB) _main   ; appel au point d'entree du programme
+   HALT              ; arret de la machine
+   }
+
+// point d'entree du programme.
+int main(){
+    int a = 3;
+    int b = 4;
+    
+    int aFb = a*b; //a fois b
+    int aPb = a+b; //a plus b
+    int aMb = a-b;
+    int bMa = b-a;
+    
+    if(1 < 2){
+			asm{
+				LOAD %a
+				SUBR SOut
+			}
+	}else{
+		asm{
+				LOAD %b
+				SUBR SOut
+			}
+	}
+    
+	return 0;
+}

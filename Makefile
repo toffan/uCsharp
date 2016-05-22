@@ -20,7 +20,9 @@ src :
 
 att :
 	$(JDIR)/javac -classpath $(GJAR) mcs/tds/*.java
-	$(JDIR)/javac -classpath $(GJAR) mcs/type/*.java
+	$(JDIR)/javac -classpath $(GJAR) mcs/libasm/tds/*.java
+	$(JDIR)/javac -classpath $(GJAR) mcs/libasm/type/*.java
+	$(JDIR)/javac -classpath $(GJAR) mcs/libasm/gc/*.java
 	$(JDIR)/javac -classpath $(GJAR) mcs/gc/*.java
 	$(JDIR)/javac -classpath $(GJAR) mcs/compiler/*.java
 
@@ -30,7 +32,9 @@ class :
 clean :
 	rm -rf $(PACKAGE)
 	rm -f mcs/tds/*.class
-	rm -f mcs/type/*.class
+	rm -f mcs/libasm/tds/*.class
+	rm -f mcs/libasm/type/*.class
+	rm -f mcs/libasm/gc/*.class
 	rm -f mcs/gc/*.class
 	rm -f mcs/compiler/*.class
 	rm -rf mcs/egg/*

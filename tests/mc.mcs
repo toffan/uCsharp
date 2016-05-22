@@ -1,7 +1,28 @@
+// assembleur inline en dehors d'une fonction
+asm {
+   CALL (LB) _main   ; appel au point d'entree du programme
+   HALT              ; arret de la machine
+   }
+
+// Assembleur inline dans une fonction.
+// malloc en TAM :
+// params : Taille : entier (pre : >0)
+// retour : entier (post : une adresse dans le tas)
+int*  malloc(int taille){
+  int adr;
+  // appel a l'allocation TAM
+  asm {
+    LOAD %taille    ; acces au parametre taille
+    SUBR Malloc     ; allocation
+    STORE %adr      ; resultat dans adr
+  }
+  return adr;
+}
+
 // NB. Ce programme ne sert qu'a illustrer les concepts de mC
 // et ne calcule rien de particulier !
 // nom de type (doit commencer par une majuscule)
-typedef int Entier ; 
+typedef int Entier ;
 
 // variable globale
 Entier x;
@@ -15,7 +36,6 @@ typedef struct {
 // variable globale
 Point p;
 
-
 // fonction illustrant la manipulation de pointeurs.
 int foo(int n, int m){
     // declaration de variable locale sans initialisation
@@ -24,57 +44,39 @@ int foo(int n, int m){
     // declaration avec initialisation
     int a = n + m;
     // declaration d'un pointeur et allocation de la zone pointee
-    int *m = (int *)malloc(1);
-    a = *m +666;
+    int* mm = (int*) malloc(1);
+    a = *mm +666;
     // declaration d'un pointeur sur pointeur
-    int ** k = (int **)malloc(1) ;
-    *k = m;
+    int**  k = (int** )malloc(1) ;
+    *k = mm;
     // allocation
-    *k = (int *)malloc(1) ;
-    ** k = 12;
+    *k = (int* )malloc(1) ;
+    **k = 12;
     int b = **k + 9999;
     // cast
-    m = (int *)malloc(1);
-    return m;
+    mm = (int* )malloc(1);
+    return (int) m;
 }
+
+typedef struct { int x; int y; } Toto;
 
 // fonction illustrant les expressions arithmetiques
 int bar(int a, int b){
-   struct { int x; int y; } *pt;
-   *pt.x = 3;
+   Toto* pt;
+   (*pt).x = 3;
+   pt->x = 2;
    pt->y = 3;
    int u = 301;
    int v = 401;
    int result;
    result = foo(33*a - b > (-55*u/22%11/v));
    return result;
-} 
-
-// assembleur inline en dehors d'une fonction
-asm {
-   CALL (LB) _main   ; appel au point d'entree du programme
-   HALT              ; arret de la machine
-   }
-
-// Assembleur inline dans une fonction. 
-// malloc en TAM : 
-// params : Taille : entier (pre : >0)
-// retour : entier (post : une adresse dans le tas)
-int * malloc(int taille){
-  int adr;
-  // appel a l'allocation TAM
-  asm {
-    LOAD %taille    ; acces au parametre taille
-    SUBR Malloc     ; allocation
-    STORE %adr      ; resultat dans adr
-  }
-  return adr;
 }
 
 // fonction renvoyant un pointeur utilisant la fonction precedente
-int * pointeur(int x){
+int*  pointeur(int x){
   // declaration et allocation
-  int *p = malloc(x);
+  int* p = malloc(x);
   // appel fonction foo
   *p = foo(999, 1);
   // retourner le pointeur
@@ -84,7 +86,7 @@ int * pointeur(int x){
 
 // Assembleur inline dans une fonction
 // log : afficher un message et une valeur
-void log(char *message, int valeur){
+void log(char* message, int valeur){
   int x = 12;
   asm {
     LOAD %message        ; acces au premier parametre
@@ -93,7 +95,7 @@ void log(char *message, int valeur){
     LOAD %x              ; acces a la variable x
     SUBR IAdd
     SUBR IOUT
-    SUBR LN 
+    SUBR LN
     }
 }
 
@@ -103,9 +105,7 @@ int main(){
     char c = 'a';
     int y = 999;
     // appel fonction
-    char c = 'a';
-    int y = 999;
-    int res = foo2 (y, (int) c);
+    int res = foo(y, (int) c);
     // appel fonction bar
     log("Hello, world ! ", bar(98,99));
     // instruction conditionnelle
