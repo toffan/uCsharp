@@ -11,27 +11,27 @@ import mcs.gc.tam.TamHelperString;
 /**
  * Interface à respecter pour un generateur de code assembleur
  */
-public interface GeneratorItf{
-	/**
-	 * Ecrit le code entier dans un fichier du nom donne au debut.
-	 *
-	 * @param code
-	 */
-	public void generateFile(String code);
-	
-	public String getFileName();
-	
-	public HelperBoolInterface getBoolHelper();
+public interface GeneratorItf {
+    /**
+     * Ecrit le code entier dans un fichier du nom donne au debut.
+     *
+     * @param code
+     */
+    public void generateFile(String code);
 
-	public HelperCharInterface getCharHelper();
+    public String getFileName();
 
-	public HelperIntInterface getIntHelper();
+    public HelperBoolInterface getBoolHelper();
 
-	public HelperMemoryInterface getMemoryHelper();
+    public HelperCharInterface getCharHelper();
 
-	public HelperStringInterface getStringHelper();
+    public HelperIntInterface getIntHelper();
 
-	public HelperGeneralInterface getGeneralHelper();
+    public HelperMemoryInterface getMemoryHelper();
 
-	public HelperFunctionInterface getFunctionHelper();
+    public HelperStringInterface getStringHelper();
+
+    public HelperGeneralInterface getGeneralHelper();
+
+    public HelperFunctionInterface getFunctionHelper();
 }

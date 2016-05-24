@@ -28,7 +28,7 @@ public class Logger {
     }
 
     public void print() {
-        for (String line: log) {
+        for (String line : log) {
             System.out.println(line);
         }
     }

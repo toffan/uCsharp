@@ -13,27 +13,28 @@ public class TamHelperFunction implements HelperFunctionInterface {
     /**
      * @{inheriDoc}
      */
-    public String generateFunction(String functionName, String functionTag, String code) {
-        return "; code de la fonction :  " + functionName + " \n" +
-                "_" + functionTag + ":\n"
-                + code
-                + "; fin code fonction " + functionName + " \n";
+    public String generateFunction(String functionName, String functionTag,
+                                   String code) {
+        return "; code de la fonction :  " + functionName + " \n"
+            + "_" + functionTag + ":\n" + code + "; fin code fonction " +
+            functionName + " \n";
     }
 
-    public String generateReturn(int sizeReturn, int depReturn, String codeRetour) {
-        return "; retour"
-                + codeRetour
-                + "\tRETURN (" + sizeReturn + ")" + depReturn + "\n";
+    public String generateReturn(int sizeReturn, int depReturn,
+                                 String codeRetour) {
+        return "; retour" + codeRetour + "\tRETURN (" + sizeReturn + ")" +
+            depReturn + "\n";
     }
 
-    public String generateCall(String functionName, String functionTag, List<VAR> parameters) {
-        String code = "; Appel fonction : " + functionName + " avec les parametres :\n";
+    public String generateCall(String functionName, String functionTag,
+                               List<VAR> parameters) {
+        String code =
+            "; Appel fonction : " + functionName + " avec les parametres :\n";
         for (VAR p : parameters) {
-            code += ";\t <nom parametre>  <type parametre> \n";
+            code += ";\t " + p.name() + " : " + p.type().name() + "\n";
+            p.addr() code += "PUSH ";
         }
         code += "\tCALL(SB) _" + functionTag + "\n";
         return code;
     }
-
-
 }

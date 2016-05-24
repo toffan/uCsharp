@@ -52,5 +52,4 @@ public interface HelperStringInterface {
     String generateStringToChar(String value);
 
     String generateStringToChar(int dep, int size);
-
 }

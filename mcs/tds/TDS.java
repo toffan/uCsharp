@@ -45,7 +45,8 @@ public class TDS {
      * Ajoute ou mets a jour une variable
      */
     public void putVar(String id, TYPE type) {
-        this.lg.entry("ajout de la VAR '" + id + "' de TYPE '" + type.name() + "'.");
+        this.lg.entry("ajout de la VAR '" + id + "' de TYPE '" + type.name() +
+                      "'.");
 
         VAR var = new VAR(type, this.nxtAddr);
         this.nxtAddr = this.nxtAddr.next(type.size());
@@ -82,9 +83,13 @@ public class TDS {
      * Ajoute ou mets a jour un type
      */
     public void putType(String id, TYPE type) {
-        // Si le type est anonyme (struct par exemple), on le nomme d'apres son id.
-        if (type.name().isEmpty()) { type.setName(id); }
-        this.lg.entry("ajout du TYPE '" + type.name() + "' de taille " + type.size() + " en tant que '" + id + "'.");
+        // Si le type est anonyme (struct par exemple), on le nomme d'apres son
+        // id.
+        if (type.name().isEmpty()) {
+            type.setName(id);
+        }
+        this.lg.entry("ajout du TYPE '" + type.name() + "' de taille " +
+                      type.size() + " en tant que '" + id + "'.");
         this.types.put(id, type);
     }
 }

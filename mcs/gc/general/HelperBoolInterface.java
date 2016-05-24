@@ -58,5 +58,4 @@ public interface HelperBoolInterface {
 
     /** bool to string **/
     public String generateBoolToString();
-
 }

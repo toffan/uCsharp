@@ -5,10 +5,8 @@ package mcs.libasm.tds;
 
 /**
  * Element d'une ASMTDS
- * 
+ *
  * @author marcel
- * 
+ *
  */
-public interface INFO {
-
-}
+public interface INFO {}
