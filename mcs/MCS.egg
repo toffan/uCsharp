@@ -69,7 +69,7 @@ inh gen : GeneratorItf for
 
 -- Le code genere.
 syn code : String for
-         ENTITES, ENTITE, DECL ;
+         ENTITES, ENTITE, DECL, FONCTION, BLOC ;
 
 -- Nom de l'ident a gauche d'une declaration.
 inh name : String for DECL;
@@ -344,8 +344,7 @@ local
     h : HelperFunctionInterface;
 do
     h := DECL^gen.getFunctionHelper();
-    --DECL^code := h.generateFunction(DECL^name, "__" + DECL^name + "__", FONCTION^code);
-    DECL^code := h.generateFunction(DECL^name, "__" + DECL^name + "__", "");
+    DECL^code := h.generateFunction(DECL^name, "_" + DECL^name, FONCTION^code);
 end
 }
 
@@ -358,7 +357,7 @@ end
 --
 --
 -- Debut de la premiere ligne d'une fonction.
-FONCTION -> paro PARFS parf #type BLOC ;
+FONCTION -> paro PARFS parf #type BLOC #code ;
 
 -- Transmission de la TDS interne de la fonction au corps de fonction.
 #type {

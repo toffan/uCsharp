@@ -32,7 +32,8 @@ public class TamHelperFunction implements HelperFunctionInterface {
             "; Appel fonction : " + functionName + " avec les parametres :\n";
         for (VAR p : parameters) {
             code += ";\t " + p.name() + " : " + p.type().name() + "\n";
-            p.addr() code += "PUSH ";
+            // p.addr()
+            // code += "PUSH ";
         }
         code += "\tCALL(SB) _" + functionTag + "\n";
         return code;
