@@ -759,7 +759,7 @@ end
 --
 --
 -- Un nouveau bloc est insere en instruction.
-INST -> BLOC #type ;
+INST -> BLOC #type #code ;
 
 -- Un nouveau bloc est insere en instruction, si il est dote d'un type de
 -- retour, il contient un " return ", et son type se propage
@@ -767,6 +767,13 @@ INST -> BLOC #type ;
 local
 do
     INST^type := BLOC^type;
+end
+}
+
+-- Recuperation du code genere.
+#code {
+do
+    INST^code := BLOC^code;
 end
 }
 
