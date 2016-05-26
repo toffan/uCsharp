@@ -946,7 +946,14 @@ end
 --
 --
 -- Affectation
-AFFX -> affect A #type ;
+AFFX -> affect #precode A #type #code ;
+
+-- Determine si l'expression A doit generer une adresse ou une valeur.
+#precode {
+do
+    A^leftValue := false;
+end
+}
 
 -- Verification du type des affectations (suite).
 #type {
@@ -956,16 +963,31 @@ do
 end
 }
 
+-- Generation du code pour une declaration avec initialisation : on utilise le code genere pour A.
+#code {
+local
+do
+    AFFX^code := A^code;
+end
+}
+
 --
 --
 -- Fin d'une affectation.
-AFFX -> #type ;
+AFFX -> #type #code ;
 
 -- Verification du type des affectations (fin).
 #type {
 local
 do
     AFFX^type := null;
+end
+}
+
+-- Generation du code pour une absence de rightValue.
+#code {
+do
+    AFFX^code := "";
 end
 }
 
