@@ -42,12 +42,12 @@ public class TamHelperGeneral implements HelperGeneralInterface {
     /**
      * {@inheritDoc}
      */
-    public String generateIf(String code, String code2, String code3) {
+    public String generateIf(String condition, String codeElse, String codeIf) {
         String sinon = this.generateLabel();
         String fin = this.generateLabel();
-        return "\t; if\n" + code + "\n"
-            + "\tJUMPIF(0) " + sinon + "\n" + code2 + "\n"
-            + "\tJUMP " + fin + "\n" + sinon + "\n" + code3 + "\n" + fin + "\n"
+        return "\t; if\n" + condition + "\n"
+            + "\tJUMPIF(0) " + sinon + "\n" + codeElse + "\n"
+            + "\tJUMP " + fin + "\n" + sinon + "\n" + codeIf + "\n" + fin + "\n"
             + "\t; fin if\n";
     }
 

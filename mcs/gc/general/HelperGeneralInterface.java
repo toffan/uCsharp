@@ -36,20 +36,16 @@ public interface HelperGeneralInterface {
 
     /**
      * Code pour generer une condition.
-     *
-     * @param code
-     * @param code2
-     * @param code3
-     * @return
+     * @param condition code de la condition
+     * @param codeElse code exécuté si la condition n'est pas valide
+     * @param codeIf code exécuté si la condition est valide
      */
-    public String generateIf(String code, String code2, String code3);
+    public String generateIf(String condition, String codeElse, String codeIf);
 
 
     /**
      * code pour generer un commentaire
-     *
-     * @param c
-     * @return
+     * @param c le texte du commentaire
      */
     public String generateComment(String c);
 }
