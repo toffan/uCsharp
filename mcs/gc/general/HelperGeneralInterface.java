@@ -37,10 +37,11 @@ public interface HelperGeneralInterface {
     /**
      * Code pour generer une condition.
      * @param condition code de la condition
-     * @param codeElse code exécuté si la condition n'est pas valide
-     * @param codeIf code exécuté si la condition est valide
+     * @param codeIf code exécuté si la condition est valide (bloc SI).
+     * @param codeElse code exécuté si la condition n'est pas valide (bloc SINON).
+     * @return
      */
-    public String generateIf(String condition, String codeElse, String codeIf);
+    public String generateIf(String condition, String codeIf, String codeElse);
 
 
     /**
