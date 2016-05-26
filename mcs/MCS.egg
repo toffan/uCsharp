@@ -739,7 +739,7 @@ end
 --
 --
 -- Instruction " expression " (affectation et appel de procedure).
-INST -> E pv #type ;
+INST -> E pv #type #code ;
 
 -- Une expression seule est un effet de bord, pas de type.
 #type {
@@ -749,6 +749,12 @@ do
 end
 }
 
+-- Recuperation du code genere.
+#code {
+do
+    INST^code := E^code;
+end
+}
 
 --
 --
