@@ -63,7 +63,7 @@ public interface HelperMemoryInterface {
      * @param taille
      * @return
      */
-    public String generateDynamicWriteMem(int taille);
+    public String generateDynamicWrite(int taille);
 
 
     /**

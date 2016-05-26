@@ -33,7 +33,7 @@ public class TamHelperMemory implements HelperMemoryInterface {
     /**
      * {@inheritDoc}
      */
-    public String generateDynamicWriteMem(int taille) {
+    public String generateDynamicWrite(int taille) {
         return "\tSTOREI(" + taille + ")\n";
     }
 
