@@ -70,7 +70,9 @@ inh gen : GeneratorItf for
 
 -- Le code genere.
 syn code : String for
-         ENTITES, ENTITE, DECL, FONCTION, BLOC ;
+         ENTITES, ENTITE, DECL, FONCTION,
+         BLOC, INSTS, INST, A, AFFX, E, SIX,
+         R, RX, T, TX, F, FX;
 
 -- Nom de l'ident a gauche d'une declaration.
 inh name : String for DECL;
