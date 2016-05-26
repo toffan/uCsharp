@@ -56,7 +56,8 @@ inh numParam : Integer for ESX;
 
 -- Typage declaration de fonction.
 syn varF : FCT for DECL ;
-inh fct : FCT for FONCTION, PARFS, PARFSX, PARF ;
+inh fct : FCT for FONCTION, PARFS, PARFSX, PARF,
+        BLOC, INSTS, INST, SIX ;
 
 -- Le generateur de code.
 inh gen : GeneratorItf for
@@ -866,12 +867,23 @@ end
 --
 --
 -- L'instruction retourne un type, un " return de fonction ".
-INST -> retour E pv #type ;
+INST -> retour E pv #type #code ;
 #type {
 local
 do
     -- Instruction return : on transfere le type de l'expression renvoyee.
     INST^type := E^type;
+end
+}
+
+#code {
+local
+    h : HelperFunctionInterface;
+    tFct : FTYPE;
+do
+    h := INST^gen.getFunctionHelper();
+    tFct := INST^fct.type();
+    INST^code := E^code + "; return explicite pour " + INST^fct.name() + "\n" + h.generateReturn(tFct.sizeParams(), E^type.size(), "");
 end
 }
 
