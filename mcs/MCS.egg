@@ -780,7 +780,7 @@ end
 --
 --
 -- Bloc conditionnel.
-INST -> si paro E parf BLOC SIX #type ;
+INST -> si paro E parf BLOC SIX #type #code ;
 
 -- Le type du bloc conditionnel correspond au type de retour commun.
 #type {
@@ -813,10 +813,20 @@ do
 end
 }
 
+-- Generation du code pour le if.
+#code {
+local
+    h : HelperGeneralInterface;
+do
+    h := INST^gen.getGeneralHelper();
+    INST^code := h.generateIf(E^code, BLOC^code, SIX^code);
+end
+}
+
 --
 --
 -- Bloc sinon.
-SIX -> sinon BLOC #type ;
+SIX -> sinon BLOC #type #code ;
 
 -- Propagation du type.
 #type {
@@ -826,16 +836,30 @@ do
 end
 }
 
+-- Recuperation du code genere.
+#code {
+do
+    SIX^code := BLOC^code;
+end
+}
+
 --
 --
 -- Pas de bloc suivant dans la conditionnelle.
-SIX -> #type ;
+SIX -> #type #code ;
 
 -- Pas de bloc, considere comme un effet de bord.
 #type {
 local
 do
     SIX^type := null;
+end
+}
+
+-- Recuperation du code genere.
+#code {
+do
+    SIX^code := "";
 end
 }
 
