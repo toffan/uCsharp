@@ -690,7 +690,7 @@ end
 --
 --
 -- Declaration d'une variable locale, avec ou sans initialisation.
-INST -> TYPE ident #record AFFX pv #type ;
+INST -> TYPE ident #record AFFX pv #type #code ;
 
 -- Enregistrement de la variable dans la TDS du bloc.
 #record {
@@ -716,6 +716,22 @@ do
     -- Verification du type de l'affectation.
     if AFFX^type /= null && AFFX^type /= TYPE^type then
         error(MCS_BAD_TYPE_2, TYPE^type.name(), AFFX^type.name(), ident^txt);
+    end
+end
+}
+
+-- Recuperation du code genere.
+#code {
+local
+    h : HelperMemoryInterface;
+do
+    h := INST^gen.getMemoryHelper();
+    if AFFX^type = null then
+        -- Generation du code pour une declaration sans initialisation.
+        INST^code := h.generateReserve(TYPE^type.size());
+    else
+        -- Generation du code pour une declaration avec initialisation (recuperation de la rightValue).
+        INST^code := AFFX^code;
     end
 end
 }
