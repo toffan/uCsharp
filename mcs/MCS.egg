@@ -1419,7 +1419,7 @@ end
 --
 --
 -- Appel de sous-programme
-FX -> #type1 paro ES parf FX #type2 ;
+FX -> #type1 paro ES parf FX #type2 #code ;
 
 -- Verification du type racine.
 #type1 {
@@ -1437,6 +1437,16 @@ end
 #type2 {
 do
     FX^type := FX1^type;
+end
+}
+
+#code {
+local
+    h : HelperFunctionInterface;
+do
+    h := FX^gen.getFunctionHelper();
+    -- listeCode contient le code pour pousser les parametres de la fonction sur la pile.
+    FX^code := h.generateCall(ES^listeCode) + FX1^code;
 end
 }
 
