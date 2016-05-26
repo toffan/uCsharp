@@ -623,13 +623,19 @@ end
 --
 --
 -- Delimitation d'un bloc de code.
-BLOC -> aco INSTS acf #type ;
+BLOC -> aco INSTS acf #type #code ;
 
 -- Le type propage est non-null si le bloc contient une instruction " return ".
 #type {
 local
 do
     BLOC^type := INSTS^type;
+end
+}
+
+#code {
+do
+    BLOC^code := INSTS^code;
 end
 }
 
