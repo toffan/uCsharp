@@ -75,6 +75,9 @@ syn code : String for
 -- Nom de l'ident a gauche d'une declaration.
 inh name : String for DECL;
 
+-- Permet de savoir si une expression est une leftValue ou non.
+inh leftValue : Boolean for A;
+
 -- Terminaux
 space separateur is    "[\r\n\t ]+";
 space comm is    "\/\/[^\n]*\n";
@@ -906,7 +909,14 @@ end
 --
 --
 -- Expression qui affecte.
-E -> A AFFX #type ;
+E -> #precode A AFFX #type #code ;
+
+-- Determine si l'expression A doit generer une adresse ou une valeur.
+#precode {
+do
+    A^leftValue := true;
+end
+}
 
 -- Verification du type des affectations.
 #type {
@@ -916,6 +926,19 @@ do
         error(MCS_BAD_TYPE_2_BIS, A^type.name(), AFFX^type.name());
     else
         E^type := A^type;
+    end
+end
+}
+
+#code {
+local
+    h : HelperMemoryInterface;
+do
+    h := E^gen.getMemoryHelper();
+    if AFFX^type /= null then
+        E^code := AFFX^code + A^code + h.generateDynamicWriteMem(AFFX^type.size());
+    else
+        E^code := A^code;
     end
 end
 }
