@@ -20,10 +20,10 @@ public class TamHelperFunction implements HelperFunctionInterface {
             functionName + " \n";
     }
 
-    public String generateReturn(int sizeReturn, int depReturn,
+    public String generateReturn(int sizeParams, int sizeReturn,
                                  String codeRetour) {
-        return "; retour" + codeRetour + "\tRETURN (" + sizeReturn + ")" +
-            depReturn + "\n";
+        return "; retour" + codeRetour + "\tRETURN (" + sizeParams + ")" +
+            sizeReturn + "\n";
     }
 
     public String generateCall(String functionName, String functionTag,
