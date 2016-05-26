@@ -642,7 +642,7 @@ end
 --
 --
 -- Instruction vide, effet de bord.
-INSTS -> #type ;
+INSTS -> #type #code ;
 
 -- Un effet de bord ne retourne rien, type null.
 #type {
@@ -652,10 +652,17 @@ do
 end
 }
 
+-- Pas de code genere.
+#code {
+do
+    INSTS^code := "";
+end
+}
+
 --
 --
 -- Ajout d'une instruction dans le bloc.
-INSTS -> INST INSTS #type ;
+INSTS -> INST INSTS #type #code ;
 
 -- Le type d'une instruction INST (differente d'une expression E) est soit :
 --    - null (effet de bord).
@@ -670,6 +677,13 @@ do
     else
         INSTS^type := INSTS1^type;
     end
+end
+}
+
+-- Concatenation du code genere pour les differentes instructions.
+#code {
+do
+    INSTS^code := INST^code + INSTS1^code;
 end
 }
 
