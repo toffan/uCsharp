@@ -1536,6 +1536,7 @@ INST -> asm #tds ASM #gen #type ;
 do
     -- A remplacer par la table courante pour que
     -- l'assembleur puisse acceder aux variables
+    -- TODO: gerer l'assembleur inline.
     ASM^tds_asm := null;
 end
 }
@@ -1546,6 +1547,7 @@ do
     -- ASM^code_asm contient le code assembleur inline
     -- dans lequel les noms de variables ont ete remplaces
     -- par leurs adresses.
+    INST^code := ASM^code_asm;
 end
 }
 
