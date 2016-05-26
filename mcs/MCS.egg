@@ -257,6 +257,7 @@ do
     else
         -- Propagation du type declare.
         DECL^typeLeft := TYPE^type;
+        -- Propagation du nom de l'ident de gauche.
         DECL^name := ident^txt;
     end
 end
@@ -330,7 +331,7 @@ do
     -- Creation du type a partir du type de retour de la fonction.
     t := new FTYPE(DECL^typeLeft);
     -- Creation de la VAR representant la fonction.
-    f := new FCT(t, DECL^tds);
+    f := new FCT(t, DECL^tds, DECL^name);
     -- Propagation de la VAR a DECL pour enregistrement dans la TDS (de la VAR ET du type associe).
     DECL^varF := f;
     -- Transmission de la VAR a FONCTION pour reellement generer la fonction et son type
@@ -364,6 +365,21 @@ FONCTION -> paro PARFS parf #type BLOC #code ;
 local
 do
     BLOC^tds := FONCTION^fct.tds();
+end
+}
+
+-- Recuperation du code du corps de la fonction
+-- Insertion d'un return artificiel au cas ou il n'y en aurait pas.
+#code {
+local
+    h : HelperFunctionInterface;
+    tFct : FTYPE;
+    tReturn : TYPE;
+do
+    h := FONCTION^gen.getFunctionHelper();
+    tFct := FONCTION^fct.type();
+    tReturn := tFct.retType();
+    FONCTION^code := BLOC^code + "; return artificiel pour " + FONCTION^fct.name() + "\n" + h.generateReturn(tFct.sizeParams(), 0, "");
 end
 }
 
