@@ -8,7 +8,7 @@ public class FCT extends VAR {
     ///   Attributs   ///
     private ArrayList<String> params;
     private TDS tds;
-    private name;
+    private String name;
 
     ///   Constructeurs   ///
     public FCT(FTYPE type, TDS parente, String name) {
@@ -54,5 +54,5 @@ public class FCT extends VAR {
         // Si le cast echoue, c'est du a une erreur de conception.
         return (FTYPE) super.type();
     }
-    public String name() { return this.name };
+    public String name() { return this.name; }
 }
