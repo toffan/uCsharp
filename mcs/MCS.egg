@@ -941,7 +941,7 @@ local
 do
     h := E^gen.getMemoryHelper();
     if AFFX^type /= null then
-        E^code := AFFX^code + A^code + h.generateDynamicWriteMem(AFFX^type.size());
+        E^code := AFFX^code + A^code + h.generateDynamicWrite(AFFX^type.size());
     else
         E^code := A^code;
     end
@@ -1602,7 +1602,7 @@ local
 do
     h := FX^gen.getFunctionHelper();
     -- codeList contient le code pour pousser les parametres de la fonction sur la pile.
-    FX^code := h.generateCall(ES^codeList) + FX1^code;
+    FX^code := h.generateCall(FX^typeLeft.name(), FX^typeLeft.name(), ES^codeList) + FX1^code;
 end
 }
 
