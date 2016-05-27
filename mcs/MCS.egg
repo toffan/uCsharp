@@ -80,6 +80,9 @@ inh name : String for DECL;
 -- Permet de savoir si une expression est une leftValue ou non.
 inh leftValue : Boolean for A;
 
+--le code généré pour chaque parametre d'une fonction
+syn codeList : ArrayList<String> for ES, ESX;
+
 -- Terminaux
 space separateur is    "[\r\n\t ]+";
 space comm is    "\/\/[^\n]*\n";
@@ -996,7 +999,7 @@ end
 --
 --
 -- Relation, moins prioritaire que A.
-A -> R AX #type ;
+A -> R AX #type #code;
 
 -- Verification du type d'une relation.
 #type {
@@ -1013,6 +1016,14 @@ do
         -- Pas de comparaison, utilisation du type de R.
         A^type := R^type;
     end
+end
+}
+
+#code{
+local
+do
+	--TODO
+	A^code := "";
 end
 }
 
@@ -1055,7 +1066,7 @@ OPREL -> neg ;
 --
 --
 -- Terme.
-R -> T RX #type ;
+R -> T RX #type #code;
 
 -- Verification du type d'une operation additive.
 #type {
@@ -1069,10 +1080,18 @@ do
 end
 }
 
+#code{
+local
+do
+	--TODO
+	R^code := "";
+end
+}
+
 --
 --
 -- Additions ...
-RX -> OPADD T RX #type ;
+RX -> OPADD T RX #type #code;
 
 -- Verification du type d'une operation additive (suite).
 #type {
@@ -1086,16 +1105,32 @@ do
 end
 }
 
+#code{
+local
+do
+	--TODO
+	RX^code := "";
+end
+}
+
 --
 --
 -- Fin d'une addition.
-RX -> #type ;
+RX -> #type #code;
 
 -- Verification du type d'une operation additive (fin).
 #type {
 local
 do
     RX^type := null;
+end
+}
+
+#code{
+local
+do
+	--TODO
+	RX^code := "";
 end
 }
 
@@ -1109,7 +1144,7 @@ OPADD -> ou ;
 --
 --
 -- Multiplication, ...
-T -> F TX #type ;
+T -> F TX #type #code;
 
 -- Verification du type d'une operation multiplicative.
 #type {
@@ -1123,10 +1158,18 @@ do
 end
 }
 
+#code{
+local
+do
+	--TODO
+	T^code := "";
+end
+}
+
 --
 --
 -- Suite de la multiplication.
-TX -> OPMUL F TX #type ;
+TX -> OPMUL F TX #type #code;
 
 -- Verification du type d'une operation multiplicative (suite).
 #type {
@@ -1140,16 +1183,31 @@ do
 end
 }
 
+#code{
+local
+do
+	--TODO
+	TX^code := "";
+end
+}
 --
 --
 -- Fin de la multiplication.
-TX -> #type ;
+TX -> #type #code;
 
 -- Verification du type d'une operation multiplicative (fin).
 #type {
 local
 do
     TX^type := null;
+end
+}
+
+#code{
+local
+do
+	--TODO
+	TX^code := "";
 end
 }
 
@@ -1170,7 +1228,7 @@ OPMUL -> et ;
 --
 --
 -- Constante entiere
-F -> entier #type ;
+F -> entier #type #code;
 
 -- Une constante entiere a un type entier.
 #type {
@@ -1180,10 +1238,18 @@ do
 end
 }
 
+#code{
+local
+do
+	--TODO
+	F^code := "";
+end
+}
+
 --
 --
 -- Constante chaine
-F -> chaine #type ;
+F -> chaine #type #code ;
 
 -- Une const-chaîne a un type de pointeur-sur-char.
 #type {
@@ -1193,10 +1259,18 @@ do
 end
 }
 
+#code{
+local
+do
+	--TODO
+	F^code := "";
+end
+}
+
 --
 --
 -- Constante caractere
-F -> caractere #type ;
+F -> caractere #type #code;
 
 -- Type char.
 #type {
@@ -1206,16 +1280,33 @@ do
 end
 }
 
+#code{
+local
+do
+	--TODO
+	F^code := "";
+end
+}
+
+
 --
 --
 -- Expression unaire
-F -> OPUN F #type ;
+F -> OPUN F #type #code ;
 
 -- Propagation du type.
 #type {
 local
 do
     F^type := F1^type;
+end
+}
+
+#code{
+local
+do
+	--TODO
+	F^code := "";
 end
 }
 
@@ -1229,7 +1320,7 @@ OPUN -> non;
 --
 --
 -- Pointeur NULL
-F -> null #type ;
+F -> null #type #code;
 
 -- Type du pointeur null.
 #type {
@@ -1241,10 +1332,18 @@ do
 end
 }
 
+#code{
+local
+do
+	--TODO
+	F^code := "";
+end
+}
+
 --
 --
 -- Expression parenthesee
-F -> paro E parf #type1 FX #type2 ;
+F -> paro E parf #type1 FX #type2 #code;
 
 -- Recuperation du type evalue.
 #type1 {
@@ -1262,10 +1361,18 @@ do
 end
 }
 
+#code{
+local
+do
+	--TODO
+	F^code := "";
+end
+}
+
 --
 --
 -- Cast explicite.
-F -> paro TYPE parf F #type ;
+F -> paro TYPE parf F #type #code ;
 
 -- Cast explicite : on n'utilise pas le type de F.
 #type {
@@ -1276,10 +1383,18 @@ do
 end
 }
 
+#code{
+local
+do
+	--TODO
+	F^code := "";
+end
+}
+
 --
 --
 -- Typage d'un dereferencement avec *.
-F -> mult F #type ;
+F -> mult F #type #code;
 
 -- Typage d'une expression contenant *.
 #type {
@@ -1295,10 +1410,18 @@ do
 end
 }
 
+#code{
+local
+do
+	--TODO
+	F^code := "";
+end
+}
+
 --
 --
 -- Utilisation d'un ident.
-F -> ident #type1 FX #type2 ;
+F -> ident #type1 FX #type2 #code;
 
 -- TODO: Ajouter un commentaire.
 #type1 {
@@ -1321,10 +1444,18 @@ do
 end
 }
 
+#code{
+local
+do
+	--TODO
+	F^code := "";
+end
+}
+
 --
 --
 -- Fin d'evaluation du type d'un facteur.
-FX -> #type ;
+FX -> #type #code;
 
 -- Propagation du type racine.
 #type {
@@ -1343,10 +1474,18 @@ do
 end
 }
 
+#code{
+local
+do
+	--TODO
+	FX^code := "";
+end
+}
+
 --
 --
 -- Acces champ
-FX -> pt ident #type1 FX #type2 ;
+FX -> pt ident #type1 FX #type2 #code;
 
 -- Verification du type racine.
 #type1 {
@@ -1376,10 +1515,18 @@ do
 end
 }
 
+#code{
+local
+do
+	--TODO
+	FX^code := "";
+end
+}
+
 --
 --
 -- Acces champ pointeur.
-FX -> arrow  ident #type1 FX #type2 ;
+FX -> arrow  ident #type1 FX #type2 #code ;
 
 -- Verification du type racine.
 #type1 {
@@ -1417,6 +1564,13 @@ do
 end
 }
 
+#code{
+local
+do
+	--TODO
+	FX^code := "";
+end
+}
 
 --
 --
@@ -1447,20 +1601,27 @@ local
     h : HelperFunctionInterface;
 do
     h := FX^gen.getFunctionHelper();
-    -- listeCode contient le code pour pousser les parametres de la fonction sur la pile.
-    FX^code := h.generateCall(ES^listeCode) + FX1^code;
+    -- codeList contient le code pour pousser les parametres de la fonction sur la pile.
+    FX^code := h.generateCall(ES^codeList) + FX1^code;
 end
 }
 
 --
 --
 -- Appel de sous-programme sans arguments, aucune verification necessaire.
-ES -> ;
+ES -> #code;
+
+#code{
+local
+do
+	ES^codeList := new ArrayList<String>();
+end
+}
 
 --
 --
 -- Appel de sous-programme avec arguments.
-ES -> E #type ESX ;
+ES -> E #type ESX #code;
 
 -- Verification du type du parametre.
 #type {
@@ -1476,15 +1637,28 @@ do
 end
 }
 
+#code{
+local
+do
+	--concatenation du code des parametres
+	ES^codeList := ESX^codeList.add(0,E^code); --ajout en tete de la liste du code du parametre
+end
+}
 --
 --
 -- Appel de sous-programme avec arguments : fin de liste.
-ESX -> ;
+ESX -> #code;
 
+#code{
+local
+do
+	ESX^codeList := new ArrayList<String>();
+end
+}
 --
 --
 -- Appel de sous-programme avec arguments : suite.
-ESX -> virg E #type ESX ;
+ESX -> virg E #type ESX #code;
 
 -- Verification du type du parametre.
 #type {
@@ -1497,6 +1671,14 @@ do
     else
         ESX1^numParam := ESX^numParam + 1;
     end
+end
+}
+
+#code{
+local
+do
+	--concatenation du code des parametres
+	ESX^codeList := ESX1^codeList.add(0,E^code); --ajout en tete de la liste du code du parametre
 end
 }
 
