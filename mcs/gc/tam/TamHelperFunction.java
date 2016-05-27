@@ -27,13 +27,11 @@ public class TamHelperFunction implements HelperFunctionInterface {
     }
 
     public String generateCall(String functionName, String functionTag,
-                               List<VAR> parameters) {
+                               List<String> parameters) {
         String code =
             "; Appel fonction : " + functionName + " avec les parametres :\n";
-        for (VAR p : parameters) {
-            code += ";\t " + p.name() + " : " + p.type().name() + "\n";
-            // p.addr()
-            // code += "PUSH ";
+        for (String p : parameters) {
+            code += ";\t " + p + "\n";
         }
         code += "\tCALL(SB) _" + functionTag + "\n";
         return code;

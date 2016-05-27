@@ -39,7 +39,6 @@ public class TamHelperMemory implements HelperMemoryInterface {
 
     @Override
     public String generateVoid() {
-        // TODO Auto-generated method stub
         return null;
     }
 
@@ -59,8 +58,7 @@ public class TamHelperMemory implements HelperMemoryInterface {
 
     @Override
     public String generateAdr(int dep) {
-        // TODO Auto-generated method stub
-        return null;
+    	return "\tLOADA " + dep + "[SB]\n";
     }
 
     @Override

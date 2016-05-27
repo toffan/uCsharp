@@ -50,25 +50,23 @@ public interface HelperMemoryInterface {
     public String generateStaticWrite(int dep, int taille);
 
     /**
-     * code pour lire la valeur d'une expression dont on connait l'adresse à
-     * l'execution seulement : pointeurs
+     * Empile taille mots lus à l’adresse précedemment empilée
      * @param taille
      * @return
      */
     public String generateDynamicRead(int taille);
 
     /**
-     * code pour ecrire la valeur d'une expression dont on connait l'adresse à
-     * l'execution seulement : pointeurs
-     * @param taille
+     * Ecrit les taille mots empilés sur la pile à l’adresse empilée 
+     * @param taille nombre de mots empilés a écrire à l'adresse empilée.
      * @return
      */
     public String generateDynamicWrite(int taille);
 
 
     /**
-     * Code pour empiler une adresse
-     * @param dep
+     * empile la valeur absolue de l'adresse avec un deplacement de dep par rapport à LB.
+     * @param dep le deplacement par rapport à la LB
      * @return
      */
     public String generateAdr(int dep);

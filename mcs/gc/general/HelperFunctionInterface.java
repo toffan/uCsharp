@@ -42,5 +42,5 @@ public interface HelperFunctionInterface {
      * @return
      */
     public String generateCall(String functionName, String functionTag,
-                               List<VAR> parameters);
+            				List<String> parameters);
 }
