@@ -941,8 +941,12 @@ local
 do
     h := E^gen.getMemoryHelper();
     if AFFX^type /= null then
+        -- Affectation
         E^code := AFFX^code + A^code + h.generateDynamicWrite(AFFX^type.size());
     else
+        -- Recuperation simple de la valeur d'une expression (de meme que pour une rightValue).
+        -- TODO: Choisir l'implementation qui convient le mieux :
+        --       booleen leftValue ou generer dans tout les cas la leftValue et la rightValue.
         E^code := A^code;
     end
 end
