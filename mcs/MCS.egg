@@ -1639,9 +1639,12 @@ end
 
 #code{
 local
+	codeListTemp : ArrayList<String>;
 do
 	--concatenation du code des parametres
-	ES^codeList := ESX^codeList.add(0,E^code); --ajout en tete de la liste du code du parametre
+	codeListTemp := ESX^codeList;
+	codeListTemp.add(0,E^code);
+	ES^codeList :=  codeListTemp;--ajout en tete de la liste du code du parametre
 end
 }
 --
@@ -1676,9 +1679,12 @@ end
 
 #code{
 local
+	codeListTemp : ArrayList<String>;
 do
 	--concatenation du code des parametres
-	ESX^codeList := ESX1^codeList.add(0,E^code); --ajout en tete de la liste du code du parametre
+	codeListTemp := ESX1^codeList;
+	codeListTemp.add(0,E^code);
+	ESX^codeList :=  codeListTemp;--ajout en tete de la liste du code du parametre
 end
 }
 
