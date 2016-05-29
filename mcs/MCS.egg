@@ -86,6 +86,9 @@ syn rightCode : String for A, R, T, F ;
 --le code généré pour chaque parametre d'une fonction
 syn codeList : ArrayList<String> for ES, ESX;
 
+-- Permet de savoir si les parametres d'une operation doivent etre au prealable convertis en booleens.
+syn toBool : Boolean for OPADD ;
+
 -- Terminaux
 space separateur is    "[\r\n\t ]+";
 space comm is    "\/\/[^\n]*\n";
@@ -1169,11 +1172,21 @@ do
 end
 }
 
-#code{
+-- Generation du code d'une operation additive.
+#code {
 local
 do
-	--TODO
-	R^code := "";
+    if RX^type /= null & RX^type = T^type then
+        -- R contient une addition donc est forcement une rightValue...
+        R^leftCode := "";
+        -- L'addition est faite dans le code de RX.
+        R^rightCode := T^rightCode + RX^code;
+    else
+        -- On ne prend pas en compte ici l'erreur de type ayant deja ete traitee au dessus.
+        -- On recupere les deux types de code generes (pas d'addition a ce niveau).
+        R^leftCode := T^leftCode;
+        R^rightCode := T^rightCode;
+    end
 end
 }
 
@@ -1189,16 +1202,30 @@ do
     if RX1^type /= null && RX1^type /= T^type then
         error(MCS_BAD_TYPE_4, T^type.name(), RX1^type.name());
     else
-        RX^type := T^type;
+        -- Les operateurs additifs de base utilisent des entiers.
+        if T^type /= RX^tds.searchType("int", true) then
+            error(MCS_BAD_TYPE_4, "int", T^type.name());
+        else
+            RX^type := T^type;
+        end
     end
 end
 }
 
-#code{
+-- Generation du code pour les operations additives (suite).
+#code {
 local
+    h : HelperIntInterface;
 do
-	--TODO
-	RX^code := "";
+    h := RX^gen.getIntHelper();
+    -- L'operation additive a lieu ici.
+    -- OPADD^code contient l'appel a l'operateur.
+    if OPADD^toBool then
+        -- Si l'operateur utilise necessite une conversion prealable en booleen.
+        RX^code := h.generateIntToBool() + T^rightCode + h.generateIntToBool() + OPADD^code + RX1^code;
+    else
+        RX^code := T^rightCode + OPADD^code + RX1^code;
+    end
 end
 }
 
@@ -1215,10 +1242,9 @@ do
 end
 }
 
-#code{
-local
+-- Pas de code genere.
+#code {
 do
-	--TODO
 	RX^code := "";
 end
 }
@@ -1226,9 +1252,45 @@ end
 --
 --
 -- Operateurs additifs.
-OPADD -> plus ;
-OPADD -> moins ;
-OPADD -> ou ;
+
+OPADD -> plus #code ;
+
+-- Generation de code : appel de la subroutine correspondante.
+#code {
+local
+    h : HelperIntInterface;
+do
+    h := OPADD^gen.getIntHelper();
+    OPADD^code := h.generateSum();
+    OPADD^toBool := false;
+end
+}
+
+OPADD -> moins #code ;
+
+-- Generation de code : appel de la subroutine correspondante.
+#code {
+local
+    h : HelperIntInterface;
+do
+    h := OPADD^gen.getIntHelper();
+    OPADD^code := h.generateSub();
+    OPADD^toBool := false;
+end
+}
+
+OPADD -> ou #code ;
+
+-- Generation de code : appel de la subroutine correspondante.
+#code {
+local
+    h : HelperBoolInterface;
+do
+    h := OPADD^gen.getBoolHelper();
+    OPADD^code := h.generateOr();
+    OPADD^toBool := true;
+end
+}
 
 --
 --
