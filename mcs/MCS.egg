@@ -394,7 +394,7 @@ do
     h := FONCTION^gen.getFunctionHelper();
     tFct := FONCTION^fct.type();
     tReturn := tFct.retType();
-    FONCTION^code := BLOC^code + "; return artificiel pour " + FONCTION^fct.name() + "\n" + h.generateReturn(tFct.sizeParams(), 0, "");
+    FONCTION^code := BLOC^code + h.generateReturn(tFct.sizeParams(), 0, "artificiel pour " + FONCTION^fct.name());
 end
 }
 
@@ -897,7 +897,7 @@ local
 do
     h := INST^gen.getFunctionHelper();
     tFct := INST^fct.type();
-    INST^code := E^code + "; return explicite pour " + INST^fct.name() + "\n" + h.generateReturn(tFct.sizeParams(), E^type.size(), "");
+    INST^code := E^code + h.generateReturn(tFct.sizeParams(), E^type.size(), "explicite pour " + INST^fct.name());
 end
 }
 

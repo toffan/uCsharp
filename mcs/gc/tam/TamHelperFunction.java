@@ -22,8 +22,8 @@ public class TamHelperFunction implements HelperFunctionInterface {
 
     public String generateReturn(int sizeParams, int sizeReturn,
                                  String codeRetour) {
-        return "; retour" + codeRetour + "\tRETURN (" + sizeParams + ")" +
-            sizeReturn + "\n";
+        return "; retour " + codeRetour + "\n"
+            + "    RETURN (" + sizeParams + ") " + sizeReturn + "\n";
     }
 
     public String generateCall(String functionName, String functionTag,
