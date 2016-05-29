@@ -66,6 +66,7 @@ inh gen : GeneratorItf for
         INSTS, INST, TYPE, STYPE, PTRS,
         CHAMPS, CHAMP,
         E, A, AFFX, R, RX, AX, T, TX, F, FX, SIX,
+        OPREL, OPADD, OPMUL,
         ES, ESX ;
 
 -- Le code genere.
@@ -1078,13 +1079,78 @@ end
 
 --
 --
--- Operatieurs relationnels.
-OPREL -> inf ;
-OPREL -> sup ;
-OPREL -> infeg ;
-OPREL -> supeg ;
-OPREL -> eg ;
-OPREL -> neg ;
+-- Operateurs relationnels.
+OPREL -> inf #code ;
+
+-- Generation de code : appel de la subroutine correspondante.
+#code {
+local
+    h : HelperIntInterface;
+do
+    h := OPREL^gen.getIntHelper();
+    OPREL^code := h.generateLss();
+end
+}
+
+OPREL -> sup #code ;
+
+-- Generation de code : appel de la subroutine correspondante.
+#code {
+local
+    h : HelperIntInterface;
+do
+    h := OPREL^gen.getIntHelper();
+    OPREL^code := h.generateGtr();
+end
+}
+
+OPREL -> infeg #code ;
+
+-- Generation de code : appel de la subroutine correspondante.
+#code {
+local
+    h : HelperIntInterface;
+do
+    h := OPREL^gen.getIntHelper();
+    OPREL^code := h.generateLeq();
+end
+}
+
+OPREL -> supeg #code ;
+
+-- Generation de code : appel de la subroutine correspondante.
+#code {
+local
+    h : HelperIntInterface;
+do
+    h := OPREL^gen.getIntHelper();
+    OPREL^code := h.generateGeq();
+end
+}
+
+OPREL -> eg #code ;
+
+-- Generation de code : appel de la subroutine correspondante.
+#code {
+local
+    h : HelperIntInterface;
+do
+    h := OPREL^gen.getIntHelper();
+    OPREL^code := h.generateEq();
+end
+}
+
+OPREL -> neg #code ;
+
+-- Generation de code : appel de la subroutine correspondante.
+#code {
+local
+    h : HelperIntInterface;
+do
+    h := OPREL^gen.getIntHelper();
+    OPREL^code := h.generateNeq();
+end
+}
 
 --
 --
