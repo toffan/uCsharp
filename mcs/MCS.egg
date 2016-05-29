@@ -1638,12 +1638,14 @@ do
 end
 }
 
+-- Generation de code pour une expression parenthesee.
 #code {
 local
 do
-	-- TODO: Generation de code.
-	F^leftCode := "";
-	F^rightCode := "";
+	-- A priori simple concatenation du code.
+    -- TODO: Verifier le bon fonctionnement.
+	F^leftCode := E^code + FX^code;
+	F^rightCode := E^code + FX^code;
 end
 }
 
