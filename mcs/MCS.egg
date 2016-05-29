@@ -941,9 +941,8 @@ do
     h := E^gen.getMemoryHelper();
     if AFFX^type /= null then
         -- Affectation
-        -- TODO: Dupliquer proprement AFFX^code sur la pile pour que le resultat d'une affectation soit la valeur affectee.
-        -- TODO: Remplacer 0 par un indice de haut de pile... (pour dupliquer la derniere valeur et non la premiere).
-        E^code := AFFX^code + h.generateStaticRead(0, AFFX^type.size()) + A^leftCode + h.generateDynamicWrite(AFFX^type.size());
+        -- Duplication de AFFX^code sur la pile pour que le resultat d'une affectation soit la valeur affectee.
+        E^code := AFFX^code + h.generateDuplicate(AFFX^type.size()) + A^leftCode + h.generateDynamicWrite(AFFX^type.size());
     else
         -- Recuperation simple de la valeur d'une expression (de meme que pour une rightValue).
         E^code := A^rightCode;

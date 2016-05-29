@@ -78,4 +78,10 @@ public class TamHelperMemory implements HelperMemoryInterface {
         return "; liberation de " + size + " mots sur la pile\n"
             + "\tPOP " + size + "\n";
     }
+
+    @Override
+    public String generateDuplicate(int size) {
+        return "; duplication des " + size + "mots precedents.\n"
+            + "\tLOAD (" + size + ") -" + size + "[ST]\n";
+    }
 }
