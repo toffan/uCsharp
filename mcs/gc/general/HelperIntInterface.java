@@ -2,6 +2,12 @@ package mcs.gc.general;
 
 public interface HelperIntInterface {
 
+    /**
+     * Negation d'un entier precedemment charge sur la pile.
+     * @return Le code genere pour la negation.
+     */
+    public String generateNeg();
+
     /** sommer 2 entiers precedemment charges sur la pile. */
     public String generateSum();
 

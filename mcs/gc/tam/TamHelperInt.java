@@ -10,6 +10,12 @@ import mcs.gc.general.*;
 public class TamHelperInt implements HelperIntInterface {
 
     @Override
+    public String generateNeg() {
+        return "; negation de l'entier precedemment charge.\n"
+            + "\tSUBR INeg\n";
+    }
+
+    @Override
     public String generateSum() {
         return "; somme des deux entiers charges precedemment.\n"
             + "\tSUBR IAdd\n";
