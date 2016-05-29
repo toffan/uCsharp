@@ -1659,7 +1659,11 @@ F -> paro TYPE parf F #type #code ;
 local
 do
     warning(MCS_WAR_CAST, F1^type.name(), TYPE^type.name());
-    F^type := TYPE^type;
+    if TYPE^type.size() /= F1^type.size() then
+        error(MCS_BAD_CAST, F1^type.name(), TYPE^type.name(), F1^type.size(), TYPE^type.size());
+    else
+        F^type := TYPE^type;
+    end
 end
 }
 
