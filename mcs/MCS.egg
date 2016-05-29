@@ -1681,6 +1681,9 @@ end
 --
 -- Typage d'un dereferencement avec *.
 F -> mult F #type #code;
+global
+    -- Type pointe.
+    pt : TYPE;
 
 -- Typage d'une expression contenant *.
 #type {
@@ -1691,17 +1694,24 @@ do
         error(MCS_NOT_PTR, F1^type.name());
     else
         p := F1^type.toPointer();
-        F^type := p.ptype();
+        pt := p.ptype();
+        F^type := pt;
     end
 end
 }
 
+-- Generation de code pour un acces valeur pointee.
 #code {
 local
+    h : HelperMemoryInterface;
 do
-	-- TODO: Generation de code.
-	F^leftCode := "";
-	F^rightCode := "";
+    h := F^gen.getMemoryHelper();
+    -- F -> *a ; a = F1
+	-- F1^rightCode contient le contenu de a, soit l'adresse de la zone pointee.
+    -- On n'a a priori pas besoin de F1^leftCode qui est l'adresse de a.
+	F^leftCode := F1^rightCode;
+    -- Attention : on utilise bien ici pt (type pointe) et non F1^type (type pointeur).
+	F^rightCode := F1^rightCode + h.generateDynamicRead(pt.size());
 end
 }
 
