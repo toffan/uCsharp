@@ -71,14 +71,16 @@ inh gen : GeneratorItf for
 -- Le code genere.
 syn code : String for
          ENTITES, ENTITE, DECL, FONCTION,
-         BLOC, INSTS, INST, A, AFFX, E, SIX,
-         R, RX, T, TX, F, FX;
+         BLOC, INSTS, INST, AFFX, E, SIX,
+         AX, OPREL, RX, OPADD, TX, OPMUL, FX ;
 
 -- Nom de l'ident a gauche d'une declaration.
 inh name : String for DECL;
 
--- Permet de savoir si une expression est une leftValue ou non.
-inh leftValue : Boolean for A;
+-- Code generant une adresse.
+syn leftCode : String for A, R, T, F ;
+-- Code generant une valeur.
+syn rightCode : String for A, R, T, F ;
 
 --le code généré pour chaque parametre d'une fonction
 syn codeList : ArrayList<String> for ES, ESX;
@@ -914,14 +916,7 @@ end
 --
 --
 -- Expression qui affecte.
-E -> #precode A AFFX #type #code ;
-
--- Determine si l'expression A doit generer une adresse ou une valeur.
-#precode {
-do
-    A^leftValue := true;
-end
-}
+E -> A AFFX #type #code ;
 
 -- Verification du type des affectations.
 #type {
@@ -942,12 +937,12 @@ do
     h := E^gen.getMemoryHelper();
     if AFFX^type /= null then
         -- Affectation
-        E^code := AFFX^code + A^code + h.generateDynamicWrite(AFFX^type.size());
+        -- TODO: Dupliquer proprement AFFX^code sur la pile pour que le resultat d'une affectation soit la valeur affectee.
+        -- TODO: Remplacer 0 par un indice de haut de pile... (pour dupliquer la derniere valeur et non la premiere).
+        E^code := AFFX^code + h.generateStaticRead(0, AFFX^type.size()) + A^leftCode + h.generateDynamicWrite(AFFX^type.size());
     else
         -- Recuperation simple de la valeur d'une expression (de meme que pour une rightValue).
-        -- TODO: Choisir l'implementation qui convient le mieux :
-        --       booleen leftValue ou generer dans tout les cas la leftValue et la rightValue.
-        E^code := A^code;
+        E^code := A^rightCode;
     end
 end
 }
@@ -955,14 +950,7 @@ end
 --
 --
 -- Affectation
-AFFX -> affect #precode A #type #code ;
-
--- Determine si l'expression A doit generer une adresse ou une valeur.
-#precode {
-do
-    A^leftValue := false;
-end
-}
+AFFX -> affect A #type #code ;
 
 -- Verification du type des affectations (suite).
 #type {
@@ -976,7 +964,7 @@ end
 #code {
 local
 do
-    AFFX^code := A^code;
+    AFFX^code := A^rightCode;
 end
 }
 
