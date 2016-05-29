@@ -12,7 +12,8 @@ public class TamHelperString implements HelperStringInterface {
     @Override
     public String generateNew(String value) {
         // TODO: Tester le bon fonctionnement de SAlloc et de tam en general...
-        return "; allocation d'une nouvelle string de taille " + value.length() + " \n"
+        return "; allocation d'une nouvelle string de taille " +
+            value.length() + " \n"
             + "    LOADL " + value.length() + "\n"
             + "    SUBR SAlloc\n"
             + "; affectation de la chaine.\n"

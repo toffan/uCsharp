@@ -94,10 +94,10 @@ public interface HelperMemoryInterface {
     public String generateFree(int size);
 
     /**
-     * Code permettant de dupliquer les derniers mots memoires pousses sur la pile.
+     * Code permettant de dupliquer les derniers mots memoires pousses sur la
+     * pile.
      * @param size le nombre de mots memoire a dupliquer.
      * @return Le code genere.
      */
     public String generateDuplicate(int size);
-
 }
