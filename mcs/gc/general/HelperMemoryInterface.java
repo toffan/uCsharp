@@ -57,7 +57,7 @@ public interface HelperMemoryInterface {
     public String generateDynamicRead(int taille);
 
     /**
-     * Ecrit les taille mots empilés sur la pile à l’adresse empilée 
+     * Ecrit les taille mots empilés sur la pile à l’adresse empilée
      * @param taille nombre de mots empilés a écrire à l'adresse empilée.
      * @return
      */
@@ -65,7 +65,8 @@ public interface HelperMemoryInterface {
 
 
     /**
-     * empile la valeur absolue de l'adresse avec un deplacement de dep par rapport à LB.
+     * empile la valeur absolue de l'adresse avec un deplacement de dep par
+     * rapport à LB.
      * @param dep le deplacement par rapport à la LB
      * @return
      */

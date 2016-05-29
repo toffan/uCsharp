@@ -1461,10 +1461,10 @@ do
 end
 }
 
-#code{
+#code {
 local
 do
-	--TODO
+	-- TODO: Generation de code.
 	F^code := "";
 end
 }
@@ -1482,10 +1482,10 @@ do
 end
 }
 
-#code{
+#code {
 local
 do
-	--TODO
+	-- TODO: Generation de code.
 	F^code := "";
 end
 }
@@ -1503,11 +1503,12 @@ do
 end
 }
 
-#code{
+#code {
 local
 do
-	--TODO
-	F^code := "";
+	-- TODO: Generation de code.
+	F^leftCode := "";
+	F^rightCode := "";
 end
 }
 
@@ -1525,11 +1526,12 @@ do
 end
 }
 
-#code{
+#code {
 local
 do
-	--TODO
-	F^code := "";
+	-- TODO: Generation de code.
+    F^leftCode := "";
+    F^rightCode := "";
 end
 }
 
@@ -1550,16 +1552,17 @@ F -> null #type #code;
 local
 do
     -- TODO: Verifier le bon fonctionnement :
-    -- -- Type null compatible avec les autres dans la verification de type ?
+    -- Type null compatible avec les autres dans la verification de type ?
     F^type := null;
 end
 }
 
-#code{
+#code {
 local
 do
-	--TODO
-	F^code := "";
+	-- TODO: Generation de code.
+	F^leftCode := "";
+	F^rightCode := "";
 end
 }
 
@@ -1584,11 +1587,12 @@ do
 end
 }
 
-#code{
+#code {
 local
 do
-	--TODO
-	F^code := "";
+	-- TODO: Generation de code.
+	F^leftCode := "";
+	F^rightCode := "";
 end
 }
 
@@ -1606,11 +1610,12 @@ do
 end
 }
 
-#code{
+#code {
 local
 do
-	--TODO
-	F^code := "";
+	-- TODO: Generation de code.
+	F^leftCode := "";
+	F^rightCode := "";
 end
 }
 
@@ -1633,11 +1638,12 @@ do
 end
 }
 
-#code{
+#code {
 local
 do
-	--TODO
-	F^code := "";
+	-- TODO: Generation de code.
+	F^leftCode := "";
+	F^rightCode := "";
 end
 }
 
@@ -1646,7 +1652,7 @@ end
 -- Utilisation d'un ident.
 F -> ident #type1 FX #type2 #code;
 
--- TODO: Ajouter un commentaire.
+-- Typage  et verification de l'existence de la variable.
 #type1 {
 local
     v : VAR;
@@ -1667,11 +1673,12 @@ do
 end
 }
 
-#code{
+#code {
 local
 do
-	--TODO
-	F^code := "";
+	-- TODO: Generation de code.
+	F^leftCode := "";
+	F^rightCode := "";
 end
 }
 
@@ -1697,10 +1704,10 @@ do
 end
 }
 
-#code{
+#code {
 local
 do
-	--TODO
+	-- TODO: Generation de code.
 	FX^code := "";
 end
 }
@@ -1738,10 +1745,10 @@ do
 end
 }
 
-#code{
+#code {
 local
 do
-	--TODO
+	-- TODO: Generation de code.
 	FX^code := "";
 end
 }
@@ -1787,10 +1794,10 @@ do
 end
 }
 
-#code{
+#code {
 local
 do
-	--TODO
+	-- TODO: Generation de code.
 	FX^code := "";
 end
 }
@@ -1834,7 +1841,7 @@ end
 -- Appel de sous-programme sans arguments, aucune verification necessaire.
 ES -> #code;
 
-#code{
+#code {
 local
 do
 	ES^codeList := new ArrayList<String>();
@@ -1860,7 +1867,7 @@ do
 end
 }
 
-#code{
+#code {
 local
 	codeListTemp : ArrayList<String>;
 do
@@ -1875,7 +1882,7 @@ end
 -- Appel de sous-programme avec arguments : fin de liste.
 ESX -> #code;
 
-#code{
+#code {
 local
 do
 	ESX^codeList := new ArrayList<String>();
@@ -1900,7 +1907,7 @@ do
 end
 }
 
-#code{
+#code {
 local
 	codeListTemp : ArrayList<String>;
 do

@@ -58,7 +58,7 @@ public class TamHelperMemory implements HelperMemoryInterface {
 
     @Override
     public String generateAdr(int dep) {
-    	return "\tLOADA " + dep + "[SB]\n";
+        return "\tLOADA " + dep + "[SB]\n";
     }
 
     @Override

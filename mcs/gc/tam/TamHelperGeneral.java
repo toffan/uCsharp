@@ -47,7 +47,8 @@ public class TamHelperGeneral implements HelperGeneralInterface {
         String fin = this.generateLabel();
         return "\t; if\n" + condition + "\n"
             + "\tJUMPIF(0) " + sinon + "\n" + codeIf + "\n"
-            + "\tJUMP " + fin + "\n" + sinon + "\n" + codeElse + "\n" + fin + "\n"
+            + "\tJUMP " + fin + "\n" + sinon + "\n" + codeElse + "\n" + fin +
+            "\n"
             + "\t; fin if\n";
     }
 
