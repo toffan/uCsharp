@@ -27,12 +27,18 @@ public interface HelperGeneralInterface {
     public String generateEnd();
 
     /**
-     * Charge un entier de valeur v sur le sommet de pile
-     *
-     * @param v
-     * @return
+     * Charge une chaine v sur le sommet de pile.
+     * @param v chaine a empiler.
+     * @return Le code genere pour empiler la constante.
      */
     public String generateConstante(String v);
+
+    /**
+     * Charge un entier de valeur v sur le sommet de pile.
+     * @param v entier a empiler.
+     * @return Le code genere pour empiler la constante.
+     */
+    public String generateConstante(int v);
 
     /**
      * Code pour generer une condition.

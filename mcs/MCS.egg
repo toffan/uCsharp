@@ -73,15 +73,15 @@ inh gen : GeneratorItf for
 syn code : String for
          ENTITES, ENTITE, DECL, FONCTION,
          BLOC, INSTS, INST, AFFX, E, SIX,
-         AX, OPREL, RX, OPADD, TX, OPMUL, FX, OPUN ;
+         AX, OPREL, RX, OPADD, TX, OPMUL, OPUN ;
 
 -- Nom de l'ident a gauche d'une declaration.
 inh name : String for DECL;
 
 -- Code generant une adresse.
-syn leftCode : String for A, R, T, F ;
+syn leftCode : String for A, R, T, F, FX ;
 -- Code generant une valeur.
-syn rightCode : String for A, R, T, F ;
+syn rightCode : String for A, R, T, F, FX ;
 
 --le code généré pour chaque parametre d'une fonction
 syn codeList : ArrayList<String> for ES, ESX;
@@ -1644,8 +1644,8 @@ local
 do
 	-- A priori simple concatenation du code.
     -- TODO: Verifier le bon fonctionnement.
-	F^leftCode := E^code + FX^code;
-	F^rightCode := E^code + FX^code;
+	F^leftCode := E^code + FX^leftCode;
+	F^rightCode := E^code + FX^rightCode;
 end
 }
 
@@ -1719,11 +1719,12 @@ end
 --
 -- Utilisation d'un ident.
 F -> ident #type1 FX #type2 #code;
+global
+    -- Variable correspondant a l'ident.
+    v : VAR;
 
 -- Typage  et verification de l'existence de la variable.
 #type1 {
-local
-    v : VAR;
 do
     v := F^tds.searchVar(ident^txt, true);
     if v = null then
@@ -1741,12 +1742,42 @@ do
 end
 }
 
+-- Generation de code pour un acces a une variable.
 #code {
 local
+    hm : HelperMemoryInterface;
+    hg : HelperGeneralInterface;
+    t : TYPE;
+    a : Address;
 do
-	-- TODO: Generation de code.
-	F^leftCode := "";
-	F^rightCode := "";
+    hm := F^gen.getMemoryHelper();
+    hg := F^gen.getGeneralHelper();
+    t := v.type();
+    a := v.addr();
+    if FX^type = null then
+        -- Empilement de l'adresse de la variable.
+        F^leftCode := hg.generateConstante(a.val());
+        -- Empilement de la valeur de la variable.
+        F^rightCode := hm.generateStaticRead(a.val(), t.size());
+    else
+        if t.isStruct() then
+            -- La differenciation effective se fera lors la generation du code de FX.
+            -- Empilement de l'adresse du champ.
+            F^leftCode := hg.generateConstante(a.val()) + FX^leftCode;
+            -- Empilement de la valeur du champ.
+            F^rightCode := hg.generateConstante(a.val()) + FX^rightCode;
+        elseif t.isPointer() then
+            -- La differenciation effective se fera lors la generation du code de FX.
+            -- Empilement de l'adresse du champ.
+            F^leftCode := hg.generateConstante(a.val()) + FX^leftCode;
+            -- Empilement de la valeur du champ.
+            F^rightCode := hg.generateConstante(a.val()) + FX^rightCode;
+        elseif t.isFType() then
+            -- TODO: Generation de code.
+            F^leftCode := FX^leftCode;
+            F^rightCode := FX^rightCode;
+        end
+    end
 end
 }
 
@@ -1772,11 +1803,12 @@ do
 end
 }
 
+-- Generation de code pour une fin d'expression.
 #code {
 local
 do
-	-- TODO: Generation de code.
-	FX^code := "";
+	FX^leftCode := "";
+	FX^rightCode := "";
 end
 }
 
@@ -1866,7 +1898,8 @@ end
 local
 do
 	-- TODO: Generation de code.
-	FX^code := "";
+	FX^leftCode := "";
+	FX^rightCode := "";
 end
 }
 
@@ -1900,7 +1933,12 @@ local
 do
     h := FX^gen.getFunctionHelper();
     -- codeList contient le code pour pousser les parametres de la fonction sur la pile.
-    FX^code := h.generateCall(FX^typeLeft.name(), FX^typeLeft.name(), ES^codeList) + FX1^code;
+    -- TODO: Generation de code : generer l'appel de fonction.
+    FX^leftCode := "";
+    FX^rightCode := "";
+    -- TODO: Generation de code : generer proprement FX^leftCode.
+    --FX^leftCode := h.generateCall(FX^typeLeft.name(), FX^typeLeft.name(), ES^codeList) + FX1^code + "; TODO: empiler l'adresse de la derniere case sur la pile.";
+    --FX^rightCode := h.generateCall(FX^typeLeft.name(), FX^typeLeft.name(), ES^codeList) + FX1^code;
 end
 }
 

@@ -38,6 +38,11 @@ public class TamHelperGeneral implements HelperGeneralInterface {
      */
     public String generateConstante(String v) { return "\tLOADL " + v + "\n"; }
 
+    /**
+     * {@inheritDoc}
+     */
+    public String generateConstante(int v) { return "\tLOADL " + v + "\n"; }
+
 
     /**
      * {@inheritDoc}
