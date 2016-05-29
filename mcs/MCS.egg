@@ -66,14 +66,14 @@ inh gen : GeneratorItf for
         INSTS, INST, TYPE, STYPE, PTRS,
         CHAMPS, CHAMP,
         E, A, AFFX, R, RX, AX, T, TX, F, FX, SIX,
-        OPREL, OPADD, OPMUL,
+        OPREL, OPADD, OPMUL, OPUN,
         ES, ESX ;
 
 -- Le code genere.
 syn code : String for
          ENTITES, ENTITE, DECL, FONCTION,
          BLOC, INSTS, INST, AFFX, E, SIX,
-         AX, OPREL, RX, OPADD, TX, OPMUL, FX ;
+         AX, OPREL, RX, OPADD, TX, OPMUL, FX, OPUN ;
 
 -- Nom de l'ident a gauche d'une declaration.
 inh name : String for DECL;
@@ -1539,21 +1539,56 @@ do
 end
 }
 
+-- Generation de code pour une operation unaire.
 #code {
-local
 do
-	-- TODO: Generation de code.
+    -- F fait intervenir une operation, donc est forcement une rightValue.
     F^leftCode := "";
-    F^rightCode := "";
+    -- OPUN^code contient l'appel a l'operateur.
+    F^rightCode := F1^rightCode + OPUN^code;
 end
 }
 
 --
 --
 -- Operateurs unaires
-OPUN -> plus ;
-OPUN -> moins ;
-OPUN -> non;
+
+OPUN -> plus #code ;
+
+-- Generation de code : appel de la subroutine correspondante.
+#code {
+do
+    -- Rien a faire en particulier.
+    OPUN^code := "";
+end
+}
+
+OPUN -> moins #code ;
+
+-- Generation de code : appel de la subroutine correspondante.
+#code {
+local
+    hi : HelperIntInterface;
+    hg : HelperGeneralInterface;
+do
+    hi := OPUN^gen.getIntHelper();
+    hg := OPUN^gen.getGeneralHelper();
+    -- Multiplication par -1.
+    OPUN^code := hg.generateComment("Multiplication par -1.") + hg.generateConstante("-1") + hi.generateMul();
+end
+}
+
+OPUN -> non #code ;
+
+-- Generation de code : appel de la subroutine correspondante.
+#code {
+local
+    h : HelperIntInterface;
+do
+    h := OPUN^gen.getIntHelper();
+    OPUN^code := h.generateNeg();
+end
+}
 
 --
 --
