@@ -87,7 +87,7 @@ syn rightCode : String for A, R, T, F ;
 syn codeList : ArrayList<String> for ES, ESX;
 
 -- Permet de savoir si les parametres d'une operation doivent etre au prealable convertis en booleens.
-syn toBool : Boolean for OPADD ;
+syn toBool : Boolean for OPADD, OPMUL ;
 
 -- Terminaux
 space separateur is    "[\r\n\t ]+";
@@ -1309,11 +1309,21 @@ do
 end
 }
 
-#code{
+-- Generation du code d'une operation multiplicative.
+#code {
 local
 do
-	--TODO
-	T^code := "";
+    if TX^type /= null & TX^type = F^type then
+        -- T contient une multiplication donc est forcement une rightValue...
+        T^leftCode := "";
+        -- La multiplication est faite dans le code de TX.
+        T^rightCode := F^rightCode + TX^code;
+    else
+        -- On ne prend pas en compte ici l'erreur de type ayant deja ete traitee au dessus.
+        -- On recupere les deux types de code generes (pas de multiplication).
+        T^leftCode := F^leftCode;
+        T^rightCode := F^rightCode;
+    end
 end
 }
 
@@ -1329,18 +1339,33 @@ do
     if TX1^type /= null && TX1^type /= F^type then
         error(MCS_BAD_TYPE_5, F^type.name(), TX1^type.name());
     else
-        TX^type := F^type;
+        -- Les operateurs multiplicatifs de base utilisent des entiers.
+        if F^type /= TX^tds.searchType("int", true) then
+            error(MCS_BAD_TYPE_5, "int", F^type.name());
+        else
+            TX^type := F^type;
+        end
     end
 end
 }
 
-#code{
+-- Generation du code pour les operations multiplicatives (suite).
+#code {
 local
+    h : HelperIntInterface;
 do
-	--TODO
-	TX^code := "";
+    h := TX^gen.getIntHelper();
+    -- L'operation multiplicative a lieu ici.
+    -- OPMUL^code contient l'appel a l'operateur.
+    if OPMUL^toBool then
+        -- Si l'operateur utilise necessite une conversion prealable en booleen.
+        TX^code := h.generateIntToBool() + F^rightCode + h.generateIntToBool() + OPMUL^code + TX1^code;
+    else
+        TX^code := F^rightCode + OPMUL^code + TX1^code;
+    end
 end
 }
+
 --
 --
 -- Fin de la multiplication.
@@ -1354,10 +1379,9 @@ do
 end
 }
 
-#code{
-local
+-- Pas de code genere.
+#code {
 do
-	--TODO
 	TX^code := "";
 end
 }
@@ -1365,10 +1389,58 @@ end
 --
 --
 -- Operateurs multiplicatifs.
-OPMUL -> mult ;
-OPMUL -> div ;
-OPMUL -> mod ;
-OPMUL -> et ;
+
+OPMUL -> mult #code ;
+
+-- Generation de code : appel de la subroutine correspondante.
+#code {
+local
+    h : HelperIntInterface;
+do
+    h := OPMUL^gen.getIntHelper();
+    OPMUL^code := h.generateMul();
+    OPMUL^toBool := false;
+end
+}
+
+OPMUL -> div #code ;
+
+-- Generation de code : appel de la subroutine correspondante.
+#code {
+local
+    h : HelperIntInterface;
+do
+    h := OPMUL^gen.getIntHelper();
+    OPMUL^code := h.generateDiv();
+    OPMUL^toBool := false;
+end
+}
+
+OPMUL -> mod #code ;
+
+-- Generation de code : appel de la subroutine correspondante.
+#code {
+local
+    h : HelperIntInterface;
+do
+    h := OPMUL^gen.getIntHelper();
+    OPMUL^code := h.generateMod();
+    OPMUL^toBool := false;
+end
+}
+
+OPMUL -> et #code ;
+
+-- Generation de code : appel de la subroutine correspondante.
+#code {
+local
+    h : HelperBoolInterface;
+do
+    h := OPMUL^gen.getBoolHelper();
+    OPMUL^code := h.generateAnd();
+    OPMUL^toBool := true;
+end
+}
 
 --
 --
