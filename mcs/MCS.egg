@@ -1762,16 +1762,16 @@ do
     else
         if t.isStruct() then
             -- La differenciation effective se fera lors la generation du code de FX.
-            -- Empilement de l'adresse du champ.
+            -- Empilement de l'adresse de l'enregistrement puis de l'adresse du champ.
             F^leftCode := hg.generateConstante(a.val()) + FX^leftCode;
-            -- Empilement de la valeur du champ.
+            -- Empilement de l'adresse de l'enregistrement puis de la valeur du champ.
             F^rightCode := hg.generateConstante(a.val()) + FX^rightCode;
         elseif t.isPointer() then
             -- La differenciation effective se fera lors la generation du code de FX.
-            -- Empilement de l'adresse du champ.
-            F^leftCode := hg.generateConstante(a.val()) + FX^leftCode;
-            -- Empilement de la valeur du champ.
-            F^rightCode := hg.generateConstante(a.val()) + FX^rightCode;
+            -- Empilement de l'adresse de la zone pointee, puis de l'adresse du champ.
+            F^leftCode := hm.generateStaticRead(a.val(), t.size()) + FX^leftCode;
+            -- Empilement de l'adresse de la zone pointee puis de la valeur du champ.
+            F^rightCode := hm.generateStaticRead(a.val(), t.size()) + FX^rightCode;
         elseif t.isFType() then
             -- TODO: Generation de code.
             F^leftCode := FX^leftCode;
@@ -1868,23 +1868,23 @@ do
     -- Le code commun empile l'adresse du champ utilise.
     codeCommun := hg.generateConstante(a.val()) + hi.generateSum();
     if FX1^type = null then
-        -- Empilement de l'adresse de la variable (le champ).
+        -- Empilement de l'adresse de la variable (adresse du champ).
         FX^leftCode := codeCommun;
         -- Empilement de la valeur de la variable (valeur du champ).
         FX^rightCode := codeCommun + hm.generateDynamicRead(t.size());
     else
         if t.isStruct() then
             -- La differenciation effective se fera lors la generation du code de FX.
-            -- Empilement de l'adresse du champ.
+            -- Empilement de l'adresse de l'enregistrement (premier niveau de champ) puis de l'adresse du champ.
             FX^leftCode := codeCommun + FX1^leftCode;
-            -- Empilement de la valeur du champ.
+            -- Empilement de l'adresse de l'enregistrement (premier niveau de champ) puis de la valeur du champ.
             FX^rightCode := codeCommun + FX1^rightCode;
         elseif t.isPointer() then
             -- La differenciation effective se fera lors la generation du code de FX.
-            -- Empilement de l'adresse du champ.
-            FX^leftCode := codeCommun + FX1^leftCode;
-            -- Empilement de la valeur du champ.
-            FX^rightCode := codeCommun + FX1^rightCode;
+            -- Empilement de l'adresse de la zone pointee, puis de l'adresse du champ.
+            FX^leftCode := codeCommun + hm.generateDynamicRead(t.size()) + FX1^leftCode;
+            -- Empilement de l'adresse de la zone pointee puis de la valeur du champ.
+            FX^rightCode := codeCommun + hm.generateDynamicRead(t.size()) + FX1^rightCode;
         elseif t.isFType() then
             -- TODO: Generation de code.
             FX^leftCode := FX1^leftCode;
@@ -1898,6 +1898,9 @@ end
 --
 -- Acces champ pointeur.
 FX -> arrow  ident #type1 FX #type2 #code ;
+global
+    -- Champ accede.
+    c : VAR;
 
 -- Verification du type racine.
 #type1 {
@@ -1905,7 +1908,6 @@ local
     p : PTR;
     pt : TYPE;
     s : STRUCT;
-    c : VAR;
 do
     if !(FX^typeLeft.isPointer()) then
         error(MCS_NOT_PTR, FX^typeLeft.name());
@@ -1935,12 +1937,50 @@ do
 end
 }
 
+-- Generation de code acces champ pointeur.
 #code {
 local
+    hm : HelperMemoryInterface;
+    hg : HelperGeneralInterface;
+    hi : HelperIntInterface;
+    -- Type du champ accede.
+    t : TYPE;
+    -- Adresse relative du champ accede.
+    a : Address;
+    -- Code de calcul de l'adresse absolue du champ accede.
+    codeCommun : String;
 do
-	-- TODO: Generation de code.
-	FX^leftCode := "";
-	FX^rightCode := "";
+    hm := FX^gen.getMemoryHelper();
+    hg := FX^gen.getGeneralHelper();
+    hi := FX^gen.getIntHelper();
+    t := c.type();
+    a := c.addr();
+    -- Le code commun empile l'adresse du champ utilise.
+    codeCommun := hg.generateConstante(a.val()) + hi.generateSum();
+    if FX1^type = null then
+        -- Empilement de l'adresse de la variable (adresse du champ).
+        FX^leftCode := codeCommun;
+        -- Empilement de la valeur de la variable (valeur du champ).
+        FX^rightCode := codeCommun + hm.generateDynamicRead(t.size());
+    else
+        if t.isStruct() then
+            -- La differenciation effective se fera lors la generation du code de FX.
+            -- Empilement de l'adresse de l'enregistrement puis de l'adresse du champ.
+            FX^leftCode := codeCommun + FX1^leftCode;
+            -- Empilement de l'adresse de l'enregistrement puis de la valeur du champ.
+            FX^rightCode := codeCommun + FX1^rightCode;
+        elseif t.isPointer() then
+            -- La differenciation effective se fera lors la generation du code de FX.
+            -- Empilement de l'adresse de la zone pointee, puis de l'adresse du champ.
+            FX^leftCode := codeCommun + hm.generateDynamicRead(t.size()) + FX1^leftCode;
+            -- Empilement de l'adresse de la zone pointee puis de la valeur du champ.
+            FX^rightCode := codeCommun + hm.generateDynamicRead(t.size()) + FX1^rightCode;
+        elseif t.isFType() then
+            -- TODO: Generation de code.
+            FX^leftCode := FX1^leftCode;
+            FX^rightCode := FX1^rightCode;
+        end
+    end
 end
 }
 
