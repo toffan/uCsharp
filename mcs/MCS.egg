@@ -1486,11 +1486,16 @@ do
 end
 }
 
+-- Generation de code pour une constante chaine.
 #code {
 local
+    h : HelperStringInterface;
 do
-	-- TODO: Generation de code.
-	F^code := "";
+    h := F^gen.getStringHelper();
+    -- Une constante est necessairement une rightValue.
+    -- TODO: Declencher une erreur de compilation si la constante est utilisee en tant que leftValue.
+    F^leftCode := "";
+    F^rightCode := h.generateNew(chaine^txt);
 end
 }
 
