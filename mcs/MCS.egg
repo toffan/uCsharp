@@ -1512,12 +1512,16 @@ do
 end
 }
 
+-- Generation de code pour une constante caractere.
 #code {
 local
+    h : HelperGeneralInterface;
 do
-	-- TODO: Generation de code.
+    h := F^gen.getGeneralHelper();
+    -- Une constante est necessairement une rightValue.
+    -- TODO: Declencher une erreur de compilation si la constante est utilisee en tant que leftValue.
 	F^leftCode := "";
-	F^rightCode := "";
+    F^rightCode := h.generateConstante(caractere^txt);
 end
 }
 
