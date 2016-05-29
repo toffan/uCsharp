@@ -1605,12 +1605,15 @@ do
 end
 }
 
+-- Generation de code pour le pointeur null.
 #code {
 local
+    h : HelperMemoryInterface;
 do
-	-- TODO: Generation de code.
+    h := F^gen.getMemoryHelper();
+    -- F est une constante (null) donc forcement une rightValue...
 	F^leftCode := "";
-	F^rightCode := "";
+	F^rightCode := h.generateVoid();
 end
 }
 

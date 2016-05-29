@@ -39,7 +39,8 @@ public class TamHelperMemory implements HelperMemoryInterface {
 
     @Override
     public String generateVoid() {
-        return null;
+        return "; adresse non initialisee.\n"
+            + "    SUBR MVoid\n";
     }
 
     @Override
