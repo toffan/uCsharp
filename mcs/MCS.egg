@@ -1461,11 +1461,16 @@ do
 end
 }
 
+-- Generation de code pour une constante entiere.
 #code {
 local
+    h : HelperGeneralInterface;
 do
-	-- TODO: Generation de code.
-	F^code := "";
+    h := F^gen.getGeneralHelper();
+    -- Une constante est necessairement une rightValue.
+    -- TODO: Declencher une erreur de compilation si la constante est utilisee en tant que leftValue.
+	F^leftCode := "";
+    F^rightCode := h.generateConstante(entier^txt);
 end
 }
 
