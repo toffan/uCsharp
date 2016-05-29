@@ -1011,37 +1011,68 @@ do
 end
 }
 
-#code{
+-- Generation du code d'une relation.
+#code {
 local
 do
-	--TODO
-	A^code := "";
+    if AX^type /= null & AX^type = R^type then
+        -- A est une condition booleenne donc forcement une rightValue...
+        A^leftCode := "";
+        -- La comparaison est faite dans le code de AX.
+        A^rightCode := R^rightCode + AX^code;
+    else
+        -- On ne prend pas en compte ici l'erreur de type ayant deja ete traitee au dessus.
+        -- On recupere les deux types de code generes (pas de comparaison a ce niveau).
+        A^leftCode := R^leftCode;
+        A^rightCode := R^rightCode;
+    end
 end
 }
 
 --
 --
 -- Operateur relationnel.
-AX -> OPREL R #type ;
+AX -> OPREL R #type #code ;
 
 -- Verification du type d'une relation (suite).
 #type {
 local
 do
-    AX^type := R^type;
+    -- Les operateurs relationels de base utilisent des entiers.
+    if R^type /= AX^tds.searchType("int", true) then
+        error(MCS_BAD_TYPE_3, "int", R^type.name());
+    else
+        AX^type := R^type;
+    end
+end
+}
+
+-- Generation de code pour une relation (suite).
+#code {
+do
+    -- La comparaison a lieu ici.
+    -- OPREL^code contient l'appel a l'operateur de comparaison.
+    AX^code := R^rightCode + OPREL^code;
 end
 }
 
 --
 --
 -- Fin de la relation.
-AX -> #type ;
+AX -> #type #code ;
 
 -- Verification du type d'une relation (fin).
 #type {
 local
 do
     AX^type := null;
+end
+}
+
+-- Pas de code genere.
+#code {
+do
+    AX^code := "";
 end
 }
 
