@@ -1315,7 +1315,7 @@ end
 #code {
 local
 do
-    if TX^type /= null & TX^type = F^type then
+    if TX^type /= null && TX^type = F^type then
         -- T contient une multiplication donc est forcement une rightValue...
         T^leftCode := "";
         -- La multiplication est faite dans le code de TX.

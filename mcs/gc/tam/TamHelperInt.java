@@ -36,7 +36,7 @@ public class TamHelperInt implements HelperIntInterface {
     @Override
     public String generateMul() {
         return "; multiplication de deux entiers charges precedemment.\n"
-            + "\tSUBR IMul";
+            + "\tSUBR IMul\n";
     }
 
     @Override
