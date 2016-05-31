@@ -83,6 +83,9 @@ syn leftCode : String for A, R, T, F, FX ;
 -- Code generant une valeur.
 syn rightCode : String for A, R, T, F, FX ;
 
+-- Permet de savoir si on arrive à la fin d'une expression.
+syn endl : Boolean for FX;
+
 --le code généré pour chaque parametre d'une fonction
 syn codeList : ArrayList<String> for ES, ESX;
 
@@ -1754,7 +1757,7 @@ do
     hg := F^gen.getGeneralHelper();
     t := v.type();
     a := v.addr();
-    if FX^type = null then
+    if FX^endl then
         -- Empilement de l'adresse de la variable.
         F^leftCode := hg.generateConstante(a.val());
         -- Empilement de la valeur de la variable.
@@ -1809,6 +1812,7 @@ local
 do
 	FX^leftCode := "";
 	FX^rightCode := "";
+    FX^endl := true;
 end
 }
 
@@ -1863,11 +1867,12 @@ do
     hm := FX^gen.getMemoryHelper();
     hg := FX^gen.getGeneralHelper();
     hi := FX^gen.getIntHelper();
+    FX^endl := false;
     t := c.type();
     a := c.addr();
     -- Le code commun empile l'adresse du champ utilise.
     codeCommun := hg.generateConstante(a.val()) + hi.generateSum();
-    if FX1^type = null then
+    if FX1^endl then
         -- Empilement de l'adresse de la variable (adresse du champ).
         FX^leftCode := codeCommun;
         -- Empilement de la valeur de la variable (valeur du champ).
@@ -1953,11 +1958,12 @@ do
     hm := FX^gen.getMemoryHelper();
     hg := FX^gen.getGeneralHelper();
     hi := FX^gen.getIntHelper();
+    FX^endl := false;
     t := c.type();
     a := c.addr();
     -- Le code commun empile l'adresse du champ utilise.
     codeCommun := hg.generateConstante(a.val()) + hi.generateSum();
-    if FX1^type = null then
+    if FX1^endl then
         -- Empilement de l'adresse de la variable (adresse du champ).
         FX^leftCode := codeCommun;
         -- Empilement de la valeur de la variable (valeur du champ).
@@ -2013,6 +2019,7 @@ local
     h : HelperFunctionInterface;
 do
     h := FX^gen.getFunctionHelper();
+    FX^endl := false;
     -- codeList contient le code pour pousser les parametres de la fonction sur la pile.
     -- TODO: Generation de code : generer l'appel de fonction.
     FX^leftCode := "";
