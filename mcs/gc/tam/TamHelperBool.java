@@ -9,49 +9,49 @@ import mcs.gc.general.*;
 public class TamHelperBool implements HelperBoolInterface {
 
     public String generateNegation() {
-        return "; negation bool\n"
-            + "\tSUBR BNeg";
+        return "; Negation booleen.\n"
+            + "    SUBR BNeg";
     }
 
     public String generateOr() {
-        return "; disjonction de deux booleens precedemment charges sur la pile.\n"
-            + "\tSUBR BOr\n";
+        return "; Disjonction de deux booleens (precedemment charges sur la pile).\n"
+            + "    SUBR BOr\n";
     }
 
     public String generateAnd() {
-        return "; conjonction de deux booleens precedemment charges sur la pile.\n"
-            + "\tSUBR BAnd\n";
+        return "; Conjonction de deux booleens (precedemment charges sur la pile).\n"
+            + "    SUBR BAnd\n";
     }
 
     public String generateDisplay(String value) {
-        return "; display Bool " + value + "\n"
-            + "\tLOADL " + value + "\n"
-            + "\tSUBR BOut\n";
+        return "; Affichage booleen : " + value + "\n"
+            + "    LOADL " + value + "\n"
+            + "    SUBR BOut\n";
     }
 
     public String generateDisplay(int dep, int size) {
-        return "; display Bool (" + dep + "," + size + ") \n"
-            + "\tLOAD(" + size + ") " + dep + "[LB] \n"
-            + "\tSUBR BOut\n";
+        return "; Affichage booleen (" + dep + "," + size + ")\n"
+            + "    LOAD(" + size + ") " + dep + "[LB]\n"
+            + "    SUBR BOut\n";
     }
 
     public String generateRead() {
-        return "; input 1 entier \n"
-            + "\tSUBR BIn \n";
+        return "; Input entier.\n"
+            + "    SUBR BIn\n";
     }
 
     public String generateBoolToChar() {
-        return "; bool to char \n"
-            + "\tSUBR B2C\n";
+        return "; Conversion bool vers char.\n"
+            + "    SUBR B2C\n";
     }
 
     public String generateBoolToInt() {
-        return "; bool to int \n"
-            + "\tSUBR B2I\n";
+        return "; Conversion bool vers int.\n"
+            + "    SUBR B2I\n";
     }
 
     public String generateBoolToString() {
-        return "; bool to string \n"
-            + "\tSUBR B2S\n";
+        return "; Conversion bool vers string.\n"
+            + "    SUBR B2S\n";
     }
 }

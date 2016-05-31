@@ -11,99 +11,99 @@ public class TamHelperInt implements HelperIntInterface {
 
     @Override
     public String generateNeg() {
-        return "; negation de l'entier precedemment charge.\n"
-            + "\tSUBR INeg\n";
+        return "; Negation entiere (entier precedemment empile).\n"
+            + "    SUBR INeg\n";
     }
 
     @Override
     public String generateSum() {
-        return "; somme des deux entiers charges precedemment.\n"
-            + "\tSUBR IAdd\n";
+        return "; Somme de deux entiers (precedemment empiles).\n"
+            + "    SUBR IAdd\n";
     }
 
     @Override
     public String generateSub() {
-        return "; soustraction des deux entiers charges precedemment (le dernier entier charge etant celui a soustraire).\n"
-            + "\tSUBR ISub\n";
+        return "; Soustraction de deux entiers (precedemment empiles).\n"
+            + "    SUBR ISub\n";
     }
 
     @Override
     public String generateDiv() {
-        return "; division de deux entiers charges precedemment (le dernier entier charge etant le denominateur).\n"
-            + "\tSUBR IDiv\n";
+        return "; Division de deux entiers (precedemment empiles) (le dernier entier charge etant le denominateur).\n"
+            + "    SUBR IDiv\n";
     }
 
     @Override
     public String generateMul() {
-        return "; multiplication de deux entiers charges precedemment.\n"
-            + "\tSUBR IMul\n";
+        return "; Multiplication de deux entiers (precedemment empiles).\n"
+            + "    SUBR IMul\n";
     }
 
     @Override
     public String generateMod() {
-        return "; modulo de deux entiers charges precedemment.\n"
-            + "\tSUBR IMod\n";
+        return "; Modulo de deux entiers (precedemment empiles).\n"
+            + "    SUBR IMod\n";
     }
 
     @Override
     public String generateEq() {
-        return "; comparaison (egalite) entre deux entiers charges precedemment.\n"
-            + "\tSUBR IEq\n";
+        return "; Comparaison (egalite) de deux entiers (precedemment empiles).\n"
+            + "    SUBR IEq\n";
     }
 
     @Override
     public String generateNeq() {
-        return "; comparaison (inegalite) entre deux entiers charges precedemment.\n"
-            + "\tSUBR INeq\n";
+        return "; Comparaison (inegalite) de deux entiers (precedemment empiles).\n"
+            + "    SUBR INeq\n";
     }
 
     @Override
     public String generateLss() {
-        return "; comparaison (inferieur strict) entre deux entiers charges precedemment.\n"
-            + "\tSUBR ILss\n";
+        return "; Comparaison (inferieur strict) de deux entiers (precedemment empiles).\n"
+            + "    SUBR ILss\n";
     }
 
     @Override
     public String generateLeq() {
-        return "; comparaison (inferieur ou egal) entre deux entiers charges precedemment.\n"
-            + "\tSUBR ILeq\n";
+        return "; Comparaison (inferieur ou egal) de deux entiers (precedemment empiles).\n"
+            + "    SUBR ILeq\n";
     }
 
     @Override
     public String generateGtr() {
-        return "; comparaison (superieur strict) entre deux entiers charges precedemment.\n"
-            + "\tSUBR IGtr\n";
+        return "; Comparaison (superieur strict) de deux entiers (precedemment empiles).\n"
+            + "    SUBR IGtr\n";
     }
 
     @Override
     public String generateGeq() {
-        return "; comparaison (superieur ou egal) entre deux entiers charges precedemment.\n"
-            + "\tSUBR IGeq\n";
+        return "; Comparaison (superieur ou egal) de deux entiers (precedemment empiles).\n"
+            + "    SUBR IGeq\n";
     }
 
     @Override
     public String generateIntToBool() {
-        return "; conversion d'un entier precedemment charge en booleen.\n"
-            + "\tSUBR I2B\n";
+        return "; Conversion d'un entier (precedemment empile) en booleen.\n"
+            + "    SUBR I2B\n";
     }
 
     @Override
     public String generateDisplay(String value) {
-        return "; affichage d'un entier sur stdout\n"
-            + "\tLOADL " + value + "\n"
-            + "\tSUBR IOut\n";
+        return "; Affichage d'un entier sur stdout.\n"
+            + "    LOADL " + value + "\n"
+            + "    SUBR IOut\n";
     }
 
     @Override
     public String generateDisplay(int dep, int size) {
-        return "; affichage d'un entier sur stdout\n"
-            + "\tLOAD(" + size + ") " + dep + "[LB] \n"
-            + "\tSUBR IOut\n";
+        return "; Affichage d'un entier sur stdout.\n"
+            + "    LOAD(" + size + ") " + dep + "[LB]\n"
+            + "    SUBR IOut\n";
     }
 
     @Override
     public String generateRead() {
-        return "; lecture sur stdin d'un entier \n"
+        return "; Lecture d'un entier sur stdin.\n"
             + "SUBR IIn\n";
     }
 }

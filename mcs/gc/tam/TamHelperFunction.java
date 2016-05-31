@@ -15,14 +15,14 @@ public class TamHelperFunction implements HelperFunctionInterface {
      */
     public String generateFunction(String functionName, String functionTag,
                                    String code) {
-        return "; code de la fonction :  " + functionName + " \n"
-            + "_" + functionTag + ":\n" + code + "; fin code fonction " +
-            functionName + " \n";
+        return "; Code de la fonction :  " + functionName + "\n"
+            + "_" + functionTag + ":\n" + code + "; Fin code fonction " +
+            functionName + "\n";
     }
 
     public String generateReturn(int sizeParams, int sizeReturn,
                                  String codeRetour) {
-        return "; retour " + codeRetour + "\n"
+        return "; Retour " + codeRetour + "\n"
             + "    RETURN (" + sizeParams + ") " + sizeReturn + "\n";
     }
 
@@ -31,9 +31,9 @@ public class TamHelperFunction implements HelperFunctionInterface {
         String code =
             "; Appel fonction : " + functionName + " avec les parametres :\n";
         for (String p : parameters) {
-            code += ";\t " + p + "\n";
+            code += ";     " + p + "\n";
         }
-        code += "\tCALL(SB) _" + functionTag + "\n";
+        code += "    CALL(SB) _" + functionTag + "\n";
         return code;
     }
 }

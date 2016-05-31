@@ -13,53 +13,53 @@ public class TamHelperMemory implements HelperMemoryInterface {
      * {@inheritDoc}
      */
     public String generateStaticRead(int dep, int taille) {
-        return "\tLOAD(" + taille + ") " + dep + "[SB]\n";
+        return "    LOAD(" + taille + ") " + dep + "[SB]\n";
     }
 
     /**
      * {@inheritDoc}
      */
     public String generateStaticWrite(int dep, int taille) {
-        return "\tSTORE(" + taille + ") " + dep + "[SB]\n";
+        return "    STORE(" + taille + ") " + dep + "[SB]\n";
     }
 
     /**
      * {@inheritDoc}
      */
     public String generateDynamicRead(int taille) {
-        return "\tLOADI(" + taille + ")\n";
+        return "    LOADI(" + taille + ")\n";
     }
 
     /**
      * {@inheritDoc}
      */
     public String generateDynamicWrite(int taille) {
-        return "\tSTOREI(" + taille + ")\n";
+        return "    STOREI(" + taille + ")\n";
     }
 
     @Override
     public String generateVoid() {
-        return "; adresse non initialisee.\n"
+        return "; Adresse non initialisee.\n"
             + "    SUBR MVoid\n";
     }
 
     @Override
     public String generateMalloc(String size) {
-        return "; allocation de la mémoire d'un bloc dee taille " + size + "\n"
-            + "\tLOADL " + size + "\n"
-            + "\tSUBR MAlloc\n";
+        return "; Allocation de la mémoire d'un bloc de taille " + size + "\n"
+            + "    LOADL " + size + "\n"
+            + "    SUBR MAlloc\n";
     }
 
     @Override
     public String generateFree(String size) {
-        return "; libération de la mémoire \n"
-            + "\tLOADL " + size + "\n"
-            + "\tSUBR MFree\n";
+        return "; Libération de la mémoire.\n"
+            + "    LOADL " + size + "\n"
+            + "    SUBR MFree\n";
     }
 
     @Override
     public String generateAdr(int dep) {
-        return "\tLOADA " + dep + "[SB]\n";
+        return "    LOADA " + dep + "[SB]\n";
     }
 
     @Override
@@ -70,19 +70,22 @@ public class TamHelperMemory implements HelperMemoryInterface {
 
     @Override
     public String generateReserve(int size) {
-        return "; reservation de " + size + " mots sur la pile\n"
-            + "\tPUSH " + size + "\n";
+        return "; Reservation de " + size + " mot" + (size > 1 ? "s" : "") +
+            " sur la pile.\n"
+            + "    PUSH " + size + "\n";
     }
 
     @Override
     public String generateFree(int size) {
-        return "; liberation de " + size + " mots sur la pile\n"
-            + "\tPOP " + size + "\n";
+        return "; Liberation de " + size + " mot" + (size > 1 ? "s" : "") +
+            " sur la pile.\n"
+            + "    POP " + size + "\n";
     }
 
     @Override
     public String generateDuplicate(int size) {
-        return "; duplication des " + size + "mots precedents.\n"
-            + "\tLOAD (" + size + ") -" + size + "[ST]\n";
+        return "; Duplication " + (size > 1 ? "des " + size : "du") + " mot" +
+            (size > 1 ? "s" : "") + " precedent" + (size > 1 ? "s" : "") + ".\n"
+            + "    LOAD (" + size + ") -" + size + "[ST]\n";
     }
 }

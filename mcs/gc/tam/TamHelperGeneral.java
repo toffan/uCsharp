@@ -19,7 +19,7 @@ public class TamHelperGeneral implements HelperGeneralInterface {
      */
     public String generateDeclaration(String n, VAR i, String t) {
         int taille = i.addr().val();
-        return "   ; declaration de " + n + " en " + i.addr().val() + "/SB"
+        return "; Declaration de " + n + " en " + i.addr().val() + "/SB"
             + " taille = " + taille + "\n";
     }
 
@@ -31,30 +31,35 @@ public class TamHelperGeneral implements HelperGeneralInterface {
     /**
      * {@inheritDoc}
      */
-    public String generateEnd() { return "\tHALT\n"; }
+    public String generateEnd() { return "    HALT\n"; }
 
     /**
      * {@inheritDoc}
      */
-    public String generateConstante(String v) { return "\tLOADL " + v + "\n"; }
+    public String generateConstante(String v) {
+        return "    LOADL " + v + "\n";
+    }
 
     /**
      * {@inheritDoc}
      */
-    public String generateConstante(int v) { return "\tLOADL " + v + "\n"; }
+    public String generateConstante(int v) { return "    LOADL " + v + "\n"; }
 
 
     /**
      * {@inheritDoc}
      */
     public String generateIf(String condition, String codeIf, String codeElse) {
-        String sinon = this.generateLabel();
-        String fin = this.generateLabel();
-        return "\t; if\n" + condition + "\n"
-            + "\tJUMPIF(0) " + sinon + "\n" + codeIf + "\n"
-            + "\tJUMP " + fin + "\n" + sinon + "\n" + codeElse + "\n" + fin +
-            "\n"
-            + "\t; fin if\n";
+        String res;
+        String labelSinon = this.generateLabel();
+        String labelFin = this.generateLabel();
+        res = "; if\n" + condition + "\n";
+        res += "    JUMPIF(0) " + labelSinon + "\n";
+        res += codeIf + "\n"
+               + "    JUMP " + labelFin + "\n";
+        res += labelSinon + "\n" + codeElse + "\n" + labelFin + "\n";
+        res += "    ; fin if\n";
+        return res;
     }
 
     /**

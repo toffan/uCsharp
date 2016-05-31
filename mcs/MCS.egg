@@ -363,7 +363,7 @@ local
     h : HelperFunctionInterface;
 do
     h := DECL^gen.getFunctionHelper();
-    DECL^code := h.generateFunction(DECL^name, "_" + DECL^name, FONCTION^code);
+    DECL^code := h.generateFunction(DECL^name, DECL^name, FONCTION^code);
 end
 } -- }}}
 
