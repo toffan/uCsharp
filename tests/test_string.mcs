@@ -1,0 +1,34 @@
+//test-string.mcs
+//effectue des tests sur les strings.
+
+// assembleur inline en dehors d'une fonction
+asm {
+   CALL (LB) _main   ; appel au point d'entree du programme
+   HALT              ; arret de la machine
+   }
+
+// point d'entree du programme.
+int main(){
+
+    char* sV = "volodia";
+    char* sA = "antoine";
+    char* sM = "matthieu";
+    char* sB = "benoit"; //nom proche de celui utilisé assembleur. fait expres
+	
+	
+	char u = "u";
+	
+	// fonction qui concatene tete a message.
+	void concatene(char* message, char tete){
+	asm{
+		LOAD %message;
+		LOAD %tete
+		SUBR SCONCAT;
+	}
+	}
+
+	concatene(sV,u);
+
+    
+	return 0;
+}
