@@ -35,19 +35,21 @@ public interface HelperMemoryInterface {
      * compilation : variable, champ d'un struct etc
      * @param dep
      * @param taille
+     * @param name Nom de la TDS (reference de l'adresse : SB, LB).
      * @return
      */
 
-    public String generateStaticRead(int dep, int taille);
+    public String generateStaticRead(int dep, int taille, String name);
 
     /**
      * code pour ecrire la valeur d'une expression dont on connait l'adresse à
      * la compilation : variable, champ d'un struct etc
      * @param dep
      * @param taille
+     * @param name Nom de la TDS (reference de l'adresse : SB, LB).
      * @return
      */
-    public String generateStaticWrite(int dep, int taille);
+    public String generateStaticWrite(int dep, int taille, String name);
 
     /**
      * Empile taille mots lus à l’adresse précedemment empilée
@@ -68,9 +70,10 @@ public interface HelperMemoryInterface {
      * empile la valeur absolue de l'adresse avec un deplacement de dep par
      * rapport à LB.
      * @param dep le deplacement par rapport à la LB
+     * @param name Nom de la TDS (reference de l'adresse : SB, LB).
      * @return
      */
-    public String generateAdr(int dep);
+    public String generateAdr(int dep, String name);
 
     /**
      * code pour calculer l'adresse d'un champ d'un struct

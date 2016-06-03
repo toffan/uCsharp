@@ -12,15 +12,15 @@ public class TamHelperMemory implements HelperMemoryInterface {
     /**
      * {@inheritDoc}
      */
-    public String generateStaticRead(int dep, int taille) {
-        return "    LOAD(" + taille + ") " + dep + "[SB]\n";
+    public String generateStaticRead(int dep, int taille, String name) {
+        return "    LOAD(" + taille + ") " + dep + "[" + name + "]\n";
     }
 
     /**
      * {@inheritDoc}
      */
-    public String generateStaticWrite(int dep, int taille) {
-        return "    STORE(" + taille + ") " + dep + "[SB]\n";
+    public String generateStaticWrite(int dep, int taille, String name) {
+        return "    STORE(" + taille + ") " + dep + "[" + name + "]\n";
     }
 
     /**
@@ -58,8 +58,8 @@ public class TamHelperMemory implements HelperMemoryInterface {
     }
 
     @Override
-    public String generateAdr(int dep) {
-        return "    LOADA " + dep + "[SB]\n";
+    public String generateAdr(int dep, String name) {
+        return "    LOADA " + dep + "[" + name + "]\n";
     }
 
     @Override

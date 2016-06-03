@@ -14,7 +14,7 @@ public class FCT extends VAR {
     public FCT(FTYPE type, TDS parente, String name) {
         super(type);
         this.params = new ArrayList<String>();
-        this.tds = new TDS(parente);
+        this.tds = new TDS(parente, "LB");
         this.name = name;
     }
 

@@ -9,16 +9,19 @@ public class TDS {
     private TDS parent;
     private HashMap<String, VAR> vars;
     private HashMap<String, TYPE> types;
+    private String name;
 
     public Logger lg;
 
     ///   Constucteurs   ///
-    public TDS() { this(null); }
-    public TDS(TDS parent) {
-        this.nxtAddr = parent == null ? new Address() : parent.nxtAddr;
+    public TDS(String name) { this(null, name); }
+    public TDS(TDS parent, String name) {
+        this.nxtAddr =
+            parent == null ? new Address(name) : parent.nxtAddr.updateRef(name);
         this.parent = parent;
         this.vars = new HashMap<String, VAR>();
         this.types = new HashMap<String, TYPE>();
+        this.name = name;
 
         this.lg = new Logger(true);
     }

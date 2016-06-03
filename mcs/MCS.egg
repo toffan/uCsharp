@@ -178,7 +178,7 @@ do
         ENTITES^gen := gen;
     end
 
-    tds := new TDS();
+    tds := new TDS("SB");
     -- Ajouter a la TDS les types natifs.
     tds.putType("void", new TYPE("void", 0));
     tds.putType("int", new TYPE("int", 1));
@@ -1761,7 +1761,7 @@ do
         -- Empilement de l'adresse de la variable.
         F^leftCode := hg.generateConstante(a.val());
         -- Empilement de la valeur de la variable.
-        F^rightCode := hm.generateStaticRead(a.val(), t.size());
+        F^rightCode := hm.generateStaticRead(a.val(), t.size(), a.ref());
     else
         if t.isStruct() then
             -- La differenciation effective se fera lors la generation du code de FX.
@@ -1772,9 +1772,9 @@ do
         elseif t.isPointer() then
             -- La differenciation effective se fera lors la generation du code de FX.
             -- Empilement de l'adresse de la zone pointee, puis de l'adresse du champ.
-            F^leftCode := hm.generateStaticRead(a.val(), t.size()) + FX^leftCode;
+            F^leftCode := hm.generateStaticRead(a.val(), t.size(), a.ref()) + FX^leftCode;
             -- Empilement de l'adresse de la zone pointee puis de la valeur du champ.
-            F^rightCode := hm.generateStaticRead(a.val(), t.size()) + FX^rightCode;
+            F^rightCode := hm.generateStaticRead(a.val(), t.size(), a.ref()) + FX^rightCode;
         elseif t.isFType() then
             -- TODO: Generation de code.
             F^leftCode := FX^leftCode;

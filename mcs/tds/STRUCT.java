@@ -9,7 +9,7 @@ public class STRUCT extends TYPE {
     public STRUCT() { this(null); }
     public STRUCT(String name) {
         super(name, 0);
-        this.tds = new TDS();
+        this.tds = new TDS("");
     };
 
     ///   Méthodes   ///
