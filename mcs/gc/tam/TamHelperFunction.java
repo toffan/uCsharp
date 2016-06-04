@@ -16,8 +16,10 @@ public class TamHelperFunction implements HelperFunctionInterface {
     public String generateFunction(String functionName, String functionTag,
                                    String code) {
         return "; Code de la fonction :  " + functionName + "\n"
+            + "JUMP __" + functionTag + "\n"
             + "_" + functionTag + ":\n" + code + "; Fin code fonction " +
-            functionName + "\n";
+            functionName + "\n"
+            + "__" + functionTag + ":\n";
     }
 
     public String generateReturn(int sizeParams, int sizeReturn,
