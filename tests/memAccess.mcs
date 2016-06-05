@@ -1,9 +1,19 @@
 int a;
 int b;
 
+int mult(int a, int b) {
+    return a*b;
+}
+int add(int a, int b) {
+    return a+b;
+}
+int sub(int a, int b) {
+    return a-b;
+}
+
 int main() {
     int x = 2;
     a = 3;
     b = 6;
-    return a+b*x;
+    return add(a,mult(b,x));
 }
