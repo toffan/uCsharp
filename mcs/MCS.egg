@@ -772,8 +772,12 @@ end
 
 -- Recuperation du code genere.
 #code { -- {{{
+local
+    h : HelperMemoryInterface;
 do
-    INST^code := E^code;
+    h := INST^gen.getMemoryHelper();
+    -- La valeur de l'expression E est inutile, il faut donc la depiler.
+    INST^code := E^code + h.generateFree(E^type.size());
 end
 } -- }}}
 

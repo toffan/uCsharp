@@ -79,7 +79,7 @@ public class TamHelperMemory implements HelperMemoryInterface {
     public String generateFree(int size) {
         return "; Liberation de " + size + " mot" + (size > 1 ? "s" : "") +
             " sur la pile.\n"
-            + "    POP " + size + "\n";
+            + "    POP (0) " + size + "\n";
     }
 
     @Override
