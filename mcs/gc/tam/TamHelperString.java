@@ -11,16 +11,16 @@ public class TamHelperString implements HelperStringInterface {
 
     @Override
     public String generateNew(String value) {
-        // TODO: Tester le bon fonctionnement de SAlloc et de tam en general...
+        int realLength = value.length()-2; // la longueur de la chaine "hello" est de nombre de caractere total -2;
         return "; Allocation d'une nouvelle string de taille " +
-            value.length() + "\n"
-            + "    LOADL " + value.length() + "\n"
+        realLength + "\n"
+            + "    LOADL " + realLength + "\n"
             + "    SUBR SAlloc\n"
             + "; affectation de la chaine.\n"
             + "    LOADL " + value + "\n"
             + "; duplication de l'adresse de la chaine.\n"
-            + "    LOAD (1) -" + new Integer(value.length() + 1) + "[ST]\n"
-            + "    STOREI (" + value.length() + ")\n";
+            + "    LOAD (1) -" + new Integer(realLength + 1) + "[ST]\n"
+            + "    STOREI (" + realLength + ")\n";
     }
 
     public String generateNew(int dep, int size) {
