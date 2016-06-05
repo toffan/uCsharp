@@ -26,7 +26,7 @@ public class TamHelperGeneral implements HelperGeneralInterface {
     /**
      * {@inheritDoc}
      */
-    public String generateLabel() { return "X" + this.labelCounter++; }
+    public String generateLabel() { return "_X" + (this.labelCounter++) +":"; }
 
     /**
      * {@inheritDoc}
