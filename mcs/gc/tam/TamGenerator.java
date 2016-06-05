@@ -62,7 +62,7 @@ public class TamGenerator implements GeneratorItf {
             PrintWriter pw = new PrintWriter(
                 new FileOutputStream(this.getFileName() + ".tam"));
             pw.println(";;; code TAM engendre pour " + this.filename + "\n");
-            pw.print(code + "    HALT\n");
+            pw.print(code);
             pw.close();
         } catch (FileNotFoundException e) {
             System.err.println("Impossible d'ecrire dans le fichier " +

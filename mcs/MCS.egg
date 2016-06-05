@@ -191,8 +191,10 @@ end
 -- Ecrit le code dans un fichier.
 #gen { -- {{{
 local
+    h : HelperGeneralInterface;
 do
-    gen.generateFile(";" + gen.getFileName() + "\n" + ENTITES^code + "; EOF\n");
+    h := gen.getGeneralHelper();
+    gen.generateFile(h.generateComment(gen.getFileName()) + ENTITES^code + h.generateEnd());
 end
 } -- }}}
 

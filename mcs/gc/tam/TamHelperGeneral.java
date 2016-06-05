@@ -31,7 +31,11 @@ public class TamHelperGeneral implements HelperGeneralInterface {
     /**
      * {@inheritDoc}
      */
-    public String generateEnd() { return "    HALT\n"; }
+    public String generateEnd() {
+        return "    CALL(SB) _main\n"
+            + "    HALT\n"
+            + "; EOF\n";
+    }
 
     /**
      * {@inheritDoc}
