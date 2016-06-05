@@ -31,6 +31,9 @@ att :
 class :
 	$(JDIR)/javac -classpath $(GJAR) mcs/egg/*.java
 
+test:
+	python tests.py utests/*.mcs
+
 clean :
 	rm -rf $(PACKAGE)
 	rm -f mcs/tds/*.class
