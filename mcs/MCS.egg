@@ -813,7 +813,6 @@ local
 do
     -- Une expression conditionnelle est de type de retour entier.
     if E^type /= INST^tds.searchType("int", true) then
-        -- TODO: Completer l'erreur avec du texte representant l'expression.
         error(MCS_NOT_BOOLEAN, E^type.name());
     else
         if BLOC^type /= null then
@@ -1785,7 +1784,7 @@ do
             -- Empilement de l'adresse de la zone pointee puis de la valeur du champ.
             F^rightCode := hm.generateStaticRead(a.val(), t.size(), a.ref()) + FX^rightCode;
         elseif t.isFType() then
-            -- TODO: Generation de code.
+            -- TODO: Verifier code genere correct dans toutes situations.
             F^leftCode := FX^leftCode;
             F^rightCode := FX^rightCode;
         end
@@ -1900,7 +1899,7 @@ do
             -- Empilement de l'adresse de la zone pointee puis de la valeur du champ.
             FX^rightCode := codeCommun + hm.generateDynamicRead(t.size()) + FX1^rightCode;
         elseif t.isFType() then
-            -- TODO: Generation de code.
+            -- TODO: Verifier code genere correct dans toutes situations.
             FX^leftCode := FX1^leftCode;
             FX^rightCode := FX1^rightCode;
         end
@@ -1991,7 +1990,7 @@ do
             -- Empilement de l'adresse de la zone pointee puis de la valeur du champ.
             FX^rightCode := codeCommun + hm.generateDynamicRead(t.size()) + FX1^rightCode;
         elseif t.isFType() then
-            -- TODO: Generation de code.
+            -- TODO: Verifier code genere correct dans toutes situations.
             FX^leftCode := FX1^leftCode;
             FX^rightCode := FX1^rightCode;
         end
