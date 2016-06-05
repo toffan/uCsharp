@@ -16,8 +16,8 @@ int main(){
     char* sB = "benoit"; //nom proche de celui utilisé assembleur. fait expres
 	
 	
-	char u = "u";
-	
+	char u = 'a';
+	  
 	// fonction qui concatene tete a message.
 	void concatene(char* message, char tete){
 	asm{
@@ -28,7 +28,7 @@ int main(){
 	}
 
 	concatene(sV,u);
+  
 
-    
 	return 0;
 }
