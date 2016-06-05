@@ -73,10 +73,11 @@ inh gen : GeneratorItf for
 syn code : String for
          ENTITES, ENTITE, DECL, FONCTION,
          BLOC, INSTS, INST, AFFX, E, SIX,
-         AX, OPREL, RX, OPADD, TX, OPMUL, OPUN ;
+         AX, OPREL, RX, OPADD, TX, OPMUL, OPUN,
+         ES, ESX ;
 
 -- Nom de l'ident a gauche d'une declaration.
-inh name : String for DECL;
+inh name : String for DECL, FX;
 
 -- Code generant une adresse.
 syn leftCode : String for A, R, T, F, FX ;
@@ -85,9 +86,6 @@ syn rightCode : String for A, R, T, F, FX ;
 
 -- Permet de savoir si on arrive à la fin d'une expression.
 syn endl : Boolean for FX;
-
---le code généré pour chaque parametre d'une fonction
-syn codeList : ArrayList<String> for ES, ESX;
 
 -- Permet de savoir si les parametres d'une operation doivent etre au prealable convertis en booleens.
 syn toBool : Boolean for OPADD, OPMUL ;
@@ -1637,6 +1635,7 @@ F -> paro E parf #type1 FX #type2 #code;
 local
 do
     FX^typeLeft := E^type;
+    FX^name := null;
 end
 } -- }}}
 
@@ -1741,6 +1740,7 @@ do
         error(MCS_VUN, ident^txt);
     else
         FX^typeLeft := v.type();
+        FX^name := ident^txt;
     end
 end
 } -- }}}
@@ -2027,13 +2027,12 @@ local
 do
     h := FX^gen.getFunctionHelper();
     FX^endl := false;
-    -- codeList contient le code pour pousser les parametres de la fonction sur la pile.
-    -- TODO: Generation de code : generer l'appel de fonction.
-    FX^leftCode := "";
-    FX^rightCode := "";
-    -- TODO: Generation de code : generer proprement FX^leftCode.
-    --FX^leftCode := h.generateCall(FX^typeLeft.name(), FX^typeLeft.name(), ES^codeList) + FX1^code + "; TODO: empiler l'adresse de la derniere case sur la pile.";
-    --FX^rightCode := h.generateCall(FX^typeLeft.name(), FX^typeLeft.name(), ES^codeList) + FX1^code;
+    if FX^name = null then
+        error(MCS_BAD_FCN_CALL);
+    else
+        FX^leftCode := h.generateCall(FX^name, FX^name, ES^code) + FX1^leftCode;
+        FX^rightCode := h.generateCall(FX^name, FX^name, ES^code) + FX1^rightCode;
+    end
 end
 } -- }}}
 
@@ -2045,7 +2044,7 @@ ES -> #code;
 #code { -- {{{
 local
 do
-	ES^codeList := new ArrayList<String>();
+	ES^code := "";
 end
 } -- }}}
 
@@ -2070,12 +2069,9 @@ end
 
 #code { -- {{{
 local
-	codeListTemp : ArrayList<String>;
 do
-	--concatenation du code des parametres
-	codeListTemp := ESX^codeList;
-	codeListTemp.add(0,E^code);
-	ES^codeList :=  codeListTemp;--ajout en tete de la liste du code du parametre
+	-- Concatenation du code des parametres.
+	ES^code := E^code + ESX^code;
 end
 } -- }}}
 --
@@ -2086,7 +2082,7 @@ ESX -> #code;
 #code { -- {{{
 local
 do
-	ESX^codeList := new ArrayList<String>();
+	ESX^code := "";
 end
 } -- }}}
 --
@@ -2110,12 +2106,9 @@ end
 
 #code { -- {{{
 local
-	codeListTemp : ArrayList<String>;
 do
-	--concatenation du code des parametres
-	codeListTemp := ESX1^codeList;
-	codeListTemp.add(0,E^code);
-	ESX^codeList :=  codeListTemp;--ajout en tete de la liste du code du parametre
+	-- Concatenation du code des parametres.
+	ESX^code := E^code + ESX1^code;
 end
 } -- }}}
 
