@@ -26,7 +26,7 @@ public class TamHelperGeneral implements HelperGeneralInterface {
     /**
      * {@inheritDoc}
      */
-    public String generateLabel() { return "_X" + (this.labelCounter++) +":"; }
+    public String generateLabel() { return "X" + (this.labelCounter++); }
 
     /**
      * {@inheritDoc}
@@ -61,7 +61,7 @@ public class TamHelperGeneral implements HelperGeneralInterface {
         res += "    JUMPIF(0) " + labelSinon + "\n";
         res += codeIf + "\n"
                + "    JUMP " + labelFin + "\n";
-        res += labelSinon + "\n" + codeElse + "\n" + labelFin + "\n";
+        res += labelSinon + ":\n" + codeElse + "\n" + labelFin + ":\n";
         res += "    ; fin if\n";
         return res;
     }
