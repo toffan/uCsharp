@@ -178,7 +178,7 @@ do
         ENTITES^gen := gen;
     end
 
-    tds := new TDS("SB");
+    tds := new TDS();
     -- Ajouter a la TDS les types natifs.
     tds.putType("void", new TYPE("void", 0));
     tds.putType("int", new TYPE("int", 1));
@@ -381,8 +381,11 @@ FONCTION -> paro PARFS parf #type BLOC #code ;
 -- Transmission de la TDS interne de la fonction au corps de fonction.
 #type { -- {{{
 local
+    tds : TDS;
 do
-    BLOC^tds := FONCTION^fct.tds();
+    tds := FONCTION^fct.tds();
+    tds.endFunctionDeclaration();
+    BLOC^tds := tds;
 end
 } -- }}}
 

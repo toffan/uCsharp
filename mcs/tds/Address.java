@@ -21,14 +21,28 @@ public class Address {
     }
 
     ///   Methodes   ///
+
+    /**
+     * Renvoie l'adresse suivante.
+     * @param dplt taille de la variable mémorisée.
+     */
     public Address next(int dplt) {
         return new Address(this.ref, this.val + dplt);
     }
-    public Address updateRef(String ref) {
-        this.ref = ref;
-        return this;
-    }
+
+    /**
+     * Effectue une translation de offset de l'adresse.
+     * @param offset valeur du déplacement à effectuer.
+     */
+    public void shift(int offset) { this.val += offset; }
+
+    /**
+     * Retourne la valeur de l'adresse courante.
+     */
     public int val() { return this.val; }
-    /** Retourne le nom/reference de la TDS (reference de l'adresse). */
+
+    /**
+     * Retourne le nom/reference de la TDS (reference de l'adresse).
+     */
     public String ref() { return this.ref; }
 }
