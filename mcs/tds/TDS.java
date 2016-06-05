@@ -21,8 +21,8 @@ public class TDS {
      * @param fct indique si la TDS créée fait partie d'une fonction.
      */
     public TDS(TDS parent, boolean fct) {
-        this.nxtAddr =
-            (parent == null || fct) ? new Address(fct ? "LB" : "SB") : parent.nxtAddr;
+        this.nxtAddr = (parent == null || fct) ? new Address(fct ? "LB" : "SB")
+                                               : parent.nxtAddr;
         this.parent = parent;
         this.vars = new HashMap<String, VAR>();
         this.types = new HashMap<String, TYPE>();
@@ -73,7 +73,8 @@ public class TDS {
     /**
      * Termine l'ajout des paramètres d'une fonction.
      * Transforme l'adresse des paramètres en adresses négatives.
-     * Ajoute trois variables réservées correspondant aux trois cases mémoires créées lors d'un appel de fonction.
+     * Ajoute trois variables réservées correspondant aux trois cases mémoires
+     * créées lors d'un appel de fonction.
      */
     public void endFunctionDeclaration() {
         if (this.fct) {
@@ -87,9 +88,9 @@ public class TDS {
             // Réinitialisation de l'adresse courante.
             this.nxtAddr.shift(offset);
             // Ajout des variables réservées.
-            this.putVar("@1", this.searchType("int",true));
-            this.putVar("@2", this.searchType("int",true));
-            this.putVar("@3", this.searchType("int",true));
+            this.putVar("@1", this.searchType("int", true));
+            this.putVar("@2", this.searchType("int", true));
+            this.putVar("@3", this.searchType("int", true));
         }
     }
 
