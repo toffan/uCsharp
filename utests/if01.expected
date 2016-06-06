@@ -1,10 +1,10 @@
 JUMP __main
 _main:
     LOADL 1
-    JUMPIF (0) _X0:
-    JUMP _X1:
-    _X0:
-    _X1:
+    JUMPIF (0) ELSE_0
+    JUMP ENDIF_0
+    ELSE_0:
+    ENDIF_0:
 
     LOADL 0
     RETURN (1) 0

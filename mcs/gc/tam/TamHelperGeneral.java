@@ -55,8 +55,9 @@ public class TamHelperGeneral implements HelperGeneralInterface {
      */
     public String generateIf(String condition, String codeIf, String codeElse) {
         String res;
-        String labelSinon = this.generateLabel();
-        String labelFin = this.generateLabel();
+        int lbl = this.labelCounter++;
+        String labelSinon = "ELSE_" + lbl;
+        String labelFin = "ENDIF_" + lbl;
         res = "; if\n" + condition + "\n";
         res += "    JUMPIF (0) " + labelSinon + "\n";
         res += codeIf + "\n"

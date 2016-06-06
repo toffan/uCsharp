@@ -3,18 +3,18 @@ _main:
     LOADL 3
     LOADL 0
     LOAD (1) 3[LB]
-    JUMPIF (0) _X0:
+    JUMPIF (0) ELSE_1
     LOADL 5
-    JUMP _X1:
-    _X0:
+    JUMP ENDIF_1
+    ELSE_1:
     LOAD (1) 4[LB]
-    JUMPIF (0) _X2:
+    JUMPIF (0) ELSE_0
     LOADL 2
-    JUMP _X3:
-    _X2:
+    JUMP ENDIF_0
+    ELSE_0:
     LOADL 3
-    _X3:
-    _X1:
+    ENDIF_0:
+    ENDIF_1:
 
     LOADL 0
     RETURN (1) 0

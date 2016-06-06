@@ -6,12 +6,12 @@ _main:
     LOAD (1) 4[LB]
     SUBR BOr
     SUBR BNeg
-    JUMPIF (0) _X0:
+    JUMPIF (0) ELSE_0
     LOADL 5
-    JUMP _X1:
-    _X0:
+    JUMP ENDIF_0
+    ELSE_0:
     LOADL 2
-    _X1:
+    ENDIF_0:
 
     LOADL 0
     RETURN (1) 0
