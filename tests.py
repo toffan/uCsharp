@@ -10,6 +10,11 @@ OK = '\033[1;92mOK\033[0m'
 FAIL = '\033[1;91mFAIL\033[0m'
 ERROR = '\033[1;93mABORTED\033[0m'
 
+YELLOW = '\033[33m'
+GREEN = '\033[32m'
+RED = '\033[31m'
+RESET = '\033[0m'
+
 
 def test(filename):
     print(filename + ' ...   ', end='')
@@ -74,12 +79,23 @@ def compare(expected, obtained):
     else:
         d = Differ()
         diff = d.compare(expected, obtained)
-        return ''.join(diff)
+        return ''.join(color(line) for line in diff)
 
 
 def clean(tam):
     codelines = [line.split(';')[0].strip() for line in tam.split('\n')]
     return [line + '\n' for line in codelines if line]
+
+
+def color(line):
+    if line[0] == '+':
+        return GREEN + line + RESET
+    elif line[0] == '-':
+        return RED + line + RESET
+    elif line[0] == '?':
+        return YELLOW + line + RESET
+    else:
+        return line
 
 
 if __name__ == '__main__':
