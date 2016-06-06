@@ -97,7 +97,7 @@ public class TamHelperInt implements HelperIntInterface {
     @Override
     public String generateDisplay(int dep, int size) {
         return "; Affichage d'un entier sur stdout.\n"
-            + "    LOAD(" + size + ") " + dep + "[LB]\n"
+            + "    LOAD (" + size + ") " + dep + "[LB]\n"
             + "    SUBR IOut\n";
     }
 

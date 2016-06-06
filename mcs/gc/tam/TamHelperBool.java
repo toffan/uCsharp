@@ -31,7 +31,7 @@ public class TamHelperBool implements HelperBoolInterface {
 
     public String generateDisplay(int dep, int size) {
         return "; Affichage booleen (" + dep + "," + size + ")\n"
-            + "    LOAD(" + size + ") " + dep + "[LB]\n"
+            + "    LOAD (" + size + ") " + dep + "[LB]\n"
             + "    SUBR BOut\n";
     }
 

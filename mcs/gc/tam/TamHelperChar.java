@@ -17,7 +17,7 @@ public class TamHelperChar implements HelperCharInterface {
 
     public String generateDisplay(int dep, int size) {
         return "; Affichage d'un char sur stdout.\n"
-            + "    LOAD(" + size + ") " + dep + "[LB]\n"
+            + "    LOAD (" + size + ") " + dep + "[LB]\n"
             + "    SUBR COut\n";
     }
 
@@ -34,7 +34,7 @@ public class TamHelperChar implements HelperCharInterface {
 
     public String generateCharToBool(int dep, int size) {
         return "; Conversion char vers bool.\n"
-            + "    LOAD(" + size + ") " + dep + "[LB]\n"
+            + "    LOAD (" + size + ") " + dep + "[LB]\n"
             + "    SUBR C2B\n";
     }
 
@@ -46,7 +46,7 @@ public class TamHelperChar implements HelperCharInterface {
 
     public String generateCharToInt(int dep, int size) {
         return "; Conversion char vers int.\n"
-            + "    LOAD(" + size + ") " + dep + "[LB]\n"
+            + "    LOAD (" + size + ") " + dep + "[LB]\n"
             + "    SUBR C2I\n";
     }
 
@@ -58,7 +58,7 @@ public class TamHelperChar implements HelperCharInterface {
 
     public String generateCharToString(int dep, int size) {
         return "; Conversion char vers string\n"
-            + "    LOAD(" + size + ") " + dep + "[LB]\n"
+            + "    LOAD (" + size + ") " + dep + "[LB]\n"
             + "    SUBR C2S\n";
     }
 }

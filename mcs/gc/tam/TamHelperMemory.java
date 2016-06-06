@@ -13,28 +13,28 @@ public class TamHelperMemory implements HelperMemoryInterface {
      * {@inheritDoc}
      */
     public String generateStaticRead(int dep, int taille, String name) {
-        return "    LOAD(" + taille + ") " + dep + "[" + name + "]\n";
+        return "    LOAD (" + taille + ") " + dep + "[" + name + "]\n";
     }
 
     /**
      * {@inheritDoc}
      */
     public String generateStaticWrite(int dep, int taille, String name) {
-        return "    STORE(" + taille + ") " + dep + "[" + name + "]\n";
+        return "    STORE (" + taille + ") " + dep + "[" + name + "]\n";
     }
 
     /**
      * {@inheritDoc}
      */
     public String generateDynamicRead(int taille) {
-        return "    LOADI(" + taille + ")\n";
+        return "    LOADI (" + taille + ")\n";
     }
 
     /**
      * {@inheritDoc}
      */
     public String generateDynamicWrite(int taille) {
-        return "    STOREI(" + taille + ")\n";
+        return "    STOREI (" + taille + ")\n";
     }
 
     @Override

@@ -26,14 +26,14 @@ public class TamHelperString implements HelperStringInterface {
     public String generateNew(int dep, int size) {
         return "; Allocation d'une nouvelle string de taille (" + dep + "," +
             size + ")\n"
-            + "    LOAD(" + size + ") " + dep + "[LB]\n"
+            + "    LOAD (" + size + ") " + dep + "[LB]\n"
             + "    SUBR SAlloc\n";
     }
 
     @Override
     public String generateConcat(int dep, int size, String value) {
         return "; Concatenation de (" + dep + "," + size + ") - " + value + "\n"
-            + "    LOAD(" + size + ") " + dep + "[LB]\n"
+            + "    LOAD (" + size + ") " + dep + "[LB]\n"
             + "    LOADL " + value + "\n"
             + "    SUBR SConcat\n";
     }
@@ -42,7 +42,7 @@ public class TamHelperString implements HelperStringInterface {
     public String generateConcat(String value, int dep, int size) {
         return "; Concatenation de " + value + " - (" + dep + "," + size + ")\n"
             + "    LOADL " + value + "\n"
-            + "    LOAD(" + size + ") " + dep + "[LB]\n"
+            + "    LOAD (" + size + ") " + dep + "[LB]\n"
             + "    SUBR SConcat\n";
     }
 
@@ -58,8 +58,8 @@ public class TamHelperString implements HelperStringInterface {
     public String generateConcat(int dep1, int size1, int dep2, int size2) {
         return "; Concatenation de  (" + dep1 + "," + size1 + ") + (" + dep2 +
             "," + size2 + ")\n"
-            + "    LOAD(" + size1 + ") " + dep1 + "[LB]\n"
-            + "    LOAD(" + size2 + ") " + dep2 + "[LB]\n"
+            + "    LOAD (" + size1 + ") " + dep1 + "[LB]\n"
+            + "    LOAD (" + size2 + ") " + dep2 + "[LB]\n"
             + "    SUBR SConcat\n";
     }
 
@@ -71,7 +71,7 @@ public class TamHelperString implements HelperStringInterface {
 
     public String generateDisplay(int dep, int size) {
         return "; Affichage d'une string sur stdout.\n"
-            + "    LOAD(" + size + ") " + dep + "[LB]\n"
+            + "    LOAD (" + size + ") " + dep + "[LB]\n"
             + "    SUBR SOut\n";
     }
 
@@ -88,7 +88,7 @@ public class TamHelperString implements HelperStringInterface {
 
     public String generateStringToBool(int dep, int size) {
         return "; Conversion string vers bool.\n"
-            + "    LOAD(" + size + ") " + dep + "[LB]\n"
+            + "    LOAD (" + size + ") " + dep + "[LB]\n"
             + "    SUBR S2B\n";
     }
 
@@ -100,7 +100,7 @@ public class TamHelperString implements HelperStringInterface {
 
     public String generateStringToInt(int dep, int size) {
         return "; Conversion string vers int.\n"
-            + "    LOAD(" + size + ") " + dep + "[LB]\n"
+            + "    LOAD (" + size + ") " + dep + "[LB]\n"
             + "    SUBR S2I\n";
     }
 
@@ -112,7 +112,7 @@ public class TamHelperString implements HelperStringInterface {
 
     public String generateStringToChar(int dep, int size) {
         return "; Extraction premier char de la string.\n"
-            + "    LOAD(" + size + ") " + dep + "[LB]\n"
+            + "    LOAD (" + size + ") " + dep + "[LB]\n"
             + "    SUBR S2C\n";
     }
 }

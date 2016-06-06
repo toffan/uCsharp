@@ -8,5 +8,5 @@ _main:
     RETURN (1) 0
     RETURN (0) 0
 __main:
-    CALL(SB) _main
+    CALL (SB) _main
     HALT

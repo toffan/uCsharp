@@ -32,7 +32,7 @@ public class TamHelperGeneral implements HelperGeneralInterface {
      * {@inheritDoc}
      */
     public String generateEnd() {
-        return "    CALL(SB) _main\n"
+        return "    CALL (SB) _main\n"
             + "    HALT\n"
             + "; EOF\n";
     }
@@ -58,7 +58,7 @@ public class TamHelperGeneral implements HelperGeneralInterface {
         String labelSinon = this.generateLabel();
         String labelFin = this.generateLabel();
         res = "; if\n" + condition + "\n";
-        res += "    JUMPIF(0) " + labelSinon + "\n";
+        res += "    JUMPIF (0) " + labelSinon + "\n";
         res += codeIf + "\n"
                + "    JUMP " + labelFin + "\n";
         res += labelSinon + ":\n" + codeElse + "\n" + labelFin + ":\n";

@@ -33,7 +33,7 @@ public class TamHelperFunction implements HelperFunctionInterface {
         String code = "; Appel fonction : " + functionName + "\n"
                       + "; Chargement des parametres :\n" + codeParam +
                       "; Appel effectif fonction : " + functionName + "\n"
-                      + "    CALL(SB) _" + functionTag + "\n";
+                      + "    CALL (SB) _" + functionTag + "\n";
         return code;
     }
 }
