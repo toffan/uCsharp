@@ -1,0 +1,16 @@
+int main() {
+    int c1 = 3;
+    int c2 = 0;
+
+    if (c1) {
+        int a = 5;
+    } else {
+        if (c2) {
+            int b = 2;
+        } else {
+            int a = 3;
+        }
+    }
+
+    return 0;
+}

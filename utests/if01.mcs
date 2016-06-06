@@ -1,0 +1,9 @@
+int main() {
+    if (1) {
+        // nothing
+    } else {
+        // nothing
+    }
+
+    return 0;
+}

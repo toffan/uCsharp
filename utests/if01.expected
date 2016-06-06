@@ -1,0 +1,14 @@
+JUMP __main
+_main:
+    LOADL 1
+    JUMPIF (0) _X0:
+    JUMP _X1:
+    _X0:
+    _X1:
+
+    LOADL 0
+    RETURN (1) 0
+    RETURN (0) 0
+__main:
+    CALL (SB) _main
+    HALT
