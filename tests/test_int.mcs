@@ -17,17 +17,17 @@ int main(){
     int aMb = a-b;
     int bMa = b-a;
     
-    if(1 < 2){
-			asm{
-				LOAD %a
-				SUBR SOut
-			}
-	}else{
-		asm{
-				LOAD %b
-				SUBR SOut
-			}
-	}
+  //  if(1 < 2){
+	//		asm{
+	//			LOAD %a
+	//			SUBR SOut
+	//		}
+//	}else{
+//		asm{
+//				LOAD %b
+//				SUBR SOut
+//			}
+//	}
     
 	return 0;
 }

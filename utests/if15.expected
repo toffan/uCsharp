@@ -1,0 +1,23 @@
+JUMP __main
+_main:
+    LOADL 3
+    LOADL 0
+    LOADL 1
+    LOAD (1) 3[LB]
+    LOAD (1) 4[LB]
+    LOAD (1) 5[LB]
+    SUBR BAnd
+    SUBR BOr
+    JUMPIF (0) ELSE_0
+    LOADL 5
+    JUMP ENDIF_0
+    ELSE_0:
+    LOADL 2
+    ENDIF_0:
+
+    LOADL 0
+    RETURN (1) 0
+    RETURN (0) 0
+__main:
+    CALL (SB) _main
+    HALT

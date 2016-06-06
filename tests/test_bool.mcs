@@ -1,0 +1,21 @@
+//test-bool.mcs
+//effectue des tests sur les entiers.
+
+// assembleur inline en dehors d'une fonction
+asm {
+   CALL (LB) _main   ; appel au point d'entree du programme
+   HALT              ; arret de la machine
+   }
+
+// point d'entree du programme.
+int main(){
+    int t = 1;
+    int f = 0;
+    
+    int tAf = t && f; //true and false := false
+    int tOf = t || f; //true or false := true
+    int tOt = t || t;
+    int fOt = f || t;
+    
+	return 0;
+}

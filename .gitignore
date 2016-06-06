@@ -1,9 +1,14 @@
 *.zip
 *.class
+*.tam
 .*.swp
 mcs/egg
 /bin/
 
-#Eclipse files 
+#Eclipse files
 .classpath
 .project
+
+# itam
+workspace/
+.tmp*

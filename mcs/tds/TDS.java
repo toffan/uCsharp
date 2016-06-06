@@ -9,16 +9,24 @@ public class TDS {
     private TDS parent;
     private HashMap<String, VAR> vars;
     private HashMap<String, TYPE> types;
+    private boolean fct;
 
     public Logger lg;
 
     ///   Constucteurs   ///
-    public TDS() { this(null); }
-    public TDS(TDS parent) {
-        this.nxtAddr = parent == null ? new Address() : parent.nxtAddr;
+    public TDS() { this(null, false); }
+    /**
+     * Constructeur de TDS.
+     * @param parent TDS parente
+     * @param fct indique si la TDS créée fait partie d'une fonction.
+     */
+    public TDS(TDS parent, boolean fct) {
+        this.nxtAddr = (parent == null || fct) ? new Address(fct ? "LB" : "SB")
+                                               : parent.nxtAddr;
         this.parent = parent;
         this.vars = new HashMap<String, VAR>();
         this.types = new HashMap<String, TYPE>();
+        this.fct = fct;
 
         this.lg = new Logger(true);
     }
@@ -45,7 +53,8 @@ public class TDS {
      * Ajoute ou mets a jour une variable
      */
     public void putVar(String id, TYPE type) {
-        this.lg.entry("ajout de la VAR '" + id + "' de TYPE '" + type.name() + "'.");
+        this.lg.entry("ajout de la VAR '" + id + "' de TYPE '" + type.name() +
+                      "'.");
 
         VAR var = new VAR(type, this.nxtAddr);
         this.nxtAddr = this.nxtAddr.next(type.size());
@@ -59,6 +68,30 @@ public class TDS {
         this.lg.entry("ajout de la FCT '" + id + "'.");
 
         this.vars.put(id, fct);
+    }
+
+    /**
+     * Termine l'ajout des paramètres d'une fonction.
+     * Transforme l'adresse des paramètres en adresses négatives.
+     * Ajoute trois variables réservées correspondant aux trois cases mémoires
+     * créées lors d'un appel de fonction.
+     */
+    public void endFunctionDeclaration() {
+        if (this.fct) {
+            // Désactive les usages futurs de cette fonction.
+            this.fct = false;
+            // Calcul du décalage à appliquer aux adresses des paramètres.
+            int offset = -(this.nxtAddr.val());
+            for (VAR v : this.vars.values()) {
+                v.addr().shift(offset);
+            }
+            // Réinitialisation de l'adresse courante.
+            this.nxtAddr.shift(offset);
+            // Ajout des variables réservées.
+            this.putVar("@1", this.searchType("int", true));
+            this.putVar("@2", this.searchType("int", true));
+            this.putVar("@3", this.searchType("int", true));
+        }
     }
 
     /**
@@ -82,9 +115,13 @@ public class TDS {
      * Ajoute ou mets a jour un type
      */
     public void putType(String id, TYPE type) {
-        // Si le type est anonyme (struct par exemple), on le nomme d'apres son id.
-        if (type.name().isEmpty()) { type.setName(id); }
-        this.lg.entry("ajout du TYPE '" + type.name() + "' de taille " + type.size() + " en tant que '" + id + "'.");
+        // Si le type est anonyme (struct par exemple), on le nomme d'apres son
+        // id.
+        if (type.name().isEmpty()) {
+            type.setName(id);
+        }
+        this.lg.entry("ajout du TYPE '" + type.name() + "' de taille " +
+                      type.size() + " en tant que '" + id + "'.");
         this.types.put(id, type);
     }
 }

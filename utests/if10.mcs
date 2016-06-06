@@ -1,0 +1,12 @@
+int main() {
+    int c1 = 3;
+    int c2 = 0;
+
+    if (!(c1 || c2)) {
+        int a = 5;
+    } else {
+        int b = 2;
+    }
+
+    return 0;
+}

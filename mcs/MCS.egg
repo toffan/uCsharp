@@ -15,14 +15,14 @@ option k=2;
 inh source : MCSSourceFile for PROGRAMME;
 
 -- La machine cible pour la generation de code.
-inh machine : IMachine for
-        ENTITES, ENTITE, DECL, FONCTION, INST, BLOC, INSTS, SIX,
-        PARFS, PARF, PARFSX, ES, ESX,
-        E, AFFX, A, AX, R, RX, T, TX, F, FX
+-- inh machine : IMachine for
+--        ENTITES, ENTITE, DECL, FONCTION, INST, BLOC, INSTS, SIX,
+--        PARFS, PARF, PARFSX, ES, ESX,
+--        E, AFFX, A, AX, R, RX, T, TX, F, FX
 --      -- Decommenter la ligne suivante pour MCS
 --      , BASE, DEFS, DEF
 --      -- Fin extension MCS
-        ;
+--        ;
 
 -- Ces attributs permettent de recuperer les instructions du code ASM inline.
 syn code_asm : STRING for ASM;
@@ -56,17 +56,39 @@ inh numParam : Integer for ESX;
 
 -- Typage declaration de fonction.
 syn varF : FCT for DECL ;
-inh fct : FCT for FONCTION, PARFS, PARFSX, PARF ;
+inh fct : FCT for FONCTION, PARFS, PARFSX, PARF,
+        BLOC, INSTS, INST, SIX ;
 
--- Le generateur de code
-inh gen : TamGenerator for
+-- Le generateur de code.
+inh gen : GeneratorItf for
         PROGRAMME, ENTITES, ENTITE, DECL,
         FONCTION, PARF, PARFS, PARFSX, BLOC,
         INSTS, INST, TYPE, STYPE, PTRS,
         CHAMPS, CHAMP,
         E, A, AFFX, R, RX, AX, T, TX, F, FX, SIX,
+        OPREL, OPADD, OPMUL, OPUN,
         ES, ESX ;
 
+-- Le code genere.
+syn code : String for
+         ENTITES, ENTITE, DECL, FONCTION,
+         BLOC, INSTS, INST, AFFX, E, SIX,
+         AX, OPREL, RX, OPADD, TX, OPMUL, OPUN,
+         ES, ESX ;
+
+-- Nom de l'ident a gauche d'une declaration.
+inh name : String for DECL, FX;
+
+-- Code generant une adresse.
+syn leftCode : String for A, R, T, F, FX ;
+-- Code generant une valeur.
+syn rightCode : String for A, R, T, F, FX ;
+
+-- Permet de savoir si on arrive à la fin d'une expression.
+syn endl : Boolean for FX;
+
+-- Permet de savoir si les parametres d'une operation doivent etre au prealable convertis en booleens.
+syn toBool : Boolean for OPADD, OPMUL ;
 
 -- Terminaux
 space separateur is    "[\r\n\t ]+";
@@ -136,18 +158,22 @@ compil ASM;
 -- Regle de production, point d'entree.
 PROGRAMME -> #init ENTITES #gen;
 global
-    machine : IMachine;
--- Transmission de la machine cible (choisie par l'option -m au lancement)
-#init {
+    -- Transmission de la machine cible (choisie par l'option -m au lancement)
+    --machine : IMachine;
+    gen: GeneratorItf;
+
+-- Initialise le compilateur.
+#init { -- {{{
 local
     string : TYPE;
     tds : TDS;
 do
-    machine := PROGRAMME^source.getMachine();
-    if machine = null then
+--    machine := PROGRAMME^source.getMachine();
+    gen := new TamGenerator(PROGRAMME^source.getFileName()); -- On reviendra sur le choix de la machine plus tard.
+    if gen = null then
         error(NO_MACH, PROGRAMME^source.getMachName());
     else
-        ENTITES^machine := machine;
+        ENTITES^gen := gen;
     end
 
     tds := new TDS();
@@ -160,15 +186,17 @@ do
 
     ENTITES^tds := tds;
 end
-}
+} -- }}}
 
 -- Ecrit le code dans un fichier.
-#gen {
+#gen { -- {{{
 local
+    h : HelperGeneralInterface;
 do
-    machine.writeCode(PROGRAMME^source.getFileName(), "; no code\n");
+    h := gen.getGeneralHelper();
+    gen.generateFile(h.generateComment(gen.getFileName()) + ENTITES^code + h.generateEnd());
 end
-}
+} -- }}}
 
 --
 --
@@ -176,16 +204,33 @@ end
 --
 --
 
-ENTITES -> ;
-ENTITES -> ENTITE ENTITES ;
+ENTITES -> #code;
+
+-- Fin de liste d'instructions, plus de code a generer.
+#code { -- {{{
+local
+do
+	ENTITES^code := "";
+end
+} -- }}}
+
+ENTITES -> ENTITE ENTITES #code;
+
+-- Generetion du code d'une sequence d'entites.
+#code { -- {{{
+local
+do
+	ENTITES^code := ENTITE^code + ENTITES1^code;
+end
+} -- }}}
 
 --
 --
 -- Definition d'un nom de type (commence par une majuscule).
-ENTITE -> typedef TYPE identc pv #record ;
+ENTITE -> typedef TYPE identc pv #record #code;
 
 -- Enregistrement du nouveau type dans la table des symboles.
-#record {
+#record { -- {{{
 local
     t : TYPE ;
 do
@@ -202,16 +247,23 @@ do
         end
     end
 end
-}
+} -- }}}
+
+#code { -- {{{
+local
+do
+	ENTITE^code := "; typedef de "+identc^txt+"\n";
+end
+} -- }}}
 
 --
 --
 -- Definition d'une variable globale ou d'une fonction.
 -- (Commence par une minuscule)
-ENTITE -> TYPE ident #prerecord DECL #record ;
+ENTITE -> TYPE ident #prerecord DECL #record #code ;
 
 -- Verification de la non existence de l'ident dans la tds locale.
-#prerecord {
+#prerecord { -- {{{
 local
     v : VAR ;
 do
@@ -223,12 +275,14 @@ do
     else
         -- Propagation du type declare.
         DECL^typeLeft := TYPE^type;
+        -- Propagation du nom de l'ident de gauche.
+        DECL^name := ident^txt;
     end
 end
-}
+} -- }}}
 
 -- Enregistrement de la declaration dans la table des symboles.
-#record {
+#record { -- {{{
 local
     t : TYPE;
 do
@@ -244,7 +298,14 @@ do
         ENTITE^tds.putVar(ident^txt, DECL^varF);
     end
 end
-}
+} -- }}}
+
+-- Recuperation du code de la declaration.
+#code { -- {{{
+do
+    ENTITE^code := DECL^code;
+end
+} -- }}}
 
 --
 --
@@ -255,22 +316,32 @@ end
 --
 --
 -- Fin de la declaration (variable).
-DECL -> #type pv ;
+DECL -> #type #code pv ;
 
 -- Pas de fonction sous-jacente.
-#type {
+#type { -- {{{
 do
     DECL^varF := null;
 end
-}
+} -- }}}
+
+-- Generation du code pour une declaration de variable.
+#code { -- {{{
+local
+    h : HelperMemoryInterface;
+do
+    h := DECL^gen.getMemoryHelper();
+    DECL^code := h.generateReserve(DECL^typeLeft.size());
+end
+} -- }}}
 
 --
 --
 -- Fin de la declaration (fonction).
-DECL -> #type FONCTION ;
+DECL -> #type FONCTION #code ;
 
 -- Creation du type de la fonction et de la VAR correspondante.
-#type {
+#type { -- {{{
 local
     f : FCT;
     t : FTYPE;
@@ -278,13 +349,23 @@ do
     -- Creation du type a partir du type de retour de la fonction.
     t := new FTYPE(DECL^typeLeft);
     -- Creation de la VAR representant la fonction.
-    f := new FCT(t, DECL^tds);
+    f := new FCT(t, DECL^tds, DECL^name);
     -- Propagation de la VAR a DECL pour enregistrement dans la TDS (de la VAR ET du type associe).
     DECL^varF := f;
     -- Transmission de la VAR a FONCTION pour reellement generer la fonction et son type
     FONCTION^fct := f;
 end
-}
+} -- }}}
+
+-- Generation du code pour une declaration de fonction.
+#code { -- {{{
+local
+    h : HelperFunctionInterface;
+do
+    h := DECL^gen.getFunctionHelper();
+    DECL^code := h.generateFunction(DECL^name, DECL^name, FONCTION^code);
+end
+} -- }}}
 
 --
 --
@@ -295,15 +376,45 @@ end
 --
 --
 -- Debut de la premiere ligne d'une fonction.
-FONCTION -> paro PARFS parf #type BLOC ;
+FONCTION -> paro PARFS parf #type1 BLOC #type2 #code ;
+global
+    tFct : FTYPE;
 
 -- Transmission de la TDS interne de la fonction au corps de fonction.
-#type {
+#type1 { -- {{{
 local
+    tds : TDS;
 do
-    BLOC^tds := FONCTION^fct.tds();
+    tds := FONCTION^fct.tds();
+    -- Termine l'ajout des parametres a la fonction.
+    tds.endFunctionDeclaration();
+    BLOC^tds := tds;
 end
-}
+} -- }}}
+
+-- Verification du type de retour de la fonction.
+#type2 { -- {{{
+local
+    tReturn : TYPE;
+do
+    tFct := FONCTION^fct.type();
+    tReturn := tFct.retType();
+    if tReturn /= BLOC^type then
+        error(MCS_BAD_TYPE_6, tReturn.name(), BLOC^type.name());
+    end
+end
+} -- }}}
+
+-- Recuperation du code du corps de la fonction
+-- Insertion d'un return artificiel au cas ou il n'y en aurait pas.
+#code { -- {{{
+local
+    h : HelperFunctionInterface;
+do
+    h := FONCTION^gen.getFunctionHelper();
+    FONCTION^code := BLOC^code + h.generateReturn(tFct.sizeParams(), 0, "artificiel pour " + FONCTION^fct.name());
+end
+} -- }}}
 
 --
 --
@@ -333,7 +444,7 @@ PARFSX -> virg PARF PARFSX ;
 PARF -> TYPE ident #type #record ;
 
 -- Enregistrement du type du parametre de la fonction.
-#type {
+#type { -- {{{
 local
     t : FTYPE;
 do
@@ -342,10 +453,10 @@ do
     -- Attention : a faire avant d'enregistrer le parametre dans la liste des parametres !
     t.putParam(TYPE^type);
 end
-}
+} -- }}}
 
 -- Enregistrement du parametre dans la liste de parametres de la fonction.
-#record {
+#record { -- {{{
 local
     f : FCT;
 do
@@ -358,7 +469,7 @@ do
         f.putParam(ident^txt);
     end
 end
-}
+} -- }}}
 
 --
 --
@@ -372,20 +483,20 @@ end
 TYPE -> STYPE #type1 PTRS #type2 ;
 
 -- Propagation du premier type.
-#type1 {
+#type1 { -- {{{
 local
 do
     PTRS^typeLeft := STYPE^type;
 end
-}
+} -- }}}
 
 -- Propagation du second type.
-#type2 {
+#type2 { -- {{{
 local
 do
     TYPE^type := PTRS^type;
 end
-}
+} -- }}}
 
 --
 --
@@ -393,12 +504,12 @@ end
 PTRS -> #type ;
 
 -- Propagation du type du pointeur.
-#type {
+#type { -- {{{
 local
 do
     PTRS^type := PTRS^typeLeft;
 end
-}
+} -- }}}
 
 --
 --
@@ -406,7 +517,7 @@ end
 PTRS -> mult PTRS #type ;
 
 -- Ajout du type a la table des symboles.
-#type {
+#type { -- {{{
 local
     t : PTR;
     o : TYPE;
@@ -428,7 +539,7 @@ do
         PTRS^tds.putType(t.name(), t);
     end
 end
-}
+} -- }}}
 
 --
 --
@@ -436,12 +547,12 @@ end
 STYPE-> void #type ;
 
 -- Les types de base sont deja presents dans la TDS.
-#type {
+#type { -- {{{
 local
 do
     STYPE^type := STYPE^tds.searchType("void", true);
 end
-}
+} -- }}}
 
 --
 --
@@ -449,12 +560,12 @@ end
 STYPE-> int #type ;
 
 -- Les types de base sont deja presents dans la TDS.
-#type {
+#type { -- {{{
 local
 do
     STYPE^type := STYPE^tds.searchType("int", true);
 end
-}
+} -- }}}
 
 --
 --
@@ -462,12 +573,12 @@ end
 STYPE-> char #type ;
 
 -- Les types de base sont deja presents dans la TDS.
-#type {
+#type { -- {{{
 local
 do
     STYPE^type := STYPE^tds.searchType("char", true);
 end
-}
+} -- }}}
 
 --
 --
@@ -475,7 +586,7 @@ end
 STYPE -> identc #type ;
 
 -- Resolution du type nomme dans la TDS.
-#type {
+#type { -- {{{
 local
     t : TYPE;
 do
@@ -486,7 +597,7 @@ do
         STYPE^type := t;
     end
 end
-}
+} -- }}}
 
 --
 --
@@ -494,7 +605,7 @@ end
 STYPE -> #type struct aco CHAMPS acf ;
 
 -- Creation du type struct initial (vide).
-#type {
+#type { -- {{{
 local
     s : STRUCT;
 do
@@ -502,7 +613,7 @@ do
     CHAMPS^typeCHP := s;
     STYPE^type := s;
 end
-}
+} -- }}}
 
 --
 --
@@ -520,7 +631,7 @@ CHAMPS -> CHAMP CHAMPS ;
 CHAMP -> TYPE ident pv #type ;
 
 -- Enregistrement du type d'un champ dans la TPS de la struct.
-#type {
+#type { -- {{{
 local
     v : VAR ;
 do
@@ -534,7 +645,7 @@ do
         CHAMP^typeCHP.putVar(ident^txt, TYPE^type);
     end
 end
-}
+} -- }}}
 
 --
 --
@@ -545,38 +656,51 @@ end
 --
 --
 -- Delimitation d'un bloc de code.
-BLOC -> aco INSTS acf #type ;
+BLOC -> aco INSTS acf #type #code ;
 
 -- Le type propage est non-null si le bloc contient une instruction " return ".
-#type {
+#type { -- {{{
 local
 do
     BLOC^type := INSTS^type;
 end
-}
+} -- }}}
+
+#code { -- {{{
+do
+    BLOC^code := INSTS^code;
+end
+} -- }}}
 
 --
 --
 -- Instruction vide, effet de bord.
-INSTS -> #type ;
+INSTS -> #type #code ;
 
 -- Un effet de bord ne retourne rien, type null.
-#type {
+#type { -- {{{
 local
 do
     INSTS^type := null;
 end
-}
+} -- }}}
+
+-- Pas de code genere.
+#code { -- {{{
+do
+    INSTS^code := "";
+end
+} -- }}}
 
 --
 --
 -- Ajout d'une instruction dans le bloc.
-INSTS -> INST INSTS #type ;
+INSTS -> INST INSTS #type #code ;
 
 -- Le type d'une instruction INST (differente d'une expression E) est soit :
 --    - null (effet de bord).
 --    - Resultat d'un return.
-#type {
+#type { -- {{{
 local
 do
     -- Le type d'une liste d'instructions INSTS est le type de la premiere INST
@@ -587,15 +711,22 @@ do
         INSTS^type := INSTS1^type;
     end
 end
-}
+} -- }}}
+
+-- Concatenation du code genere pour les differentes instructions.
+#code { -- {{{
+do
+    INSTS^code := INST^code + INSTS1^code;
+end
+} -- }}}
 
 --
 --
 -- Declaration d'une variable locale, avec ou sans initialisation.
-INST -> TYPE ident #record AFFX pv #type ;
+INST -> TYPE ident #record AFFX pv #type #code ;
 
 -- Enregistrement de la variable dans la TDS du bloc.
-#record {
+#record { -- {{{
 local
     v : VAR;
 do
@@ -606,10 +737,10 @@ do
         INST^tds.putVar(ident^txt, TYPE^type);
     end
 end
-}
+} -- }}}
 
 -- Typage de l'instruction et verification du type de l'affectation.
-#type {
+#type { -- {{{
 local
 do
     -- Une declaration ou une affectation est un effet de bord, pas de type.
@@ -620,48 +751,100 @@ do
         error(MCS_BAD_TYPE_2, TYPE^type.name(), AFFX^type.name(), ident^txt);
     end
 end
-}
+} -- }}}
+
+-- Recuperation du code genere.
+#code { -- {{{
+local
+    h : HelperMemoryInterface;
+do
+    h := INST^gen.getMemoryHelper();
+    if AFFX^type = null then
+        -- Generation du code pour une declaration sans initialisation.
+        INST^code := h.generateReserve(TYPE^type.size());
+    else
+        -- Generation du code pour une declaration avec initialisation (recuperation de la rightValue).
+        INST^code := AFFX^code;
+    end
+end
+} -- }}}
 
 --
 --
 -- Instruction " expression " (affectation et appel de procedure).
-INST -> E pv #type ;
+INST -> E pv #type #code ;
 
 -- Une expression seule est un effet de bord, pas de type.
-#type {
+#type { -- {{{
 local
 do
     INST^type := null;
 end
-}
+} -- }}}
 
+-- Recuperation du code genere.
+#code { -- {{{
+local
+    h : HelperMemoryInterface;
+do
+    h := INST^gen.getMemoryHelper();
+    -- La valeur de l'expression E est inutile, il faut donc la depiler.
+    INST^code := E^code + h.generateFree(E^type.size());
+end
+} -- }}}
 
 --
 --
 -- Un nouveau bloc est insere en instruction.
-INST -> BLOC #type ;
+INST -> #type1 BLOC #type2 #code ;
+
+-- Creation d'une TDS locale au bloc.
+#type1 { -- {{{
+local
+    tds : TDS;
+do
+    tds := new TDS(INST^tds, false);
+    BLOC^tds := tds;
+end
+} -- }}}
 
 -- Un nouveau bloc est insere en instruction, si il est dote d'un type de
 -- retour, il contient un " return ", et son type se propage
-#type {
+#type2 { -- {{{
 local
 do
     INST^type := BLOC^type;
 end
-}
+} -- }}}
+
+-- Recuperation du code genere.
+#code { -- {{{
+do
+    INST^code := BLOC^code;
+end
+} -- }}}
 
 --
 --
 -- Bloc conditionnel.
-INST -> si paro E parf BLOC SIX #type ;
+INST -> si paro E parf #type1 BLOC SIX #type2 #code ;
+
+-- Creation d'une TDS locale au bloc.
+#type1 { -- {{{
+local
+    tds : TDS;
+do
+    tds := new TDS(INST^tds, false);
+    BLOC^tds := tds;
+end
+} -- }}}
 
 -- Le type du bloc conditionnel correspond au type de retour commun.
-#type {
+#type2 { -- {{{
 local
 do
     -- Une expression conditionnelle est de type de retour entier.
     if E^type /= INST^tds.searchType("int", true) then
-        -- TODO: Completer l'erreur avec du texte representant l'expression.
         error(MCS_NOT_BOOLEAN, E^type.name());
     else
         if BLOC^type /= null then
@@ -684,45 +867,99 @@ do
         end
     end
 end
-}
+} -- }}}
+
+-- Generation du code pour le if.
+#code { -- {{{
+local
+    h : HelperGeneralInterface;
+do
+    h := INST^gen.getGeneralHelper();
+    INST^code := h.generateIf(E^code, BLOC^code, SIX^code);
+end
+} -- }}}
 
 --
 --
 -- Bloc sinon.
-SIX -> sinon BLOC #type ;
+SIX -> sinon #type1 BLOC #type2 #code ;
+
+-- Creation d'une TDS locale au bloc.
+#type1 { -- {{{
+local
+    tds : TDS;
+do
+    tds := new TDS(SIX^tds, false);
+    BLOC^tds := tds;
+end
+} -- }}}
 
 -- Propagation du type.
-#type {
+#type2 { -- {{{
 local
 do
     SIX^type := BLOC^type;
 end
-}
+} -- }}}
+
+-- Recuperation du code genere.
+#code { -- {{{
+do
+    SIX^code := BLOC^code;
+end
+} -- }}}
 
 --
 --
 -- Pas de bloc suivant dans la conditionnelle.
-SIX -> #type ;
+SIX -> #type #code ;
 
 -- Pas de bloc, considere comme un effet de bord.
-#type {
+#type { -- {{{
 local
 do
     SIX^type := null;
 end
-}
+} -- }}}
+
+-- Recuperation du code genere.
+#code { -- {{{
+do
+    SIX^code := "";
+end
+} -- }}}
 
 --
 --
 -- L'instruction retourne un type, un " return de fonction ".
-INST -> retour E pv #type ;
-#type {
+INST -> retour E pv #type #code ;
+#type { -- {{{
 local
+    fct : FTYPE;
+    t : TYPE;
 do
-    -- Instruction return : on transfere le type de l'expression renvoyee.
-    INST^type := E^type;
+    -- Verification que le type retourne correspond au type de retour de la fonction.
+    fct := INST^fct.type();
+    t := fct.retType();
+    if t /= E^type then
+        error(MCS_BAD_TYPE_6, t.name(), E^type.name());
+    else
+        -- Instruction return : on transfere le type de l'expression renvoyee.
+        INST^type := E^type;
+    end
 end
-}
+} -- }}}
+
+#code { -- {{{
+local
+    h : HelperFunctionInterface;
+    tFct : FTYPE;
+do
+    h := INST^gen.getFunctionHelper();
+    tFct := INST^fct.type();
+    INST^code := E^code + h.generateReturn(tFct.sizeParams(), E^type.size(), "explicite pour " + INST^fct.name());
+end
+} -- }}}
 
 --
 --
@@ -743,10 +980,10 @@ end
 --
 --
 -- Expression qui affecte.
-E -> A AFFX #type ;
+E -> A AFFX #type #code ;
 
 -- Verification du type des affectations.
-#type {
+#type { -- {{{
 local
 do
     if AFFX^type /= null && AFFX^type /= A^type then
@@ -755,41 +992,72 @@ do
         E^type := A^type;
     end
 end
-}
+} -- }}}
+
+#code { -- {{{
+local
+    h : HelperMemoryInterface;
+do
+    h := E^gen.getMemoryHelper();
+    if AFFX^type /= null then
+        -- Affectation
+        -- Duplication de AFFX^code sur la pile pour que le resultat d'une affectation soit la valeur affectee.
+        E^code := AFFX^code + h.generateDuplicate(AFFX^type.size()) + A^leftCode + h.generateDynamicWrite(AFFX^type.size());
+    else
+        -- Recuperation simple de la valeur d'une expression (de meme que pour une rightValue).
+        E^code := A^rightCode;
+    end
+end
+} -- }}}
 
 --
 --
 -- Affectation
-AFFX -> affect A #type ;
+AFFX -> affect A #type #code ;
 
 -- Verification du type des affectations (suite).
-#type {
+#type { -- {{{
 local
 do
     AFFX^type := A^type;
 end
-}
+} -- }}}
+
+-- Generation du code pour une declaration avec initialisation : on utilise le code genere pour A.
+#code { -- {{{
+local
+do
+    AFFX^code := A^rightCode;
+end
+} -- }}}
 
 --
 --
 -- Fin d'une affectation.
-AFFX -> #type ;
+AFFX -> #type #code ;
 
 -- Verification du type des affectations (fin).
-#type {
+#type { -- {{{
 local
 do
     AFFX^type := null;
 end
-}
+} -- }}}
+
+-- Generation du code pour une absence de rightValue.
+#code { -- {{{
+do
+    AFFX^code := "";
+end
+} -- }}}
 
 --
 --
 -- Relation, moins prioritaire que A.
-A -> R AX #type ;
+A -> R AX #type #code;
 
 -- Verification du type d'une relation.
-#type {
+#type { -- {{{
 local
 do
     if AX^type /= null then
@@ -804,51 +1072,155 @@ do
         A^type := R^type;
     end
 end
-}
+} -- }}}
+
+-- Generation du code d'une relation.
+#code { -- {{{
+local
+do
+    if AX^type /= null & AX^type = R^type then
+        -- A est une condition booleenne donc forcement une rightValue...
+        A^leftCode := "";
+        -- La comparaison est faite dans le code de AX.
+        A^rightCode := R^rightCode + AX^code;
+    else
+        -- On ne prend pas en compte ici l'erreur de type ayant deja ete traitee au dessus.
+        -- On recupere les deux types de code generes (pas de comparaison a ce niveau).
+        A^leftCode := R^leftCode;
+        A^rightCode := R^rightCode;
+    end
+end
+} -- }}}
 
 --
 --
 -- Operateur relationnel.
-AX -> OPREL R #type ;
+AX -> OPREL R #type #code ;
 
 -- Verification du type d'une relation (suite).
-#type {
+#type { -- {{{
 local
 do
-    AX^type := R^type;
+    -- Les operateurs relationels de base utilisent des entiers.
+    if R^type /= AX^tds.searchType("int", true) then
+        error(MCS_BAD_TYPE_3, "int", R^type.name());
+    else
+        AX^type := R^type;
+    end
 end
-}
+} -- }}}
+
+-- Generation de code pour une relation (suite).
+#code { -- {{{
+do
+    -- La comparaison a lieu ici.
+    -- OPREL^code contient l'appel a l'operateur de comparaison.
+    AX^code := R^rightCode + OPREL^code;
+end
+} -- }}}
 
 --
 --
 -- Fin de la relation.
-AX -> #type ;
+AX -> #type #code ;
 
 -- Verification du type d'une relation (fin).
-#type {
+#type { -- {{{
 local
 do
     AX^type := null;
 end
-}
+} -- }}}
+
+-- Pas de code genere.
+#code { -- {{{
+do
+    AX^code := "";
+end
+} -- }}}
 
 --
 --
--- Operatieurs relationnels.
-OPREL -> inf ;
-OPREL -> sup ;
-OPREL -> infeg ;
-OPREL -> supeg ;
-OPREL -> eg ;
-OPREL -> neg ;
+-- Operateurs relationnels.
+OPREL -> inf #code ;
+
+-- Generation de code : appel de la subroutine correspondante.
+#code { -- {{{
+local
+    h : HelperIntInterface;
+do
+    h := OPREL^gen.getIntHelper();
+    OPREL^code := h.generateLss();
+end
+} -- }}}
+
+OPREL -> sup #code ;
+
+-- Generation de code : appel de la subroutine correspondante.
+#code { -- {{{
+local
+    h : HelperIntInterface;
+do
+    h := OPREL^gen.getIntHelper();
+    OPREL^code := h.generateGtr();
+end
+} -- }}}
+
+OPREL -> infeg #code ;
+
+-- Generation de code : appel de la subroutine correspondante.
+#code { -- {{{
+local
+    h : HelperIntInterface;
+do
+    h := OPREL^gen.getIntHelper();
+    OPREL^code := h.generateLeq();
+end
+} -- }}}
+
+OPREL -> supeg #code ;
+
+-- Generation de code : appel de la subroutine correspondante.
+#code { -- {{{
+local
+    h : HelperIntInterface;
+do
+    h := OPREL^gen.getIntHelper();
+    OPREL^code := h.generateGeq();
+end
+} -- }}}
+
+OPREL -> eg #code ;
+
+-- Generation de code : appel de la subroutine correspondante.
+#code { -- {{{
+local
+    h : HelperIntInterface;
+do
+    h := OPREL^gen.getIntHelper();
+    OPREL^code := h.generateEq();
+end
+} -- }}}
+
+OPREL -> neg #code ;
+
+-- Generation de code : appel de la subroutine correspondante.
+#code { -- {{{
+local
+    h : HelperIntInterface;
+do
+    h := OPREL^gen.getIntHelper();
+    OPREL^code := h.generateNeq();
+end
+} -- }}}
 
 --
 --
 -- Terme.
-R -> T RX #type ;
+R -> T RX #type #code;
 
 -- Verification du type d'une operation additive.
-#type {
+#type { -- {{{
 local
 do
     if RX^type /= null && RX^type /= T^type then
@@ -857,52 +1229,135 @@ do
         R^type := T^type;
     end
 end
-}
+} -- }}}
+
+-- Generation du code d'une operation additive.
+#code { -- {{{
+local
+do
+    if RX^type /= null & RX^type = T^type then
+        -- R contient une addition donc est forcement une rightValue...
+        R^leftCode := "";
+        -- L'addition est faite dans le code de RX.
+        R^rightCode := T^rightCode + RX^code;
+    else
+        -- On ne prend pas en compte ici l'erreur de type ayant deja ete traitee au dessus.
+        -- On recupere les deux types de code generes (pas d'addition a ce niveau).
+        R^leftCode := T^leftCode;
+        R^rightCode := T^rightCode;
+    end
+end
+} -- }}}
 
 --
 --
 -- Additions ...
-RX -> OPADD T RX #type ;
+RX -> OPADD T RX #type #code;
 
 -- Verification du type d'une operation additive (suite).
-#type {
+#type { -- {{{
 local
 do
     if RX1^type /= null && RX1^type /= T^type then
         error(MCS_BAD_TYPE_4, T^type.name(), RX1^type.name());
     else
-        RX^type := T^type;
+        -- Les operateurs additifs de base utilisent des entiers.
+        if T^type /= RX^tds.searchType("int", true) then
+            error(MCS_BAD_TYPE_4, "int", T^type.name());
+        else
+            RX^type := T^type;
+        end
     end
 end
-}
+} -- }}}
+
+-- Generation du code pour les operations additives (suite).
+#code { -- {{{
+local
+    h : HelperIntInterface;
+do
+    h := RX^gen.getIntHelper();
+    -- L'operation additive a lieu ici.
+    -- OPADD^code contient l'appel a l'operateur.
+    if OPADD^toBool then
+        -- Si l'operateur utilise necessite une conversion prealable en booleen.
+        RX^code := h.generateIntToBool() + T^rightCode + h.generateIntToBool() + OPADD^code + RX1^code;
+    else
+        RX^code := T^rightCode + OPADD^code + RX1^code;
+    end
+end
+} -- }}}
 
 --
 --
 -- Fin d'une addition.
-RX -> #type ;
+RX -> #type #code;
 
 -- Verification du type d'une operation additive (fin).
-#type {
+#type { -- {{{
 local
 do
     RX^type := null;
 end
-}
+} -- }}}
+
+-- Pas de code genere.
+#code { -- {{{
+do
+	RX^code := "";
+end
+} -- }}}
 
 --
 --
 -- Operateurs additifs.
-OPADD -> plus ;
-OPADD -> moins ;
-OPADD -> ou ;
+
+OPADD -> plus #code ;
+
+-- Generation de code : appel de la subroutine correspondante.
+#code { -- {{{
+local
+    h : HelperIntInterface;
+do
+    h := OPADD^gen.getIntHelper();
+    OPADD^code := h.generateSum();
+    OPADD^toBool := false;
+end
+} -- }}}
+
+OPADD -> moins #code ;
+
+-- Generation de code : appel de la subroutine correspondante.
+#code { -- {{{
+local
+    h : HelperIntInterface;
+do
+    h := OPADD^gen.getIntHelper();
+    OPADD^code := h.generateSub();
+    OPADD^toBool := false;
+end
+} -- }}}
+
+OPADD -> ou #code ;
+
+-- Generation de code : appel de la subroutine correspondante.
+#code { -- {{{
+local
+    h : HelperBoolInterface;
+do
+    h := OPADD^gen.getBoolHelper();
+    OPADD^code := h.generateOr();
+    OPADD^toBool := true;
+end
+} -- }}}
 
 --
 --
 -- Multiplication, ...
-T -> F TX #type ;
+T -> F TX #type #code;
 
 -- Verification du type d'une operation multiplicative.
-#type {
+#type { -- {{{
 local
 do
     if TX^type /= null && TX^type /= F^type then
@@ -911,45 +1366,140 @@ do
         T^type := F^type;
     end
 end
-}
+} -- }}}
+
+-- Generation du code d'une operation multiplicative.
+#code { -- {{{
+local
+do
+    if TX^type /= null && TX^type = F^type then
+        -- T contient une multiplication donc est forcement une rightValue...
+        T^leftCode := "";
+        -- La multiplication est faite dans le code de TX.
+        T^rightCode := F^rightCode + TX^code;
+    else
+        -- On ne prend pas en compte ici l'erreur de type ayant deja ete traitee au dessus.
+        -- On recupere les deux types de code generes (pas de multiplication).
+        T^leftCode := F^leftCode;
+        T^rightCode := F^rightCode;
+    end
+end
+} -- }}}
 
 --
 --
 -- Suite de la multiplication.
-TX -> OPMUL F TX #type ;
+TX -> OPMUL F TX #type #code;
 
 -- Verification du type d'une operation multiplicative (suite).
-#type {
+#type { -- {{{
 local
 do
     if TX1^type /= null && TX1^type /= F^type then
         error(MCS_BAD_TYPE_5, F^type.name(), TX1^type.name());
     else
-        TX^type := F^type;
+        -- Les operateurs multiplicatifs de base utilisent des entiers.
+        if F^type /= TX^tds.searchType("int", true) then
+            error(MCS_BAD_TYPE_5, "int", F^type.name());
+        else
+            TX^type := F^type;
+        end
     end
 end
-}
+} -- }}}
+
+-- Generation du code pour les operations multiplicatives (suite).
+#code { -- {{{
+local
+    h : HelperIntInterface;
+do
+    h := TX^gen.getIntHelper();
+    -- L'operation multiplicative a lieu ici.
+    -- OPMUL^code contient l'appel a l'operateur.
+    if OPMUL^toBool then
+        -- Si l'operateur utilise necessite une conversion prealable en booleen.
+        TX^code := h.generateIntToBool() + F^rightCode + h.generateIntToBool() + OPMUL^code + TX1^code;
+    else
+        TX^code := F^rightCode + OPMUL^code + TX1^code;
+    end
+end
+} -- }}}
 
 --
 --
 -- Fin de la multiplication.
-TX -> #type ;
+TX -> #type #code;
 
 -- Verification du type d'une operation multiplicative (fin).
-#type {
+#type { -- {{{
 local
 do
     TX^type := null;
 end
-}
+} -- }}}
+
+-- Pas de code genere.
+#code { -- {{{
+do
+	TX^code := "";
+end
+} -- }}}
 
 --
 --
 -- Operateurs multiplicatifs.
-OPMUL -> mult ;
-OPMUL -> div ;
-OPMUL -> mod ;
-OPMUL -> et ;
+
+OPMUL -> mult #code ;
+
+-- Generation de code : appel de la subroutine correspondante.
+#code { -- {{{
+local
+    h : HelperIntInterface;
+do
+    h := OPMUL^gen.getIntHelper();
+    OPMUL^code := h.generateMul();
+    OPMUL^toBool := false;
+end
+} -- }}}
+
+OPMUL -> div #code ;
+
+-- Generation de code : appel de la subroutine correspondante.
+#code { -- {{{
+local
+    h : HelperIntInterface;
+do
+    h := OPMUL^gen.getIntHelper();
+    OPMUL^code := h.generateDiv();
+    OPMUL^toBool := false;
+end
+} -- }}}
+
+OPMUL -> mod #code ;
+
+-- Generation de code : appel de la subroutine correspondante.
+#code { -- {{{
+local
+    h : HelperIntInterface;
+do
+    h := OPMUL^gen.getIntHelper();
+    OPMUL^code := h.generateMod();
+    OPMUL^toBool := false;
+end
+} -- }}}
+
+OPMUL -> et #code ;
+
+-- Generation de code : appel de la subroutine correspondante.
+#code { -- {{{
+local
+    h : HelperBoolInterface;
+do
+    h := OPMUL^gen.getBoolHelper();
+    OPMUL^code := h.generateAnd();
+    OPMUL^toBool := true;
+end
+} -- }}}
 
 --
 --
@@ -960,119 +1510,244 @@ OPMUL -> et ;
 --
 --
 -- Constante entiere
-F -> entier #type ;
+F -> entier #type #code;
 
 -- Une constante entiere a un type entier.
-#type {
+#type { -- {{{
 local
 do
     F^type := F^tds.searchType("int", true);
 end
-}
+} -- }}}
+
+-- Generation de code pour une constante entiere.
+#code { -- {{{
+local
+    h : HelperGeneralInterface;
+do
+    h := F^gen.getGeneralHelper();
+    -- Une constante est necessairement une rightValue.
+    -- TODO: Declencher une erreur de compilation si la constante est utilisee en tant que leftValue.
+	F^leftCode := "";
+    F^rightCode := h.generateConstante(entier^txt);
+end
+} -- }}}
 
 --
 --
 -- Constante chaine
-F -> chaine #type ;
+F -> chaine #type #code ;
 
 -- Une const-chaîne a un type de pointeur-sur-char.
-#type {
+#type { -- {{{
 local
 do
     F^type := F^tds.searchType("char*", true);
 end
-}
+} -- }}}
+
+-- Generation de code pour une constante chaine.
+#code { -- {{{
+local
+    h : HelperStringInterface;
+do
+    h := F^gen.getStringHelper();
+    -- Une constante est necessairement une rightValue.
+    -- TODO: Declencher une erreur de compilation si la constante est utilisee en tant que leftValue.
+    F^leftCode := "";
+    F^rightCode := h.generateNew(chaine^txt);
+end
+} -- }}}
 
 --
 --
 -- Constante caractere
-F -> caractere #type ;
+F -> caractere #type #code;
 
 -- Type char.
-#type {
+#type { -- {{{
 local
 do
     F^type := F^tds.searchType("char", true);
 end
-}
+} -- }}}
+
+-- Generation de code pour une constante caractere.
+#code { -- {{{
+local
+    h : HelperGeneralInterface;
+do
+    h := F^gen.getGeneralHelper();
+    -- Une constante est necessairement une rightValue.
+    -- TODO: Declencher une erreur de compilation si la constante est utilisee en tant que leftValue.
+	F^leftCode := "";
+    F^rightCode := h.generateConstante(caractere^txt);
+end
+} -- }}}
+
 
 --
 --
 -- Expression unaire
-F -> OPUN F #type ;
+F -> OPUN F #type #code ;
 
 -- Propagation du type.
-#type {
+#type { -- {{{
 local
 do
     F^type := F1^type;
 end
-}
+} -- }}}
+
+-- Generation de code pour une operation unaire.
+#code { -- {{{
+do
+    -- F fait intervenir une operation, donc est forcement une rightValue.
+    F^leftCode := "";
+    -- OPUN^code contient l'appel a l'operateur.
+    F^rightCode := F1^rightCode + OPUN^code;
+end
+} -- }}}
 
 --
 --
 -- Operateurs unaires
-OPUN -> plus ;
-OPUN -> moins ;
-OPUN -> non;
+
+OPUN -> plus #code ;
+
+-- Generation de code : appel de la subroutine correspondante.
+#code { -- {{{
+do
+    -- Rien a faire en particulier.
+    OPUN^code := "";
+end
+} -- }}}
+
+OPUN -> moins #code ;
+
+-- Generation de code : appel de la subroutine correspondante.
+#code { -- {{{
+local
+    hi : HelperIntInterface;
+    hg : HelperGeneralInterface;
+do
+    hi := OPUN^gen.getIntHelper();
+    hg := OPUN^gen.getGeneralHelper();
+    -- Multiplication par -1.
+    OPUN^code := hg.generateComment("Multiplication par -1.") + hg.generateConstante("-1") + hi.generateMul();
+end
+} -- }}}
+
+OPUN -> non #code ;
+
+-- Generation de code : appel de la subroutine correspondante.
+#code { -- {{{
+local
+    h : HelperIntInterface;
+do
+    h := OPUN^gen.getIntHelper();
+    OPUN^code := h.generateNeg();
+end
+} -- }}}
 
 --
 --
 -- Pointeur NULL
-F -> null #type ;
+F -> null #type #code;
 
 -- Type du pointeur null.
-#type {
+#type { -- {{{
 local
 do
     -- TODO: Verifier le bon fonctionnement :
-    -- -- Type null compatible avec les autres dans la verification de type ?
+    -- Type null compatible avec les autres dans la verification de type ?
     F^type := null;
 end
-}
+} -- }}}
+
+-- Generation de code pour le pointeur null.
+#code { -- {{{
+local
+    h : HelperMemoryInterface;
+do
+    h := F^gen.getMemoryHelper();
+    -- F est une constante (null) donc forcement une rightValue...
+	F^leftCode := "";
+	F^rightCode := h.generateVoid();
+end
+} -- }}}
 
 --
 --
 -- Expression parenthesee
-F -> paro E parf #type1 FX #type2 ;
+F -> paro E parf #type1 FX #type2 #code;
 
 -- Recuperation du type evalue.
-#type1 {
+#type1 { -- {{{
 local
 do
     FX^typeLeft := E^type;
+    FX^name := null;
 end
-}
+} -- }}}
 
 -- Propagation du type.
-#type2 {
+#type2 { -- {{{
 local
 do
     F^type := FX^type;
 end
-}
+} -- }}}
+
+-- Generation de code pour une expression parenthesee.
+#code { -- {{{
+local
+do
+	-- A priori simple concatenation du code.
+    -- TODO: Verifier le bon fonctionnement.
+	F^leftCode := E^code + FX^leftCode;
+	F^rightCode := E^code + FX^rightCode;
+end
+} -- }}}
 
 --
 --
 -- Cast explicite.
-F -> paro TYPE parf F #type ;
+F -> paro TYPE parf F #type #code ;
 
 -- Cast explicite : on n'utilise pas le type de F.
-#type {
+#type { -- {{{
 local
 do
     warning(MCS_WAR_CAST, F1^type.name(), TYPE^type.name());
-    F^type := TYPE^type;
+    if TYPE^type.size() /= F1^type.size() then
+        error(MCS_BAD_CAST, F1^type.name(), TYPE^type.name(), F1^type.size(), TYPE^type.size());
+    else
+        F^type := TYPE^type;
+    end
 end
-}
+} -- }}}
+
+-- Generation de code pour un cast.
+#code { -- {{{
+local
+do
+	-- Transmission du code genere, sans traitement supplementaire.
+	F^leftCode := F1^leftCode;
+	F^rightCode := F1^rightCode;
+end
+} -- }}}
 
 --
 --
 -- Typage d'un dereferencement avec *.
-F -> mult F #type ;
+F -> mult F #type #code;
+global
+    -- Type pointe.
+    pt : TYPE;
 
 -- Typage d'une expression contenant *.
-#type {
+#type { -- {{{
 local
     p : PTR;
 do
@@ -1080,44 +1755,101 @@ do
         error(MCS_NOT_PTR, F1^type.name());
     else
         p := F1^type.toPointer();
-        F^type := p.ptype();
+        pt := p.ptype();
+        F^type := pt;
     end
 end
-}
+} -- }}}
+
+-- Generation de code pour un acces valeur pointee.
+#code { -- {{{
+local
+    h : HelperMemoryInterface;
+do
+    h := F^gen.getMemoryHelper();
+    -- F -> *a ; a = F1
+	-- F1^rightCode contient le contenu de a, soit l'adresse de la zone pointee.
+    -- On n'a a priori pas besoin de F1^leftCode qui est l'adresse de a.
+	F^leftCode := F1^rightCode;
+    -- Attention : on utilise bien ici pt (type pointe) et non F1^type (type pointeur).
+	F^rightCode := F1^rightCode + h.generateDynamicRead(pt.size());
+end
+} -- }}}
 
 --
 --
 -- Utilisation d'un ident.
-F -> ident #type1 FX #type2 ;
-
--- TODO: Ajouter un commentaire.
-#type1 {
-local
+F -> ident #type1 FX #type2 #code;
+global
+    -- Variable correspondant a l'ident.
     v : VAR;
+
+-- Typage  et verification de l'existence de la variable.
+#type1 { -- {{{
 do
     v := F^tds.searchVar(ident^txt, true);
     if v = null then
         error(MCS_VUN, ident^txt);
     else
         FX^typeLeft := v.type();
+        FX^name := ident^txt;
     end
 end
-}
+} -- }}}
 -- Recuperation du type evalue.
-#type2 {
+#type2 { -- {{{
 local
 do
     F^type := FX^type;
 end
-}
+} -- }}}
+
+-- Generation de code pour un acces a une variable.
+#code { -- {{{
+local
+    hm : HelperMemoryInterface;
+    hg : HelperGeneralInterface;
+    t : TYPE;
+    a : Address;
+do
+    hm := F^gen.getMemoryHelper();
+    hg := F^gen.getGeneralHelper();
+    t := v.type();
+    a := v.addr();
+    if FX^endl then
+        -- Empilement de l'adresse de la variable.
+        F^leftCode := hg.generateConstante(a.val());
+        -- Empilement de la valeur de la variable.
+        F^rightCode := hm.generateStaticRead(a.val(), t.size(), a.ref());
+    else
+        if t.isStruct() then
+            -- La differenciation effective se fera lors la generation du code de FX.
+            -- Empilement de l'adresse de l'enregistrement puis de l'adresse du champ.
+            F^leftCode := hg.generateConstante(a.val()) + FX^leftCode;
+            -- Empilement de l'adresse de l'enregistrement puis de la valeur du champ.
+            F^rightCode := hg.generateConstante(a.val()) + FX^rightCode;
+        elseif t.isPointer() then
+            -- La differenciation effective se fera lors la generation du code de FX.
+            -- Empilement de l'adresse de la zone pointee, puis de l'adresse du champ.
+            F^leftCode := hm.generateStaticRead(a.val(), t.size(), a.ref()) + FX^leftCode;
+            -- Empilement de l'adresse de la zone pointee puis de la valeur du champ.
+            F^rightCode := hm.generateStaticRead(a.val(), t.size(), a.ref()) + FX^rightCode;
+        elseif t.isFType() then
+            -- TODO: Verifier code genere correct dans toutes situations.
+            F^leftCode := FX^leftCode;
+            F^rightCode := FX^rightCode;
+        end
+    end
+end
+} -- }}}
 
 --
 --
 -- Fin d'evaluation du type d'un facteur.
-FX -> #type ;
+FX -> #type #code;
 
 -- Propagation du type racine.
-#type {
+#type { -- {{{
 local
     ft : FTYPE;
 do
@@ -1131,18 +1863,30 @@ do
         FX^type := FX^typeLeft;
     end
 end
-}
+} -- }}}
+
+-- Generation de code pour une fin d'expression.
+#code { -- {{{
+local
+do
+	FX^leftCode := "";
+	FX^rightCode := "";
+    FX^endl := true;
+end
+} -- }}}
 
 --
 --
 -- Acces champ
-FX -> pt ident #type1 FX #type2 ;
+FX -> pt ident #type1 FX #type2 #code;
+global
+    -- Champ accede.
+    c : VAR;
 
 -- Verification du type racine.
-#type1 {
+#type1 { -- {{{
 local
     p : STRUCT;
-    c : VAR;
 do
     if !(FX^typeLeft.isStruct()) then
         error(MCS_NOT_STRUCT, FX^typeLeft.name());
@@ -1156,28 +1900,78 @@ do
         end
     end
 end
-}
+} -- }}}
 
 -- Recuperation du type
-#type2 {
+#type2 { -- {{{
 local
 do
     FX^type := FX1^type;
 end
-}
+} -- }}}
+
+-- Generation de code pour un acces champ.
+#code { -- {{{
+local
+    hm : HelperMemoryInterface;
+    hg : HelperGeneralInterface;
+    hi : HelperIntInterface;
+    -- Type du champ accede.
+    t : TYPE;
+    -- Adresse relative du champ accede.
+    a : Address;
+    -- Code de calcul de l'adresse absolue du champ accede.
+    codeCommun : String;
+do
+    hm := FX^gen.getMemoryHelper();
+    hg := FX^gen.getGeneralHelper();
+    hi := FX^gen.getIntHelper();
+    FX^endl := false;
+    t := c.type();
+    a := c.addr();
+    -- Le code commun empile l'adresse du champ utilise.
+    codeCommun := hg.generateConstante(a.val()) + hi.generateSum();
+    if FX1^endl then
+        -- Empilement de l'adresse de la variable (adresse du champ).
+        FX^leftCode := codeCommun;
+        -- Empilement de la valeur de la variable (valeur du champ).
+        FX^rightCode := codeCommun + hm.generateDynamicRead(t.size());
+    else
+        if t.isStruct() then
+            -- La differenciation effective se fera lors la generation du code de FX.
+            -- Empilement de l'adresse de l'enregistrement (premier niveau de champ) puis de l'adresse du champ.
+            FX^leftCode := codeCommun + FX1^leftCode;
+            -- Empilement de l'adresse de l'enregistrement (premier niveau de champ) puis de la valeur du champ.
+            FX^rightCode := codeCommun + FX1^rightCode;
+        elseif t.isPointer() then
+            -- La differenciation effective se fera lors la generation du code de FX.
+            -- Empilement de l'adresse de la zone pointee, puis de l'adresse du champ.
+            FX^leftCode := codeCommun + hm.generateDynamicRead(t.size()) + FX1^leftCode;
+            -- Empilement de l'adresse de la zone pointee puis de la valeur du champ.
+            FX^rightCode := codeCommun + hm.generateDynamicRead(t.size()) + FX1^rightCode;
+        elseif t.isFType() then
+            -- TODO: Verifier code genere correct dans toutes situations.
+            FX^leftCode := FX1^leftCode;
+            FX^rightCode := FX1^rightCode;
+        end
+    end
+end
+} -- }}}
 
 --
 --
 -- Acces champ pointeur.
-FX -> arrow  ident #type1 FX #type2 ;
+FX -> arrow  ident #type1 FX #type2 #code ;
+global
+    -- Champ accede.
+    c : VAR;
 
 -- Verification du type racine.
-#type1 {
+#type1 { -- {{{
 local
     p : PTR;
     pt : TYPE;
     s : STRUCT;
-    c : VAR;
 do
     if !(FX^typeLeft.isPointer()) then
         error(MCS_NOT_PTR, FX^typeLeft.name());
@@ -1197,24 +1991,71 @@ do
         end
     end
 end
-}
+} -- }}}
 
 -- Recuperation du type
-#type2 {
+#type2 { -- {{{
 local
 do
     FX^type := FX1^type;
 end
-}
+} -- }}}
 
+-- Generation de code acces champ pointeur.
+#code { -- {{{
+local
+    hm : HelperMemoryInterface;
+    hg : HelperGeneralInterface;
+    hi : HelperIntInterface;
+    -- Type du champ accede.
+    t : TYPE;
+    -- Adresse relative du champ accede.
+    a : Address;
+    -- Code de calcul de l'adresse absolue du champ accede.
+    codeCommun : String;
+do
+    hm := FX^gen.getMemoryHelper();
+    hg := FX^gen.getGeneralHelper();
+    hi := FX^gen.getIntHelper();
+    FX^endl := false;
+    t := c.type();
+    a := c.addr();
+    -- Le code commun empile l'adresse du champ utilise.
+    codeCommun := hg.generateConstante(a.val()) + hi.generateSum();
+    if FX1^endl then
+        -- Empilement de l'adresse de la variable (adresse du champ).
+        FX^leftCode := codeCommun;
+        -- Empilement de la valeur de la variable (valeur du champ).
+        FX^rightCode := codeCommun + hm.generateDynamicRead(t.size());
+    else
+        if t.isStruct() then
+            -- La differenciation effective se fera lors la generation du code de FX.
+            -- Empilement de l'adresse de l'enregistrement puis de l'adresse du champ.
+            FX^leftCode := codeCommun + FX1^leftCode;
+            -- Empilement de l'adresse de l'enregistrement puis de la valeur du champ.
+            FX^rightCode := codeCommun + FX1^rightCode;
+        elseif t.isPointer() then
+            -- La differenciation effective se fera lors la generation du code de FX.
+            -- Empilement de l'adresse de la zone pointee, puis de l'adresse du champ.
+            FX^leftCode := codeCommun + hm.generateDynamicRead(t.size()) + FX1^leftCode;
+            -- Empilement de l'adresse de la zone pointee puis de la valeur du champ.
+            FX^rightCode := codeCommun + hm.generateDynamicRead(t.size()) + FX1^rightCode;
+        elseif t.isFType() then
+            -- TODO: Verifier code genere correct dans toutes situations.
+            FX^leftCode := FX1^leftCode;
+            FX^rightCode := FX1^rightCode;
+        end
+    end
+end
+} -- }}}
 
 --
 --
 -- Appel de sous-programme
-FX -> #type1 paro ES parf FX #type2 ;
+FX -> #type1 paro ES parf FX #type2 #code ;
 
 -- Verification du type racine.
-#type1 {
+#type1 { -- {{{
 do
     if !(FX^typeLeft.isFType()) then
         error(MCS_NOT_FUNCTION, FX^typeLeft.name());
@@ -1223,27 +2064,49 @@ do
         FX1^typeLeft := FX^typeLeft;
     end
 end
-}
+} -- }}}
 
 -- Recuperation du type.
-#type2 {
+#type2 { -- {{{
 do
     FX^type := FX1^type;
 end
-}
+} -- }}}
+
+#code { -- {{{
+local
+    h : HelperFunctionInterface;
+do
+    h := FX^gen.getFunctionHelper();
+    FX^endl := false;
+    if FX^name = null then
+        error(MCS_BAD_FCN_CALL);
+    else
+        FX^leftCode := h.generateCall(FX^name, FX^name, ES^code) + FX1^leftCode;
+        FX^rightCode := h.generateCall(FX^name, FX^name, ES^code) + FX1^rightCode;
+    end
+end
+} -- }}}
 
 --
 --
 -- Appel de sous-programme sans arguments, aucune verification necessaire.
-ES -> ;
+ES -> #code;
+
+#code { -- {{{
+local
+do
+	ES^code := "";
+end
+} -- }}}
 
 --
 --
 -- Appel de sous-programme avec arguments.
-ES -> E #type ESX ;
+ES -> E #type ESX #code;
 
 -- Verification du type du parametre.
-#type {
+#type { -- {{{
 local
     tParam : TYPE;
 do
@@ -1254,20 +2117,33 @@ do
         ESX^numParam := 1;
     end
 end
-}
+} -- }}}
 
+#code { -- {{{
+local
+do
+	-- Concatenation du code des parametres.
+	ES^code := E^code + ESX^code;
+end
+} -- }}}
 --
 --
 -- Appel de sous-programme avec arguments : fin de liste.
-ESX -> ;
+ESX -> #code;
 
+#code { -- {{{
+local
+do
+	ESX^code := "";
+end
+} -- }}}
 --
 --
 -- Appel de sous-programme avec arguments : suite.
-ESX -> virg E #type ESX ;
+ESX -> virg E #type ESX #code;
 
 -- Verification du type du parametre.
-#type {
+#type { -- {{{
 local
     tParam : TYPE;
 do
@@ -1278,7 +2154,15 @@ do
         ESX1^numParam := ESX^numParam + 1;
     end
 end
-}
+} -- }}}
+
+#code { -- {{{
+local
+do
+	-- Concatenation du code des parametres.
+	ESX^code := E^code + ESX1^code;
+end
+} -- }}}
 
 --
 --
@@ -1292,20 +2176,21 @@ end
 ENTITE -> asm #tds ASM #gen;
 
 -- Utilisation de la tds au sein de l'asm.
-#tds {
+#tds { -- {{{
 do
-    -- TODO : Remplacer 'null' par la table courante pour que
-    -- le code  ASM puisse acceder aux variables de MC ou MCS
-    ASM^tds_asm := null;
+    -- Transmission de la table courante pour que
+    -- le code ASM puisse acceder aux variables de MC ou MCS.
+    ASM^tds_asm := ENTITE^tds;
 end
-}
+} -- }}}
 
 -- Recuperation de l'assembleur.
-#gen {
+#gen { -- {{{
 do
     -- On recupere le code assembleur 'inline' dans : ASM^code_asm ;
+    ENTITE^code := ASM^code_asm ;
 end
-}
+} -- }}}
 
 --
 --
@@ -1313,30 +2198,31 @@ end
 INST -> asm #tds ASM #gen #type ;
 
 -- Utilisation de la tds au sein de l'asm.
-#tds {
+#tds { -- {{{
 do
     -- A remplacer par la table courante pour que
     -- l'assembleur puisse acceder aux variables
-    ASM^tds_asm := null;
+    ASM^tds_asm := INST^tds;
 end
-}
+} -- }}}
 
 -- Utilisation de la tds au sein de l'asm.
-#gen {
+#gen { -- {{{
 do
     -- ASM^code_asm contient le code assembleur inline
     -- dans lequel les noms de variables ont ete remplaces
     -- par leurs adresses.
+    INST^code := ASM^code_asm;
 end
-}
+} -- }}}
 
 -- Evaluation du type de l'instruction
-#type {
+#type { -- {{{
 do
     -- TODO: Verifier la validite de null pour une instruction ASM.
     INST^type := null;
 end
-}
+} -- }}}
 
 ----------------- CS extension --------------------
 -- Decommenter les regles suivantes pour l'extension CS

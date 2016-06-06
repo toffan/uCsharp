@@ -1,0 +1,52 @@
+//test_if.mcs
+//vérifie l'exactitude de if
+
+// assembleur inline en dehors d'une fonction
+asm {
+   CALL (LB) _main   ; appel au point d'entree du programme
+   HALT              ; arret de la machine
+   }
+
+// point d'entree du programme.
+int main(){
+    int t = 1;
+    int f = 0;
+    int a = -1;
+    
+    if(1){
+		a = 1111;
+	}
+	else{
+		a = 1110;
+	}
+    
+    //test avec des "booleens"
+	//code commenté invalide, lève l'erreur :
+	// La variable/fonction "<missing argument>" est deja defini dans le bloc courant !
+//    if(t){
+//		char* resultat = "true";
+//    }
+//    else{
+//		char* resultat = "false";
+//	}
+	
+	//meme code avec la definition de variable en dehors
+	char* resultat = "";
+	if(t){
+		resultat = "true";
+    }
+    else{
+		resultat = "false";
+	}
+	
+	//test avec une comparaison d'entiers
+	char* resultat2 = "";
+	if(t > f){
+		resultat2 = "valide";
+	}
+	else{
+		resultat2 = "faux";
+	}
+    
+	return 0;
+}

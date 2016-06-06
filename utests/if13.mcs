@@ -1,0 +1,13 @@
+int main() {
+    int c1 = 3;
+    int c2 = 0;
+    int c3 = 1;
+
+    if (c1 || c2 || c3) {
+        int a = 5;
+    } else {
+        int b = 2;
+    }
+
+    return 0;
+}

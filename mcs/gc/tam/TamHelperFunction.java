@@ -13,27 +13,27 @@ public class TamHelperFunction implements HelperFunctionInterface {
     /**
      * @{inheriDoc}
      */
-    public String generateFunction(String functionName, String functionTag, String code) {
-        return "; code de la fonction :  " + functionName + " \n" +
-                "_" + functionTag + ":\n"
-                + code
-                + "; fin code fonction " + functionName + " \n";
+    public String generateFunction(String functionName, String functionTag,
+                                   String code) {
+        return "; Code de la fonction :  " + functionName + "\n"
+            + "JUMP __" + functionTag + "\n"
+            + "_" + functionTag + ":\n" + code + "; Fin code fonction " +
+            functionName + "\n"
+            + "__" + functionTag + ":\n";
     }
 
-    public String generateReturn(int sizeReturn, int depReturn, String codeRetour) {
-        return "; retour"
-                + codeRetour
-                + "\tRETURN (" + sizeReturn + ")" + depReturn + "\n";
+    public String generateReturn(int sizeParams, int sizeReturn,
+                                 String codeRetour) {
+        return "; Retour " + codeRetour + "\n"
+            + "    RETURN (" + sizeReturn + ") " + sizeParams + "\n";
     }
 
-    public String generateCall(String functionName, String functionTag, List<VAR> parameters) {
-        String code = "; Appel fonction : " + functionName + " avec les parametres :\n";
-        for (VAR p : parameters) {
-            code += ";\t <nom parametre>  <type parametre> \n";
-        }
-        code += "\tCALL(SB) _" + functionTag + "\n";
+    public String generateCall(String functionName, String functionTag,
+                               String codeParam) {
+        String code = "; Appel fonction : " + functionName + "\n"
+                      + "; Chargement des parametres :\n" + codeParam +
+                      "; Appel effectif fonction : " + functionName + "\n"
+                      + "    CALL (SB) _" + functionTag + "\n";
         return code;
     }
-
-
 }

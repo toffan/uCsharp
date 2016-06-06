@@ -14,35 +14,17 @@ public class TYPE {
     }
 
     ///   Proxy InstanceOf   ///
-    public boolean isStruct()
-    {
-        return (this instanceof STRUCT);
-    }
+    public boolean isStruct() { return (this instanceof STRUCT); }
 
-    public boolean isPointer()
-    {
-        return (this instanceof PTR);
-    }
+    public boolean isPointer() { return (this instanceof PTR); }
 
-    public boolean isFType()
-    {
-        return (this instanceof FTYPE);
-    }
+    public boolean isFType() { return (this instanceof FTYPE); }
 
-    public STRUCT toStruct()
-    {
-        return (STRUCT) this;
-    }
+    public STRUCT toStruct() { return (STRUCT) this; }
 
-    public PTR toPointer()
-    {
-        return (PTR) this;
-    }
+    public PTR toPointer() { return (PTR) this; }
 
-    public FTYPE toFType()
-    {
-        return (FTYPE) this;
-    }
+    public FTYPE toFType() { return (FTYPE) this; }
 
     ///   Methodes   ///
     public int size() { return this.size; }

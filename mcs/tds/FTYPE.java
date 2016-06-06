@@ -26,4 +26,11 @@ public class FTYPE extends TYPE {
         this.name = this.name.substring(0, end) + type.name() + ", )";
     }
     public int nbParams() { return this.params.size(); }
+    public int sizeParams() {
+        int res = 0;
+        for (TYPE p : params) {
+            res += p.size();
+        }
+        return res;
+    }
 }

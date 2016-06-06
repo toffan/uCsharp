@@ -1,0 +1,12 @@
+JUMP __main
+_main:
+    LOADL 5
+    LOADL 4
+    SUBR ISub
+
+    LOADL 0
+    RETURN (1) 0
+    RETURN (0) 0
+__main:
+    CALL (SB) _main
+    HALT

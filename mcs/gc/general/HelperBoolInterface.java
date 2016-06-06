@@ -3,43 +3,21 @@ package mcs.gc.general;
 public interface HelperBoolInterface {
 
     /**
-     * Negation d'une valeur
-     * @param value
-     * @return
+     * Negation d'une valeur booleenne precedemment chargee sur la pile.
+     * @return Code de la negation.
      */
-    public String generateNegation(String value);
+    public String generateNegation();
 
     /**
-     * Negation d'une valeur
-     * @param dep
-     * @param taille
-     * @return
+     * Disjonction de 2 booleens precedemment charges sur la pile.
+     * @return Code de la disjonction.
      */
-    public String generateNegation(int dep, int taille);
+    public String generateOr();
 
-    /**
-     * or de 2 booléens (adresse,valeur)
-     * @param dep
-     * @param size
-     * @param value
-     * @return
+    /** Conjonction de 2 booleens precedemment charges sur la pile.
+     * @return Code de la conjonction.
      */
-    public String generateOr(int dep, int size, String value);
-
-    /** or entre 2 valeurs **/
-    public String generateOr(String value1, String value2);
-
-    /** or entre 2 adresses **/
-    public String generateOr(int dep1, int size1, int dep2, int size2);
-
-    /** and entre 1 adresse une valeur **/
-    public String generateAnd(int dep, int size, String value);
-
-    /** and entre 2 valeurs **/
-    public String generateAnd(String value1, String value2);
-
-    /** and entre 2 adresses **/
-    public String generateAnd(int dep1, int size1, int dep2, int size2);
+    public String generateAnd();
 
     /** affiche une valeur bool sur stdout **/
     public String generateDisplay(String value);
@@ -58,5 +36,4 @@ public interface HelperBoolInterface {
 
     /** bool to string **/
     public String generateBoolToString();
-
 }
