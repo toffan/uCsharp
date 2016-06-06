@@ -796,11 +796,21 @@ end
 --
 --
 -- Un nouveau bloc est insere en instruction.
-INST -> BLOC #type #code ;
+INST -> #type1 BLOC #type2 #code ;
+
+-- Creation d'une TDS locale au bloc.
+#type1 { -- {{{
+local
+    tds : TDS;
+do
+    tds := new TDS(INST^tds, false);
+    BLOC^tds := tds;
+end
+} -- }}}
 
 -- Un nouveau bloc est insere en instruction, si il est dote d'un type de
 -- retour, il contient un " return ", et son type se propage
-#type { -- {{{
+#type2 { -- {{{
 local
 do
     INST^type := BLOC^type;
@@ -817,10 +827,20 @@ end
 --
 --
 -- Bloc conditionnel.
-INST -> si paro E parf BLOC SIX #type #code ;
+INST -> si paro E parf #type1 BLOC SIX #type2 #code ;
+
+-- Creation d'une TDS locale au bloc.
+#type1 { -- {{{
+local
+    tds : TDS;
+do
+    tds := new TDS(INST^tds, false);
+    BLOC^tds := tds;
+end
+} -- }}}
 
 -- Le type du bloc conditionnel correspond au type de retour commun.
-#type { -- {{{
+#type2 { -- {{{
 local
 do
     -- Une expression conditionnelle est de type de retour entier.
@@ -862,10 +882,20 @@ end
 --
 --
 -- Bloc sinon.
-SIX -> sinon BLOC #type #code ;
+SIX -> sinon #type1 BLOC #type2 #code ;
+
+-- Creation d'une TDS locale au bloc.
+#type1 { -- {{{
+local
+    tds : TDS;
+do
+    tds := new TDS(SIX^tds, false);
+    BLOC^tds := tds;
+end
+} -- }}}
 
 -- Propagation du type.
-#type { -- {{{
+#type2 { -- {{{
 local
 do
     SIX^type := BLOC^type;
