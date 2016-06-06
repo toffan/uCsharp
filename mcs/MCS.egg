@@ -2127,9 +2127,9 @@ ENTITE -> asm #tds ASM #gen;
 -- Utilisation de la tds au sein de l'asm.
 #tds { -- {{{
 do
-    -- TODO : Remplacer 'null' par la table courante pour que
-    -- le code  ASM puisse acceder aux variables de MC ou MCS
-    ASM^tds_asm := null;
+    -- Transmission de la table courante pour que
+    -- le code ASM puisse acceder aux variables de MC ou MCS.
+    ASM^tds_asm := ENTITE^tds;
 end
 } -- }}}
 
@@ -2151,8 +2151,7 @@ INST -> asm #tds ASM #gen #type ;
 do
     -- A remplacer par la table courante pour que
     -- l'assembleur puisse acceder aux variables
-    -- TODO: gerer l'assembleur inline.
-    ASM^tds_asm := null;
+    ASM^tds_asm := INST^tds;
 end
 } -- }}}
 

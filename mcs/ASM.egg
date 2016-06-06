@@ -3,7 +3,7 @@ option k = 2;
 option auto = true;
 -- attributs
 syn code_asm :STRING  for TAM, INST, CINST, ADR, INSTS, CSTE;
-inh tds_asm : ASMTDS for TAM, INST, INSTS, ADR, CSTE;
+inh tds_asm : TDS for TAM, INST, INSTS, ADR, CSTE;
 
 space  separ  is "[\t ]+";
 sugar  dpts   is "\:";
@@ -69,34 +69,26 @@ end
 ADR -> var  #gen;
 #gen { -- {{{
 local
-    i : INFO;
-    v : INFOVAR;
-    e : Emplacement;
-    r : Register;
-    t : DTYPE;
+    v : VAR;
+    t : TYPE;
+    a : Address;
 do
--- remplace var^txt par l'emplacement de la variable
+    -- remplace var^txt par l'emplacement de la variable
     if ADR^tds_asm = null then
-      -- write "pas de ASMTDS\n"
+        -- write "pas de TDS\n"
     else
-      i := ADR^tds_asm.chercherGlobalement(var^txt.substring(1));
-      if i /= nil then
-        match i
-          with INFOVAR then
-            v := i;
-            t := v.getType();
-            e := v.getEmpl();
-            r := e.getReg();
-            ADR^code_asm := "("+ t.getTaille() + ") " +  e.getDep() + "["+ r.getName()+ "]";
-         else
-           error(NOT_A_VAR, var^txt);
-         end
-       else
-         error(UNKNOWN, var^txt);
-       end
-     end
+        v := ADR^tds_asm.searchVar(var^txt.substring(1), true);
+        if v /= null then
+            t := v.type();
+            a := v.addr();
+            ADR^code_asm := "("+ t.size() + ") " +  a.val() + "["+ a.ref()+ "]";
+        else
+            error(UNKNOWN, var^txt);
+        end
+    end
 end
 } -- }}}
+
 INST -> nl #gen;
 #gen { -- {{{
 do

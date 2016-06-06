@@ -20,9 +20,6 @@ src :
 
 att :
 	$(JDIR)/javac -classpath $(GJAR) mcs/tds/*.java
-	$(JDIR)/javac -classpath $(GJAR) mcs/libasm/tds/*.java
-	$(JDIR)/javac -classpath $(GJAR) mcs/libasm/type/*.java
-	$(JDIR)/javac -classpath $(GJAR) mcs/libasm/gc/*.java
 	$(JDIR)/javac -classpath $(GJAR) mcs/gc/*.java
 	$(JDIR)/javac -classpath $(GJAR) mcs/gc/general/*.java
 	$(JDIR)/javac -classpath $(GJAR) mcs/gc/tam/*.java
@@ -37,9 +34,6 @@ test:
 clean :
 	rm -rf $(PACKAGE)
 	rm -f mcs/tds/*.class
-	rm -f mcs/libasm/tds/*.class
-	rm -f mcs/libasm/type/*.class
-	rm -f mcs/libasm/gc/*.class
 	rm -f mcs/gc/*.class
 	rm -f mcs/gc/tam/*.class
 	rm -f mcs/gc/general/*.class
