@@ -376,16 +376,32 @@ end
 --
 --
 -- Debut de la premiere ligne d'une fonction.
-FONCTION -> paro PARFS parf #type BLOC #code ;
+FONCTION -> paro PARFS parf #type1 BLOC #type2 #code ;
+global
+    tFct : FTYPE;
 
 -- Transmission de la TDS interne de la fonction au corps de fonction.
-#type { -- {{{
+#type1 { -- {{{
 local
     tds : TDS;
 do
     tds := FONCTION^fct.tds();
+    -- Termine l'ajout des parametres a la fonction.
     tds.endFunctionDeclaration();
     BLOC^tds := tds;
+end
+} -- }}}
+
+-- Verification du type de retour de la fonction.
+#type2 { -- {{{
+local
+    tReturn : TYPE;
+do
+    tFct := FONCTION^fct.type();
+    tReturn := tFct.retType();
+    if tReturn /= BLOC^type then
+        error(MCS_BAD_TYPE_6, tReturn.name(), BLOC^type.name());
+    end
 end
 } -- }}}
 
@@ -394,12 +410,8 @@ end
 #code { -- {{{
 local
     h : HelperFunctionInterface;
-    tFct : FTYPE;
-    tReturn : TYPE;
 do
     h := FONCTION^gen.getFunctionHelper();
-    tFct := FONCTION^fct.type();
-    tReturn := tFct.retType();
     FONCTION^code := BLOC^code + h.generateReturn(tFct.sizeParams(), 0, "artificiel pour " + FONCTION^fct.name());
 end
 } -- }}}
@@ -893,9 +905,18 @@ end
 INST -> retour E pv #type #code ;
 #type { -- {{{
 local
+    fct : FTYPE;
+    t : TYPE;
 do
-    -- Instruction return : on transfere le type de l'expression renvoyee.
-    INST^type := E^type;
+    -- Verification que le type retourne correspond au type de retour de la fonction.
+    fct := INST^fct.type();
+    t := fct.retType();
+    if t /= E^type then
+        error(MCS_BAD_TYPE_6, t.name(), E^type.name());
+    else
+        -- Instruction return : on transfere le type de l'expression renvoyee.
+        INST^type := E^type;
+    end
 end
 } -- }}}
 
