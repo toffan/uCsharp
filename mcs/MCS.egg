@@ -37,7 +37,8 @@ inh tds : TDS for
         INSTS, INST, TYPE, STYPE, PTRS,
         CHAMPS, CHAMP,
         E, A, AFFX, R, RX, AX, T, TX, F, FX, SIX,
-        ES, ESX ;
+        ES, ESX,
+        IDC ;
 
 syn type : TYPE for
         TYPE,
@@ -2259,10 +2260,45 @@ do
 end
 } -- }}}
 
----- donne l acces au contenu du 'namespace'
-ENTITE -> using identc IDC pv ;
+--
+--
+---- Donne l'acces au contenu du 'namespace'.
+---- Definit le namespace en cours d'utilisation.
+ENTITE -> using identc #type IDC pv #code ;
+
+-- Redefinit le namespace en cours d'utilisation.
+#type { -- {{{
+do
+    -- use(String namespace, boolean root)
+    -- root est vrai pour l'ident directement apres le using,
+    -- false pour les idents suivants (separes par des points -> IDC).
+    ENTITE^tds.use(identc^txt, true);
+end
+} -- }}}
+
+-- Generation de code pour using (rien).
+#code { -- {{{
+do
+    ENTITE^code := "";
+end
+} -- }}}
+
+--
+--
+---- Sous partie d'un nom (namespace/classe).
 IDC -> ;
-IDC -> pt identc IDC ;
+IDC -> pt identc #type IDC ;
+
+-- Redefinit le namespace en cours d'utilisation.
+#type { -- {{{
+do
+    -- use(String namespace, boolean root)
+    -- root est vrai pour l'ident directement apres le using,
+    -- false pour les idents suivants (separes par des points -> IDC).
+    IDC^tds.use(identc^txt, false);
+end
+} -- }}}
+
 ---- definition d'une classe (peut etre en dehors d'un namespace)
 ENTITE -> ACCES class identc HERITAGE aco DEFS acf ;
 ---- acces
