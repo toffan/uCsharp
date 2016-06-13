@@ -2239,7 +2239,26 @@ end
 } -- }}}
 
 ---- definit un contenu d'un namespace
-ENTITE -> namespace identc aco ENTITES acf ;
+ENTITE -> namespace identc #type aco ENTITES acf #code ;
+
+-- Enregistre le namespace dans la tds et
+-- cree les ressources necessaires a son utilisation.
+#type { -- {{{
+do
+    ENTITES^tds := ENTITE^tds.createNamespace(identc^txt);
+end
+} -- }}}
+
+-- Transmission du code.
+#code { -- {{{
+local
+    h : HelperGeneralInterface;
+do
+    h := ENTITE^gen.getGeneralHelper();
+    ENTITE^code := h.generateComment("--- Namespace " + identc^txt + " ---") + ENTITES^code + h.generateComment("--- Fin definition namespace " + identc^txt + " ---");
+end
+} -- }}}
+
 ---- donne l acces au contenu du 'namespace'
 ENTITE -> using identc IDC pv ;
 IDC -> ;
