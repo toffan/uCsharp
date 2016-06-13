@@ -2266,8 +2266,52 @@ BASE -> dpts base paro ES parf  ;
 PARF -> MODE TYPE ident ;
 MODE -> ref ;
 MODE -> out ;
-F -> true;
-F -> false;
+F -> true #type #code ;
+
+-- Recuperation du type pour constante booleenne.
+#type { -- {{{
+local
+do
+    F^type := F^tds.searchType("bool", true);
+end
+} -- }}}
+
+-- Generation de code pour une constante booleenne.
+#code { -- {{{
+local
+    h : HelperGeneralInterface;
+do
+    h := F^gen.getGeneralHelper();
+    -- Une constante est necessairement une rightValue.
+    -- TODO: Declencher une erreur de compilation si la constante est utilisee en tant que leftValue.
+	F^leftCode := "";
+    F^rightCode := h.generateConstante("1");
+end
+} -- }}}
+
+F -> false #type #code ;
+
+-- Recuperation du type pour constante booleenne.
+#type { -- {{{
+local
+do
+    F^type := F^tds.searchType("bool", true);
+end
+} -- }}}
+
+-- Generation de code pour une constante booleenne.
+#code { -- {{{
+local
+    h : HelperGeneralInterface;
+do
+    h := F^gen.getGeneralHelper();
+    -- Une constante est necessairement une rightValue.
+    -- TODO: Declencher une erreur de compilation si la constante est utilisee en tant que leftValue.
+	F^leftCode := "";
+    F^rightCode := h.generateConstante("0");
+end
+} -- }}}
+
 F -> this FX;
 F -> base FX;
 F -> null2;
