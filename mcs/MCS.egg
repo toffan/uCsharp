@@ -181,6 +181,7 @@ do
     tds.putType("void", new TYPE("void", 0));
     tds.putType("int", new TYPE("int", 1));
     tds.putType("char", new TYPE("char", 1));
+    tds.putType("bool", new TYPE("bool", 1));
     string := new PTR(tds.searchType("char", true));
     tds.putType(string.name(), string);
 
@@ -2227,7 +2228,16 @@ end
 ----------------- CS extension --------------------
 -- Decommenter les regles suivantes pour l'extension CS
 -------------------------------------------------
-TYPE -> bool;
+TYPE -> bool #type ;
+
+-- Les types de base sont deja presents dans la TDS.
+#type { -- {{{
+local
+do
+    TYPE^type := TYPE^tds.searchType("bool", true);
+end
+} -- }}}
+
 ---- definit un contenu d'un namespace
 ENTITE -> namespace identc aco ENTITES acf ;
 ---- donne l acces au contenu du 'namespace'
