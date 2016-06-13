@@ -88,7 +88,7 @@ syn rightCode : String for A, R, T, F, FX ;
 syn endl : Boolean for FX;
 
 -- Permet de savoir si les parametres d'une operation doivent etre au prealable convertis en booleens.
-syn toBool : Boolean for OPADD, OPMUL ;
+syn toBool : Boolean for OPADD, OPMUL, OPUN ;
 
 -- Terminaux
 space separateur is    "[\r\n\t ]+";
@@ -1601,11 +1601,18 @@ end
 
 -- Generation de code pour une operation unaire.
 #code { -- {{{
+local
+    h : HelperIntInterface;
 do
     -- F fait intervenir une operation, donc est forcement une rightValue.
     F^leftCode := "";
+    h := F^gen.getIntHelper();
     -- OPUN^code contient l'appel a l'operateur.
-    F^rightCode := F1^rightCode + OPUN^code;
+    if OPUN^toBool then
+        F^rightCode := F1^rightCode + h.generateIntToBool() + OPUN^code;
+    else
+        F^rightCode := F1^rightCode + OPUN^code;
+    end
 end
 } -- }}}
 
@@ -1620,6 +1627,7 @@ OPUN -> plus #code ;
 do
     -- Rien a faire en particulier.
     OPUN^code := "";
+    OPUN^toBool := false;
 end
 } -- }}}
 
@@ -1635,6 +1643,7 @@ do
     hg := OPUN^gen.getGeneralHelper();
     -- Multiplication par -1.
     OPUN^code := hg.generateComment("Multiplication par -1.") + hg.generateConstante("-1") + hi.generateMul();
+    OPUN^toBool := false;
 end
 } -- }}}
 
@@ -1643,10 +1652,11 @@ OPUN -> non #code ;
 -- Generation de code : appel de la subroutine correspondante.
 #code { -- {{{
 local
-    h : HelperIntInterface;
+    h : HelperBoolInterface;
 do
-    h := OPUN^gen.getIntHelper();
-    OPUN^code := h.generateNeg();
+    h := OPUN^gen.getBoolHelper();
+    OPUN^code := h.generateNegation();
+    OPUN^toBool := true;
 end
 } -- }}}
 

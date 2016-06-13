@@ -3,9 +3,12 @@ _main:
     LOADL 3
     LOADL 0
     LOAD (1) 3[LB]
+    SUBR I2B
     JUMPIF (0) ELSE_1
     LOAD (1) 4[LB]
+    SUBR I2B
     SUBR BNeg
+    SUBR I2B
     JUMPIF (0) ELSE_0
     LOADL 2
     JUMP ENDIF_0

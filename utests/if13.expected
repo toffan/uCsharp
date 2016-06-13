@@ -4,10 +4,15 @@ _main:
     LOADL 0
     LOADL 1
     LOAD (1) 3[LB]
+    SUBR I2B
     LOAD (1) 4[LB]
+    SUBR I2B
     SUBR BOr
+    SUBR I2B
     LOAD (1) 5[LB]
+    SUBR I2B
     SUBR BOr
+    SUBR I2B
     JUMPIF (0) ELSE_0
     LOADL 5
     JUMP ENDIF_0

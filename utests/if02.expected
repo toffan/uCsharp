@@ -1,6 +1,7 @@
 JUMP __main
 _main:
     LOADL 0
+    SUBR I2B
     JUMPIF (0) ELSE_0
     JUMP ENDIF_0
     ELSE_0:
