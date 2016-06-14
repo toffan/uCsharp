@@ -2226,9 +2226,17 @@ do
 end
 } -- }}}
 
+--
+--
 ----------------- CS extension --------------------
 -- Decommenter les regles suivantes pour l'extension CS
 -------------------------------------------------
+--
+--
+
+--
+--
+-- Constante booleenne.
 TYPE -> bool #type ;
 
 -- Les types de base sont deja presents dans la TDS.
@@ -2239,7 +2247,15 @@ do
 end
 } -- }}}
 
----- definit un contenu d'un namespace
+--
+--
+---- Namespaces.
+--
+--
+
+--
+--
+---- Definit un namespace (et son contenu).
 ENTITE -> namespace identc #type aco ENTITES acf #code ;
 
 -- Enregistre le namespace dans la tds et
@@ -2287,6 +2303,10 @@ end
 --
 ---- Sous partie d'un nom (namespace/classe).
 IDC -> ;
+
+--
+--
+---- Sous partie d'un nom (namespace/classe).
 IDC -> pt identc #type IDC ;
 
 -- Redefinit le namespace en cours d'utilisation.
@@ -2299,28 +2319,88 @@ do
 end
 } -- }}}
 
----- definition d'une classe (peut etre en dehors d'un namespace)
+--
+--
+---- Definition d'une classe (peut etre en dehors d'un namespace).
 ENTITE -> ACCES class identc HERITAGE aco DEFS acf ;
----- acces
+
+--
+--
+---- Type d'acces aux elements d'une classe.
+--
+--
+
+-- Mode publique.
 ACCES -> public;
+
+-- Mode prive.
 ACCES -> private;
+
+-- Mode par defaut (public ?).
 ACCES -> ;
----- heritage
+
+--
+--
+---- Heritage.
+--
+--
+
+-- Sans heritage.
 HERITAGE -> ;
+
+-- Avec heritage.
 HERITAGE -> dpts identc IDC ;
----- membres d'une classe
+
+--
+--
+---- Membres d'une classe.
+--
+--
+
+--
+--
+---- Fin de definition d'une classe.
 DEFS -> ;
+
+--
+--
+---- Liste des membres d'une classe.
 DEFS -> ACCES DEF DEFS ;
+
+--
+--
+---- Methode/Attribut d'une classe.
 DEF  -> TYPE ident DECL ;
----- constructeur
+
+--
+--
+---- Constructeur de classe.
 DEF  -> identc paro PARFS parf BASE BLOC;
----- appel eventuel au constructeur de la classe parente.
+
+--
+--
+---- Appel eventuel au constructeur de la classe parente.
 BASE -> ;
 BASE -> dpts base paro ES parf  ;
----- Mode de passage pour les fonctions et methodes : rien : D, ref : D/R, out : R
+
+--
+--
+---- Mode de passage pour les fonctions et methodes : rien : D, ref : D/R, out : R.
 PARF -> MODE TYPE ident ;
+
+--
+--
+---- Mode ref : Donnee/Resultat.
 MODE -> ref ;
+
+--
+--
+---- Mode out : Resultat.
 MODE -> out ;
+
+--
+--
+---- Constante booleenne.
 F -> true #type #code ;
 
 -- Recuperation du type pour constante booleenne.
@@ -2344,6 +2424,9 @@ do
 end
 } -- }}}
 
+--
+--
+---- Constante booleenne.
 F -> false #type #code ;
 
 -- Recuperation du type pour constante booleenne.
@@ -2367,8 +2450,24 @@ do
 end
 } -- }}}
 
+--
+--
+---- Pointeur this.
 F -> this FX;
+
+--
+--
+---- Pointeur base (<=> super en java ?).
 F -> base FX;
+
+--
+--
+---- Constante null (en minuscule -> pour les objets ?).
 F -> null2;
+
+--
+--
+---- Construction d'un objet.
 F -> new identc IDC paro ES parf ;
+
 end
