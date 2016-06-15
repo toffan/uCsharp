@@ -52,22 +52,33 @@ public class TDS {
     /**
      * Ajoute ou mets a jour une variable
      */
-    public void putVar(String id, TYPE type) {
+    public void putVar(String id, TYPE type, boolean isPub) {
         this.lg.entry("ajout de la VAR '" + id + "' de TYPE '" + type.name() +
                       "'.");
 
         VAR var = new VAR(type, this.nxtAddr);
+        var.setPub(isPub);
+
         this.nxtAddr = this.nxtAddr.next(type.size());
         this.vars.put(id, var);
+    }
+
+    public void putVar(String id, TYPE type) {
+        this.putVar(id, type, true);
     }
 
     /**
      * Ajoute ou mets a jour une fonction
      */
-    public void putVar(String id, FCT fct) {
+    public void putVar(String id, FCT fct, boolean isPub) {
         this.lg.entry("ajout de la FCT '" + id + "'.");
 
+        fct.setPub(isPub);
         this.vars.put(id, fct);
+    }
+
+    public void putVar(String id, FCT fct) {
+        this.putVar(id, fct, true);
     }
 
     /**
