@@ -1,0 +1,17 @@
+int* malloc(int size) {
+    int* addr;
+    asm {
+        LOAD %size
+        SUBR Malloc
+        STORE %addr
+    }
+    return addr;
+}
+
+
+int main() {
+    int* p = malloc(1);
+    *p = 3;
+
+    return 0;
+}

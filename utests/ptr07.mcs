@@ -1,0 +1,17 @@
+int* malloc(int size) {
+    int* addr;
+    asm {
+        LOAD %size
+        SUBR Malloc
+        STORE %addr
+    }
+    return addr;
+}
+
+typedef struct {int x; int y;} Pt;
+int main() {
+    Pt* p;
+    p = (Pt*) malloc(2);
+
+    return 0;
+}

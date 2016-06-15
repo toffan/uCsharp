@@ -1,0 +1,42 @@
+JUMP __malloc
+_malloc:
+    PUSH 1
+	LOAD (1) -1[LB]
+	SUBR Malloc
+	STORE (1) 3[LB]
+    LOAD (1) 3[LB]
+    RETURN (1) 1
+    RETURN (0) 1
+__malloc:
+
+JUMP __main
+_main:
+    PUSH 1
+    LOADL 2
+    CALL (SB) _malloc
+    LOAD (1) -1[ST]
+    LOADL 3
+    STOREI (1)
+    POP (0) 1
+    LOADL 8
+    LOAD (1) -1[ST]
+    LOAD (1) 3[LB]
+    LOADL 0
+    SUBR IAdd
+    STOREI (1)
+    POP (0) 1
+    LOADL 4
+    LOAD (1) -1[ST]
+    LOAD (1) 3[LB]
+    LOADL 1
+    SUBR IAdd
+    STOREI (1)
+    POP (0) 1
+
+    LOADL 0
+    RETURN (1) 0
+    RETURN (0) 0
+__main:
+
+    CALL (SB) _main
+    HALT
