@@ -1755,6 +1755,8 @@ do
             error(MCS_BAD_CALL,t.name());
             F^leftCode := "";
             F^rightCode := "";
+        else
+            error(MCS_UNKNOWN_1,t.name());
         end
     end
 end
@@ -1888,6 +1890,8 @@ do
             -- TODO: Verifier code genere correct dans toutes situations.
             F^leftCode := FX^leftCode;
             F^rightCode := FX^rightCode;
+        else
+            error(MCS_UNKNOWN_2,t.name(), ident^txt);
         end
     end
 end
@@ -2003,6 +2007,8 @@ do
             -- TODO: Verifier code genere correct dans toutes situations.
             FX^leftCode := FX1^leftCode;
             FX^rightCode := FX1^rightCode;
+        else
+            error(MCS_UNKNOWN_3, t.name(), ident^txt);
         end
     end
 end
@@ -2094,6 +2100,8 @@ do
             -- TODO: Verifier code genere correct dans toutes situations.
             FX^leftCode := FX1^leftCode;
             FX^rightCode := FX1^rightCode;
+        else
+            error(MCS_UNKNOWN_4,t.name(), ident^txt);
         end
     end
 end
