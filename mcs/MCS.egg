@@ -93,7 +93,7 @@ syn endl : Boolean for FX;
 syn toBool : Boolean for OPADD, OPMUL ;
 
 -- Permet de retourner une valeur pour savoir si il s'agit d'un scope publique.
-syn isPublic : Boolean for ACCES ;
+syn isPub : Boolean for ACCES ;
 
 -- Déclaration de la classe
 inh classHere : CLASS for DEFS, DEF ;
