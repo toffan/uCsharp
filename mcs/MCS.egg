@@ -90,6 +90,8 @@ syn endl : Boolean for FX;
 -- Permet de savoir si les parametres d'une operation doivent etre au prealable convertis en booleens.
 syn toBool : Boolean for OPADD, OPMUL, OPUN ;
 
+syn typeSize : Integer for BLOC ;
+
 -- Terminaux
 space separateur is    "[\r\n\t ]+";
 space comm is    "\/\/[^\n]*\n";
@@ -660,7 +662,6 @@ BLOC -> aco INSTS acf #type #code ;
 
 -- Le type propage est non-null si le bloc contient une instruction " return ".
 #type { -- {{{
-local
 do
     BLOC^type := INSTS^type;
 end
@@ -669,6 +670,7 @@ end
 #code { -- {{{
 do
     BLOC^code := INSTS^code;
+    BLOC^typeSize := BLOC^tds.typeSize();
 end
 } -- }}}
 
@@ -819,8 +821,11 @@ end
 
 -- Recuperation du code genere.
 #code { -- {{{
+local
+    h : HelperMemoryInterface;
 do
-    INST^code := BLOC^code;
+    h := INST^gen.getMemoryHelper();
+    INST^code := BLOC^code + h.generateFree(BLOC^typeSize);
 end
 } -- }}}
 
@@ -873,9 +878,13 @@ end
 #code { -- {{{
 local
     h : HelperGeneralInterface;
+    hm : HelperMemoryInterface;
+    blocIf : String;
 do
     h := INST^gen.getGeneralHelper();
-    INST^code := h.generateIf(E^code, BLOC^code, SIX^code);
+    hm := INST^gen.getMemoryHelper();
+    blocIf := BLOC^code + hm.generateFree(BLOC^typeSize);
+    INST^code := h.generateIf(E^code, blocIf, SIX^code);
 end
 } -- }}}
 
@@ -904,8 +913,11 @@ end
 
 -- Recuperation du code genere.
 #code { -- {{{
+local
+    h : HelperMemoryInterface;
 do
-    SIX^code := BLOC^code;
+    h := SIX^gen.getMemoryHelper();
+    SIX^code := BLOC^code + h.generateFree(BLOC^typeSize);
 end
 } -- }}}
 

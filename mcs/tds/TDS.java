@@ -124,4 +124,15 @@ public class TDS {
                       type.size() + " en tant que '" + id + "'.");
         this.types.put(id, type);
     }
+
+    /**
+     * Renvoie la taille de l'ensemble des variables de la TDS
+     */
+    public int typeSize() {
+        int size = 0;
+        for (VAR v: this.vars.values()) {
+            size += v.type().size();
+        }
+        return size;
+    }
 }
