@@ -1840,16 +1840,16 @@ do
     a := v.addr();
     if FX^endl then
         -- Empilement de l'adresse de la variable.
-        F^leftCode := hg.generateConstante(a.val());
+        F^leftCode := hg.generateConstante(F^tds.refAddr() + a.val());
         -- Empilement de la valeur de la variable.
         F^rightCode := hm.generateStaticRead(a.val(), t.size(), a.ref());
     else
         if t.isStruct() then
             -- La differenciation effective se fera lors la generation du code de FX.
             -- Empilement de l'adresse de l'enregistrement puis de l'adresse du champ.
-            F^leftCode := hg.generateConstante(a.val()) + FX^leftCode;
+            F^leftCode := hg.generateConstante(F^tds.refAddr() + a.val()) + FX^leftCode;
             -- Empilement de l'adresse de l'enregistrement puis de la valeur du champ.
-            F^rightCode := hg.generateConstante(a.val()) + FX^rightCode;
+            F^rightCode := hg.generateConstante(F^tds.refAddr() + a.val()) + FX^rightCode;
         elseif t.isPointer() then
             -- La differenciation effective se fera lors la generation du code de FX.
             -- Empilement de l'adresse de la zone pointee, puis de l'adresse du champ.

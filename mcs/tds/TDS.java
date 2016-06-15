@@ -6,6 +6,10 @@ public class TDS {
 
     ///   Attributs   ///
     private Address nxtAddr;
+    /** Adresse de reference / de base pour les fonctions.
+     * Permet de calculer l'adresse absolue des variables locales aux fonctions.
+     */
+    private Address refAddr;
     private TDS parent;
     private HashMap<String, VAR> vars;
     private HashMap<String, TYPE> types;
@@ -23,6 +27,7 @@ public class TDS {
     public TDS(TDS parent, boolean fct) {
         this.nxtAddr = (parent == null || fct) ? new Address(fct ? "LB" : "SB")
                                                : parent.nxtAddr;
+        this.refAddr = fct ? parent.nxtAddr : null;
         this.parent = parent;
         this.vars = new HashMap<String, VAR>();
         this.types = new HashMap<String, TYPE>();
@@ -92,6 +97,14 @@ public class TDS {
             this.putVar("@2", this.searchType("int", true));
             this.putVar("@3", this.searchType("int", true));
         }
+    }
+
+    /**
+     * Retourne l'adresse de base (valeur) de la fonction
+     * (adresse courante de la TDS au moment de la creation de la fonction.).
+     * */
+    public int refAddr() {
+        return (this.refAddr == null) ? 0 : this.refAddr.val();
     }
 
     /**
