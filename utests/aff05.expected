@@ -1,0 +1,20 @@
+JUMP __main
+_main:
+    LOADL 5
+    LOADL 6
+    LOADL 3
+    LOAD (1) 5[LB]
+    LOAD (1) -1[ST]
+    LOADL 4
+    STOREI (1)
+    LOAD (1) -1[ST]
+    LOADL 3
+    STOREI (1)
+    POP (0) 1
+
+    LOADL 0
+    RETURN (1) 0
+    RETURN (0) 0
+__main:
+    CALL (SB) _main
+    HALT
