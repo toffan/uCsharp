@@ -3,7 +3,7 @@ package mcs.tds;
 public class STRUCT extends TYPE {
 
     ///   Attributs   ///
-    private TDS tds;
+    protected TDS tds;
 
     ///   Constructeurs   ///
     public STRUCT() { this(null); }
