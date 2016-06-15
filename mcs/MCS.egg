@@ -69,7 +69,8 @@ inh gen : GeneratorItf for
         CHAMPS, CHAMP,
         E, A, AFFX, R, RX, AX, T, TX, F, FX, SIX,
         OPREL, OPADD, OPMUL, OPUN,
-        ES, ESX ;
+        ES, ESX, 
+        DEF,DEFS;
 
 -- Le code genere.
 syn code : String for
@@ -2426,12 +2427,57 @@ DEFS -> ;
 --
 --
 ---- Liste des membres d'une classe.
-DEFS -> ACCES DEF DEFS ;
+DEFS -> ACCES DEF#def DEFS ;
+
+#def{ --{{{
+local
+do
+	
+end
+} --}}}
 
 --
 --
 ---- Methode/Attribut d'une classe.
-DEF  -> TYPE ident DECL ;
+DEF  -> TYPE ident#prerecord DECL #record;
+
+#prerecord { -- {{{
+local
+    v : VAR ;
+do
+    -- Verifier qu'aucune fonction/variable du meme nom n'est pas deja definie
+    -- localement.
+    v := DEF^classHere.searchVar(ident^txt, false);
+    if v /= null then
+        error(MCS_DAE, ident^txt,DEF^classHere.name());
+    else
+        -- Propagation du type declare.
+        DECL^typeLeft := TYPE^type;
+        -- Propagation du nom de l'ident de gauche.
+        DECL^name := ident^txt;
+    end
+end
+} -- }}}
+
+-- Enregistrement de la declaration dans la table des symboles.
+#record { -- {{{
+local
+    t : TYPE;
+do
+    -- Calcul du type de la variable/fonction.
+    if DECL^varF = null then
+        -- Enregistrement effectif de la variable dans la tds.
+        DEF^classHere.putVar(ident^txt, TYPE^type);
+    else
+        t := DECL^varF.type();
+        -- Enregistrement du type de la fonction dans la table des types.
+        DEF^classHere.putType(t.name(), t);
+        -- Enregistrement effectif de la fonction dans la tds.
+        DEF^classHere.putVar(ident^txt, DECL^varF);
+    end
+end
+} -- }}}
+
 
 --
 --
