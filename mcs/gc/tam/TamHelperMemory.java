@@ -51,13 +51,6 @@ public class TamHelperMemory implements HelperMemoryInterface {
     }
 
     @Override
-    public String generateFree(String size) {
-        return "; Libération de la mémoire.\n"
-            + "    LOADL " + size + "\n"
-            + "    SUBR MFree\n";
-    }
-
-    @Override
     public String generateAdr(int dep, String name) {
         return "    LOADA " + dep + "[" + name + "]\n";
     }
