@@ -24,13 +24,6 @@ public interface HelperMemoryInterface {
     public String generateMalloc(String size);
 
     /**
-     * Libère un bloc mémoire de taille size.
-     * @param size la taille du bloc mémoire à libérer.
-     * @return
-     */
-    public String generateFree(String size);
-
-    /**
      * code pour lire la valeur d'une expression dont on connait l'adresse à la
      * compilation : variable, champ d'un struct etc
      * @param dep
