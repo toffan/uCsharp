@@ -1729,11 +1729,34 @@ end
 -- Generation de code pour une expression parenthesee.
 #code { -- {{{
 local
+    t : TYPE;
 do
-	-- A priori simple concatenation du code.
-    -- TODO: Verifier le bon fonctionnement.
-	F^leftCode := E^leftCode + FX^leftCode;
-	F^rightCode := E^rightCode + FX^rightCode;
+    t := E^type;
+    if FX^endl then
+        -- Empilement de l'adresse de la variable.
+        F^leftCode := E^leftCode;
+        -- Empilement de la valeur de la variable.
+        F^rightCode := E^rightCode;
+    else
+        if t.isStruct() then
+            -- La differenciation effective se fera lors la generation du code de FX.
+            -- Empilement de l'adresse de l'enregistrement puis de l'adresse du champ.
+            F^leftCode := E^leftCode + FX^leftCode;
+            -- Empilement de l'adresse de l'enregistrement puis de la valeur du champ.
+            F^rightCode := E^leftCode + FX^rightCode;
+        elseif t.isPointer() then
+            -- La differenciation effective se fera lors la generation du code de FX.
+            -- Empilement de l'adresse de la zone pointee, puis de l'adresse du champ.
+            F^leftCode := E^rightCode + FX^leftCode;
+            -- Empilement de l'adresse de la zone pointee puis de la valeur du champ.
+            F^rightCode := E^rightCode + FX^rightCode;
+        elseif t.isFType() then
+            -- A priori erreur !
+            error(MCS_BAD_CALL,t.name());
+            F^leftCode := "";
+            F^rightCode := "";
+        end
+    end
 end
 } -- }}}
 
