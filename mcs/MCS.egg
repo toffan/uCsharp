@@ -38,7 +38,8 @@ inh tds : TDS for
         CHAMPS, CHAMP,
         E, A, AFFX, R, RX, AX, T, TX, F, FX, SIX,
         ES, ESX,
-        IDC ;
+        IDC, HERITAGE, DEF, DEFS ;
+        -- TODO: Verifier qu'IDC...DEFS ont vraiment une bonne raison d'etre la.
 
 syn type : TYPE for
         TYPE,
@@ -90,6 +91,12 @@ syn endl : Boolean for FX;
 
 -- Permet de savoir si les parametres d'une operation doivent etre au prealable convertis en booleens.
 syn toBool : Boolean for OPADD, OPMUL ;
+
+-- Permet de retourner une valeur pour savoir si il s'agit d'un scope publique.
+syn isPublic : Boolean for ACCES ;
+
+-- Déclaration de la classe
+inh classHere : CLASS for DEFS, DEF ;
 
 -- Terminaux
 space separateur is    "[\r\n\t ]+";
@@ -2331,13 +2338,34 @@ ENTITE -> ACCES class identc HERITAGE aco DEFS acf ;
 --
 
 -- Mode publique.
-ACCES -> public;
+ACCES -> public #value ;
+
+-- C'est un acces publique.
+#value { -- {{{
+do
+    ACCES^isPub := true;
+end
+} -- }}}
 
 -- Mode prive.
-ACCES -> private;
+ACCES -> private #value ;
+
+-- C'est un acces prive.
+#value { -- {{{
+do
+    ACCES^isPub := false;
+end
+} -- }}}
 
 -- Mode par defaut (public ?).
-ACCES -> ;
+ACCES -> #value ;
+
+-- C'est un acces publique.
+#value { -- {{{
+do
+    ACCES^isPub := true;
+end
+} -- }}}
 
 --
 --
