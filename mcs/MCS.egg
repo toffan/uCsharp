@@ -210,7 +210,7 @@ ENTITES -> #code;
 #code { -- {{{
 local
 do
-	ENTITES^code := "";
+    ENTITES^code := "";
 end
 } -- }}}
 
@@ -220,7 +220,7 @@ ENTITES -> ENTITE ENTITES #code;
 #code { -- {{{
 local
 do
-	ENTITES^code := ENTITE^code + ENTITES1^code;
+    ENTITES^code := ENTITE^code + ENTITES1^code;
 end
 } -- }}}
 
@@ -252,7 +252,7 @@ end
 #code { -- {{{
 local
 do
-	ENTITE^code := "; typedef de "+identc^txt+"\n";
+    ENTITE^code := "; typedef de "+identc^txt+"\n";
 end
 } -- }}}
 
@@ -1304,7 +1304,7 @@ end
 -- Pas de code genere.
 #code { -- {{{
 do
-	RX^code := "";
+    RX^code := "";
 end
 } -- }}}
 
@@ -1441,7 +1441,7 @@ end
 -- Pas de code genere.
 #code { -- {{{
 do
-	TX^code := "";
+    TX^code := "";
 end
 } -- }}}
 
@@ -1528,7 +1528,7 @@ do
     h := F^gen.getGeneralHelper();
     -- Une constante est necessairement une rightValue.
     -- TODO: Declencher une erreur de compilation si la constante est utilisee en tant que leftValue.
-	F^leftCode := "";
+    F^leftCode := "";
     F^rightCode := h.generateConstante(entier^txt);
 end
 } -- }}}
@@ -1580,7 +1580,7 @@ do
     h := F^gen.getGeneralHelper();
     -- Une constante est necessairement une rightValue.
     -- TODO: Declencher une erreur de compilation si la constante est utilisee en tant que leftValue.
-	F^leftCode := "";
+    F^leftCode := "";
     F^rightCode := h.generateConstante(caractere^txt);
 end
 } -- }}}
@@ -1672,8 +1672,8 @@ local
 do
     h := F^gen.getMemoryHelper();
     -- F est une constante (null) donc forcement une rightValue...
-	F^leftCode := "";
-	F^rightCode := h.generateVoid();
+    F^leftCode := "";
+    F^rightCode := h.generateVoid();
 end
 } -- }}}
 
@@ -1703,10 +1703,10 @@ end
 #code { -- {{{
 local
 do
-	-- A priori simple concatenation du code.
+    -- A priori simple concatenation du code.
     -- TODO: Verifier le bon fonctionnement.
-	F^leftCode := E^code + FX^leftCode;
-	F^rightCode := E^code + FX^rightCode;
+    F^leftCode := E^code + FX^leftCode;
+    F^rightCode := E^code + FX^rightCode;
 end
 } -- }}}
 
@@ -1732,9 +1732,9 @@ end
 #code { -- {{{
 local
 do
-	-- Transmission du code genere, sans traitement supplementaire.
-	F^leftCode := F1^leftCode;
-	F^rightCode := F1^rightCode;
+    -- Transmission du code genere, sans traitement supplementaire.
+    F^leftCode := F1^leftCode;
+    F^rightCode := F1^rightCode;
 end
 } -- }}}
 
@@ -1768,11 +1768,11 @@ local
 do
     h := F^gen.getMemoryHelper();
     -- F -> *a ; a = F1
-	-- F1^rightCode contient le contenu de a, soit l'adresse de la zone pointee.
+    -- F1^rightCode contient le contenu de a, soit l'adresse de la zone pointee.
     -- On n'a a priori pas besoin de F1^leftCode qui est l'adresse de a.
-	F^leftCode := F1^rightCode;
+    F^leftCode := F1^rightCode;
     -- Attention : on utilise bien ici pt (type pointe) et non F1^type (type pointeur).
-	F^rightCode := F1^rightCode + h.generateDynamicRead(pt.size());
+    F^rightCode := F1^rightCode + h.generateDynamicRead(pt.size());
 end
 } -- }}}
 
@@ -1869,8 +1869,8 @@ end
 #code { -- {{{
 local
 do
-	FX^leftCode := "";
-	FX^rightCode := "";
+    FX^leftCode := "";
+    FX^rightCode := "";
     FX^endl := true;
 end
 } -- }}}
@@ -2096,7 +2096,7 @@ ES -> #code;
 #code { -- {{{
 local
 do
-	ES^code := "";
+    ES^code := "";
 end
 } -- }}}
 
@@ -2122,8 +2122,8 @@ end
 #code { -- {{{
 local
 do
-	-- Concatenation du code des parametres.
-	ES^code := E^code + ESX^code;
+    -- Concatenation du code des parametres.
+    ES^code := E^code + ESX^code;
 end
 } -- }}}
 --
@@ -2134,7 +2134,7 @@ ESX -> #code;
 #code { -- {{{
 local
 do
-	ESX^code := "";
+    ESX^code := "";
 end
 } -- }}}
 --
@@ -2159,8 +2159,8 @@ end
 #code { -- {{{
 local
 do
-	-- Concatenation du code des parametres.
-	ESX^code := E^code + ESX1^code;
+    -- Concatenation du code des parametres.
+    ESX^code := E^code + ESX1^code;
 end
 } -- }}}
 
