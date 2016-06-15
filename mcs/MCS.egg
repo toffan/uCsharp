@@ -2329,7 +2329,40 @@ end
 --
 --
 ---- Definition d'une classe (peut etre en dehors d'un namespace).
-ENTITE -> ACCES class identc HERITAGE aco DEFS acf ;
+ENTITE -> ACCES class identc #create HERITAGE aco #begin DEFS acf #cloture #code;
+global
+    newClass: CLASS;
+
+-- Création de la classe
+#create { -- {{{
+local
+    t: TYPE;
+do
+    newClass := new CLASS(ENTITE^tds, identc^txt);
+end
+} -- }}}
+
+-- Passage des paramètres requis à DEFS pour la génération
+#begin { -- {{{
+do
+    DEFS^classHere := newClass;
+end
+} -- }}}
+
+#cloture { -- {{{
+do
+    newClass.close();
+    -- Bloque la lecture d'attributs privés en dehors de la classe.
+end
+} -- }}}
+
+-- Generation de code pour la creation d'une classe.
+#code { -- {{{
+do
+    -- TODO: Creation de la classe.
+    ENTITE^code := "";
+end
+} -- }}}
 
 --
 --
