@@ -72,7 +72,7 @@ inh gen : GeneratorItf for
 -- Le code genere.
 syn code : String for
          ENTITES, ENTITE, DECL, FONCTION,
-         BLOC, INSTS, INST, AFFX, E, SIX,
+         BLOC, INSTS, INST, AFFX, SIX,
          AX, OPREL, RX, OPADD, TX, OPMUL, OPUN,
          ES, ESX ;
 
@@ -80,9 +80,9 @@ syn code : String for
 inh name : String for DECL, FX;
 
 -- Code generant une adresse.
-syn leftCode : String for A, R, T, F, FX ;
+syn leftCode : String for E, A, R, T, F, FX ;
 -- Code generant une valeur.
-syn rightCode : String for A, R, T, F, FX ;
+syn rightCode : String for E, A, R, T, F, FX ;
 
 -- Permet de savoir si on arrive à la fin d'une expression.
 syn endl : Boolean for FX;
@@ -791,7 +791,7 @@ local
 do
     h := INST^gen.getMemoryHelper();
     -- La valeur de l'expression E est inutile, il faut donc la depiler.
-    INST^code := E^code + h.generateFree(E^type.size());
+    INST^code := E^rightCode + h.generateFree(E^type.size());
 end
 } -- }}}
 
@@ -884,7 +884,7 @@ do
     h := INST^gen.getGeneralHelper();
     hm := INST^gen.getMemoryHelper();
     blocIf := BLOC^code + hm.generateFree(BLOC^typeSize);
-    INST^code := h.generateIf(E^code, blocIf, SIX^code);
+    INST^code := h.generateIf(E^rightCode, blocIf, SIX^code);
 end
 } -- }}}
 
@@ -969,7 +969,7 @@ local
 do
     h := INST^gen.getFunctionHelper();
     tFct := INST^fct.type();
-    INST^code := E^code + h.generateReturn(tFct.sizeParams(), E^type.size(), "explicite pour " + INST^fct.name());
+    INST^code := E^rightCode + h.generateReturn(tFct.sizeParams(), E^type.size(), "explicite pour " + INST^fct.name());
 end
 } -- }}}
 
@@ -1014,10 +1014,15 @@ do
     if AFFX^type /= null then
         -- Affectation
         -- Duplication de AFFX^code sur la pile pour que le resultat d'une affectation soit la valeur affectee.
-        E^code := AFFX^code + h.generateDuplicate(AFFX^type.size()) + A^leftCode + h.generateDynamicWrite(AFFX^type.size());
+        E^rightCode := AFFX^code + h.generateDuplicate(AFFX^type.size()) + A^leftCode + h.generateDynamicWrite(AFFX^type.size());
+        -- Une affectation est forcement une rightValue.
+        E^leftCode := "";
     else
-        -- Recuperation simple de la valeur d'une expression (de meme que pour une rightValue).
-        E^code := A^rightCode;
+        -- Recuperation de la valeur d'une expression ou
+        -- de l'adresse engendree par l'expression :
+        -- ex (p*).x avec E -> p*, on veut l'adresse de p* pour acceder ensuite a x.
+        E^rightCode := A^rightCode;
+        E^leftCode := A^leftCode;
     end
 end
 } -- }}}
@@ -1727,8 +1732,8 @@ local
 do
 	-- A priori simple concatenation du code.
     -- TODO: Verifier le bon fonctionnement.
-	F^leftCode := E^code + FX^leftCode;
-	F^rightCode := E^code + FX^rightCode;
+	F^leftCode := E^leftCode + FX^leftCode;
+	F^rightCode := E^rightCode + FX^rightCode;
 end
 } -- }}}
 
@@ -2145,7 +2150,7 @@ end
 local
 do
 	-- Concatenation du code des parametres.
-	ES^code := E^code + ESX^code;
+	ES^code := E^rightCode + ESX^code;
 end
 } -- }}}
 --
@@ -2182,7 +2187,7 @@ end
 local
 do
 	-- Concatenation du code des parametres.
-	ESX^code := E^code + ESX1^code;
+	ESX^code := E^rightCode + ESX1^code;
 end
 } -- }}}
 
