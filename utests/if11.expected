@@ -6,16 +6,20 @@ _main:
     SUBR I2B
     JUMPIF (0) ELSE_1
     LOADL 5
+    POP (0) 1
     JUMP ENDIF_1
     ELSE_1:
     LOAD (1) 4[LB]
     SUBR I2B
     JUMPIF (0) ELSE_0
     LOADL 2
+    POP (0) 1
     JUMP ENDIF_0
     ELSE_0:
     LOADL 3
+    POP (0) 1
     ENDIF_0:
+    POP (0) 0
     ENDIF_1:
 
     LOADL 0

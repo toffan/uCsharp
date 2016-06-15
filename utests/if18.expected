@@ -15,9 +15,11 @@ _main:
     SUBR I2B
     JUMPIF (0) ELSE_0
     LOADL 5
+    POP (0) 1
     JUMP ENDIF_0
     ELSE_0:
     LOADL 2
+    POP (0) 1
     ENDIF_0:
 
     LOADL 0

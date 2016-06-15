@@ -3,8 +3,10 @@ _main:
     LOADL 0
     SUBR I2B
     JUMPIF (0) ELSE_0
+    POP (0) 0
     JUMP ENDIF_0
     ELSE_0:
+    POP (0) 0
     ENDIF_0:
 
     LOADL 0
