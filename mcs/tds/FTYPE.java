@@ -23,7 +23,12 @@ public class FTYPE extends TYPE {
     public void putParam(TYPE type) {
         this.params.add(type);
         int end = this.name.length() - 1;
-        this.name = this.name.substring(0, end) + type.name() + ", )";
+        if(this.params.size() == 0)
+        {
+            this.name = this.name.substring(0, end) + type.name() + ")";
+        } else {
+            this.name = this.name.substring(0, end) + ", " + type.name() + ")";
+        }
     }
     public int nbParams() { return this.params.size(); }
     public int sizeParams() {
