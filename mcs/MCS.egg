@@ -2515,7 +2515,41 @@ end
 --
 --
 ---- Constructeur de classe.
-DEF  -> identc paro PARFS parf BASE BLOC;
+DEF  -> identc #prerecord paro PARFS parf #record BASE BLOC;
+
+#prerecord { -- {{{
+local
+    v : VAR ;
+do
+    -- Verifier qu'aucune fonction/variable du meme nom n'est pas deja definie
+    -- localement.
+    v := DEF^classHere.searchVar(identc^txt, false);
+    if v = null then
+        error(MCS_CAE, identc^txt,DEF^classHere.name());
+    end
+end
+} -- }}}
+
+-- Enregistrement de la declaration dans la table des symboles.
+#record { -- {{{
+local
+    t : TYPE;
+    m : METH;
+    f : FTYPE;
+do
+
+    t := DEF^classHere.type();
+    -- Enregistrement du constructeur dans la tds.
+	DEF^classHere.putType(t.name(), t, true);
+	-- Enregistrement effectif de la fonction dans la tds.
+    f := new FTYPE(t);
+    m := new METH(DEF^classHere,f, DEF^classHere.tds(),identc^txt);
+	DEF^classHere.putVar(identc^txt, m, true);
+        
+   
+end
+} -- }}}
+
 
 --
 --
