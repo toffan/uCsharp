@@ -3,8 +3,11 @@ package mcs.tds;
 public class CLASS extends STRUCT {
 
     // Attributs //
-    private PTR thisType; // Type de this.
-    private boolean defensive = false;// Est-ce que je refuse l'acces aux symboles prives ? 
+
+    // Type de this.
+    private PTR thisType;
+    // Est-ce que je refuse l'acces aux symboles prives ?
+    private boolean defensive = false;
 
     // Constructeurs //
     public CLASS(TDS parent, String name) {
@@ -16,30 +19,36 @@ public class CLASS extends STRUCT {
             thisType = localPtr;
         }
     };
-    
+
     // Methodes //
+
     /**
      * @param String id l'identifiant du symbole recherche dans la classe
-     * searchvar recherche un symbole (methode/attribut) dans la classe. Si l'attribut n'existe pas, ou qu'il est public ou 
-     * qu'il est prive mais que la classe n'est pas en mode defensive, alors l'attribut est retourne. Sinon erreur.
+     * searchvar recherche un symbole (methode/attribut) dans la classe.
+     * Si l'attribut n'existe pas, ou qu'il est public ou qu'il est prive mais
+     * que la classe n'est pas en mode defensive, alors l'attribut est retourne.
+     * Sinon erreur.
      */
-    public VAR searchVar(String id) { 
-    	VAR result = this.tds.searchVar(id, false); 
-    	if(result == null || result.pub() || ( !result.pub() && !this.defensive ) ){
-    		return result;
-    	}
-    	else{
-    		throw new RuntimeException("Ce symbole est prive.");
-    	}
-	}
-    
-    /**
-     * Cloture la classe : la mets en mode defensive ce qui interdit l'acces a des attributs prives
-     */
-    public void close(){
-    	this.defensive = true;
+    public VAR searchVar(String id) {
+        VAR result = this.tds.searchVar(id, false);
+        if(result == null
+            || result.pub()
+            || ( !result.pub() && !this.defensive ) ) {
+            return result;
+        }
+        else{
+            throw new RuntimeException("Ce symbole est prive.");
+        }
     }
-    
+
+    /**
+     * Cloture la classe :
+     * La mets en mode defensive ce qui interdit l'acces a des attributs prives
+     */
+    public void close() {
+        this.defensive = true;
+    }
+
     public PTR getThisType() {
         return thisType;
     };
