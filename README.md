@@ -1,37 +1,42 @@
 # uCsharp
 Compilateur pour un sous ensemble du Csharp
 
-## Participants
+## Auteurs
 - Antoine Beyet
 - Matthieu Daumas
 - Volodia Laniel
 - Benoit Lemarchand
 
-#MicroC
-##Fontionnalités
-- Les opérations sur les entiers fonctionnent
-- Récupération  de la valeur d'une affectation. On peut ainsi faire des affectiation en cascade
-- Les déclarations et appels imbriqués de fonctions
-- Les structs & les pointeurs
-- La gestion des chaines de caractères est réalisée via une suite de caractères. Le code relatif aux strings est généré mais il n'a pas été testé car la machine TAM ne le supporte pas.
-- La définition de types personnalisés
-- Le casting statique entre types. On peut caster un type en un autre uniquement si les deux types ont la même taille.
-- Lors de la compilation, le système de types loggue ses actions (tels les ajouts et recherches dans la TDS)
 
-##Améliorations possibles & limitations
-**Optimisation** 
-- Il aurait été possible de faire des optimisations sur le code généré. Actuellement il n'y a aucun pré-calcul. Ainsi l'affectation a = 3+4 charge 3 puis 4 sur la pile et enfin somme les 2 termes. Cela pourrait être optimisé avec l'ajout d'un attribut constExpr qui indique si la valeur d'un facteur est connue à la compilation. Dans le cas d'une opération entre 2 consExpr valides, la valeur serait calculée à la compilation.
+# uC
+## Fonctionnalités
+- Opérations sur les entiers.
+- Structures conditionnelles et opérations booléennes.
+- Définitions et appels de fonctions, mêmes imbriqués.
+- Définitions et utilisations de structures.
+- Affectations en cascades et récupération de la valeur d'une affectation.
+- Définition et déréférencement de pointeurs.
+- Rennomage de types.
+- Typage fort et transtypage (cast) statique.
+- Journal (log) des actions de la TDS lors de la compilation.
 
-- Afin de pouvoir récuperer la valeur d'une affectation, celle-ci est dupliquée pour pouvoir être utilisée par la suite. Dans le cas où elle n'est pas utilisée, on pourrait éviter cette recopie.
+La gestion des chaines de caractères n'a pu être effectuée car la machine TAM ne le supporte pas. Cependant nous avons quand même une esquisse d'implémentation.
 
-- Lorsque l'on sort d'un  bloc if, on dépile les variables déclarées à l'intérieur de ce bloc, même s'il n'y en a aucune. On a alors un POP 0. Cette optimisation serait facile à mettre en place via un test sur la taille des variables.
+## Tests
+Le compilateur est testé grâce à la commande `make test`. Celle-ci effectue deux chose:
+- Elle vérifie que l'ensemble des fichiers _utests/*-wrong.mcs_ renvoient des erreurs de compilation
+- Elle vérifie que l'ensemble des fichiers _utests/*.mcs_ compilent et engendrent le même code que les _utests/*.expected_
+    Si une différence est constatée celle-ci est affichée.
 
-**Limites** 
-- Faire des opérations sur le resultat d'une fonction dans la même instruction que son utilisation n'est pas garanti. On pourrait cependant interdire cette opération dans la grammaire pour renforcer le langage. _Ex: lecture d'un champ d'un struct issu d'une fonction : int xx = retourneXY()->x +3;_
+**Nécessite python3**
 
-##Tests
-Il est possible de tester la correction du code généré en exécutant la commande `make test`.
+## Améliorations possibles & limitations
+**Optimisations possibles**
+- **constexpr:** Notre compilateur effectue tous ses calculs à l'exécution (ex: dans `int a = 3 + 4;` `3 + 4` est calculé à l'exécution). Une optimisation possible aurait été de poser un booléen `constexpr` indiquant si la valeur d'un facteur est connu à la compilation. Ainsi, une opération entre deux `constexpr` peut être effectuer à la compilation.
 
-Les fichiers de tests sont dans le dossier _utests_. Les fichiers .mcs sont compilés en .tam puis sont comparés aux fichiers .expected (écrit manuellement). Les fichiers -wrong.mcs sont des fichiers mcs avec une syntaxe incorrecte et dont le résultat attendu est une erreur.
+- **assignation:** Lors d'une assignation une copie puis un dépilement inutiles sont effectués afin de permettre l'assignation en cascade. Celle-ci pourrait être supprimée lorsqu'elle n'est pas utilisée.
 
-#Micro CSharp
+- **nop:** Notre code effectue parfois des `nop` (dépilement de 0, cast de I2B, ...). Celles-ci peuvent être supprimés.
+
+
+# uCSharp
