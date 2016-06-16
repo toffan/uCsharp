@@ -19,7 +19,9 @@ ELSE_1:
     SUBR ILss
     SUBR I2B
     JUMPIF (0) ELSE_0
+    LOADL 1
     LOADL -1
+    SUBR IMul
     RETURN (1) 2
     POP (0) 0
     JUMP ENDIF_0
@@ -77,7 +79,9 @@ __abs:
 
 JUMP __main
 _main:
-    LOADL -9
+    LOADL 9
+    LOADL -1
+    SUBR IMul
     CALL (SB) _abs
     LOADL 3
     CALL (SB) _abs

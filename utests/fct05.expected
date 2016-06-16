@@ -19,7 +19,9 @@ ELSE_1:
     SUBR ILss
     SUBR I2B
     JUMPIF (0) ELSE_0
+    LOADL 1
     LOADL -1
+    SUBR IMul
     RETURN (1) 2
     POP (0) 0
     JUMP ENDIF_0
