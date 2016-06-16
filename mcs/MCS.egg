@@ -2330,7 +2330,8 @@ end
 --
 --
 ---- Definition d'une classe (peut etre en dehors d'un namespace).
-ENTITE -> ACCES class identc #create HERITAGE aco #begin DEFS acf #cloture #code;
+ENTITE ->
+    ACCES class identc #create HERITAGE aco #begin DEFS acf #cloture #code;
 global
     newClass: CLASS;
 
@@ -2339,7 +2340,13 @@ global
 local
     t: TYPE;
 do
-    newClass := new CLASS(ENTITE^tds, identc^txt);
+    t := ENTITE^tds.searchType(identc^txt);
+    if t /= null then
+       error(MCS_TAE, identc^txt);
+    else
+        newClass := new CLASS(ENTITE^tds, identc^txt);
+        ENTITE^tds.putType(newClass.name(), newClass);
+    end
 end
 } -- }}}
 
