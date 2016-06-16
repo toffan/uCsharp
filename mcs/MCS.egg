@@ -2650,13 +2650,13 @@ do
 
     t := DEF^classHere.type();
     -- Enregistrement du constructeur dans la tds.
-	DEF^classHere.putType(t.name(), t, true);
-	-- Enregistrement effectif de la fonction dans la tds.
+    DEF^classHere.putType(t.name(), t, true);
+    -- Enregistrement effectif de la fonction dans la tds.
     f := new FTYPE(t);
     m := new METH(DEF^classHere,f, DEF^classHere.tds(),identc^txt);
-	DEF^classHere.putVar(identc^txt, m, true);
-        
-   
+    DEF^classHere.putVar(identc^txt, m, true);
+
+
 end
 } -- }}}
 
@@ -2740,41 +2740,41 @@ end
 F -> this #type1  FX #type2 #code;
 -- Retour  du pointeur this sur la tds courante
 global
-	var : VAR;
+    var : VAR;
 #type1{ -- {{{
 do
-	
-	var := F^tds.searchVar(this^txt);
-	if(var /= null) then
-		FX^typeLeft := var.type();
-		FX^name := null;
-	else
-		error(MCS_NOT_METH);
-	end	
+
+    var := F^tds.searchVar(this^txt);
+    if(var /= null) then
+        FX^typeLeft := var.type();
+        FX^name := null;
+    else
+        error(MCS_NOT_METH);
+    end
 end
 } -- }}}
 
 #type2{ -- {{{
 local
 do
-	F^type := FX^type;
+    F^type := FX^type;
 end
 } -- }}}
 
 
 #code{ -- {{{
 local
-	memH : MemoryHelperInterface;
-	type : TYPE;
-	addr : Address;
-	commonCode : String;
+    memH : MemoryHelperInterface;
+    type : TYPE;
+    addr : Address;
+    commonCode : String;
 do
-	memH := F^gen.getMemoryHelper();
-	type := var.type();
-	addr := var.addr();
-	commonCode := memH.generateStaticRead(addr.val(),type.size(),addr.ref());
-	F^rightCode := commonCode + FX^rightCode;
-	F^leftCode := commonCode + FX^leftCode;
+    memH := F^gen.getMemoryHelper();
+    type := var.type();
+    addr := var.addr();
+    commonCode := memH.generateStaticRead(addr.val(),type.size(),addr.ref());
+    F^rightCode := commonCode + FX^rightCode;
+    F^leftCode := commonCode + FX^leftCode;
 end
 } -- }}}
 
