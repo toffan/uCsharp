@@ -1,5 +1,6 @@
 package mcs.tds;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class TDS {
@@ -9,6 +10,9 @@ public class TDS {
     private TDS parent;
     private HashMap<String, VAR> vars;
     private HashMap<String, TYPE> types;
+    private HashMap<String, TDS> nsInside;
+    private ArrayList<TDS> nsUsed;
+
     private boolean fct;
 
     public Logger lg;
@@ -24,14 +28,58 @@ public class TDS {
         this.nxtAddr = (parent == null || fct) ? new Address(fct ? "LB" : "SB")
                                                : parent.nxtAddr;
         this.parent = parent;
+        this.nsUsed = new ArrayList<TDS>();
         this.vars = new HashMap<String, VAR>();
         this.types = new HashMap<String, TYPE>();
+        this.nsInside = new HashMap<String, TDS>();
         this.fct = fct;
 
         this.lg = new Logger(true);
     }
 
     ///   Methodes   ///
+    /**
+     * Recupere un namespace, le cree ssi besoin et ssi create est a true.
+     * @param id identifiant a creer
+     * @param create Est-ce que je cree un ns en cas d'echec ?
+     * @return tds table des symboles
+     */
+    public TDS getNamespace(String id, boolean create) {
+        TDS res = this.nsInside.get(id);
+
+        // Dans une recherche montante avec succes, je renvoie mon resultat.
+        if(res != null && !create)
+            return res;
+
+        // Sinon, je cherche dans mon parent.
+        if (res == null) {
+            res = this.parent.getNamespace(id, false);
+
+            // Si je suis dans une recherche montante, je renvoie mon resultat.
+            if(!create) {
+                return res;
+            }
+
+            // Sinon, je cree le namespace.
+            res = new TDS(this, false);
+            this.nsInside.put(id,res);
+        }
+
+        return res;
+    }
+
+    /**
+     * Ajoute un namespace dans les namespace utilises.
+     * @param tds tds associee au namespace
+     */
+    // La recherche du ns est a faire separement avec un getNamespace( , false)
+    public void use(TDS tds) {
+        if(tds != null) {
+            this.nsUsed.add(tds);
+        }
+    }
+
+
     /**
      * Recherche une variable dans la TDS et la renvoie.
      * @param id identifiant a rechercher
@@ -43,10 +91,27 @@ public class TDS {
 
         VAR res = this.vars.get(id);
         if (res == null && go_global && parent != null) {
-            return this.parent.searchVar(id, go_global);
-        } else {
-            return res;
+            res = this.parent.searchVar(id, go_global);
         }
+
+        // La recherche dans les ns utilises est moins prioritaire sur tout.
+        if (res == null) {
+            for (TDS nsTds : this.nsUsed)
+            {
+                VAR local = nsTds.searchVar(id, false);
+
+                // Resolution ambigue
+                if (res != null && local != null && res != local) {
+                    throw new RuntimeException("Symbole " + id + " ambigu.");
+                }
+
+                // Resolution succes
+                if (res == null) {
+                    res = local;
+                }
+            }
+        }
+        return res;
     }
 
     /**

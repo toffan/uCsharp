@@ -101,6 +101,11 @@ inh willBePub : Boolean for DEF ;
 -- Propagation de la classe
 inh classHere : CLASS for DEFS, DEF, HERITAGE, DECL ;
 
+-- Gestion des namespace
+inh currentNs : TDS for IDC ;
+syn finalClass : CLASS for IDC ;
+syn finalNs : TDS for IDC ;
+
 -- Terminaux
 space separateur is    "[\r\n\t ]+";
 space comm is    "\/\/[^\n]*\n";
@@ -2293,25 +2298,73 @@ do
 end
 } -- }}}
 
+-- Fonctionnement d'un namespace :
+--
+-- namespace A
+-- {
+--     int a = 4;
+--     // A::a == 4
+-- }
+--
+-- namespace B
+-- {
+--     int a = 5;
+--     using namespace A;
+--     int b = ++a;
+--     // B::a == 6
+--     // B::b == 6
+-- }
+--
+-- namespace C
+-- {
+--     int a = -5; // Retourne une erreur si absent (ref. to 'a' is ambiguous)
+--     int b = -6; // Retourne une erreur si absent (ref. to 'b' is ambiguous)
+--     using namespace A;
+--     int c1 = a * b;
+--     using namespace B;
+--     int c2 = a * b;
+--     // B::a == -5
+--     // B::b == -6
+--     // C::c1 == 30
+--     // C::c2 == 30
+-- }
+--
+
 --
 --
 ---- Donne l'acces au contenu du 'namespace'.
 ---- Definit le namespace en cours d'utilisation.
 ENTITE -> using identc #type IDC pv #code ;
 
--- Redefinit le namespace en cours d'utilisation.
+-- Ajoute un namespace dans le scope local.
 #type { -- {{{
+local
+    ns: TDS;
 do
-    -- use(String namespace, boolean root)
-    -- root est vrai pour l'ident directement apres le using,
-    -- false pour les idents suivants (separes par des points -> IDC).
-    ENTITE^tds.use(identc^txt, true);
+    ns := ENTITE^tds.getNamespace(identc^txt, false);
+    if ns = null then
+        error(MCS_UNKNOWN_NS, identc^txt);
+    end
+
+    IDC^currentNs := ns;
 end
 } -- }}}
 
--- Generation de code pour using (rien).
+-- Generation de code pour using, application.
 #code { -- {{{
+local
+    ns: TDS;
 do
+    if IDC^finalNs = null then
+        ns := ENTITE^tds.getNamespace(identc^txt, false);
+        if ns = null then
+            error(MCS_UNKNOWN_NS, identc^txt);
+        end
+    else
+        ns := IDC^finalNs;
+    end
+
+    ENTITE^tds.use(ns);
     ENTITE^code := "";
 end
 } -- }}}
@@ -2319,20 +2372,67 @@ end
 --
 --
 ---- Sous partie d'un nom (namespace/classe).
-IDC -> ;
+IDC -> #nothing ;
+
+-- Retourne null, pour qu'aucun ns ne soit utilise.
+#nothing { -- {{{
+do
+    IDC^finalNs := null;
+    IDC^finalClass := null;
+end
+} -- }}}
 
 --
 --
 ---- Sous partie d'un nom (namespace/classe).
-IDC -> pt identc #type IDC ;
+IDC -> pt identc #type IDC #end ;
 
--- Redefinit le namespace en cours d'utilisation.
+-- Gere la recuperation de la TDS du niveau courant.
 #type { -- {{{
+local
+    ns: TDS;
 do
-    -- use(String namespace, boolean root)
-    -- root est vrai pour l'ident directement apres le using,
-    -- false pour les idents suivants (separes par des points -> IDC).
-    IDC^tds.use(identc^txt, false);
+    -- TODO: Gerer l'heritage.
+    if IDC^currentNs = null then
+        error(MCS_NALL_NS, identc^txt);
+    end
+
+    ns := IDC^currentNs.getNamespace(identc^txt, false);
+    IDC1^currentNs := ns;
+end
+} -- }}}
+
+-- Fait remonter le symbole du niveau courant.
+#end { -- {{{
+local
+    t: TYPE;
+    ns: TDS;
+do
+    -- TODO: Gerer l'heritage.
+    if IDC1^finalNs = null then
+        if IDC1^finalClass = null then
+            t := IDC^currentNs.searchType(identc^txt, false);
+            if t = null then
+                ns := IDC^currentNs.getNamespace(identc^txt, false);
+                if ns = null then
+                    error(MCS_NO_SYM, identc^txt);
+                end
+            end
+
+            if t.isClass() then
+                IDC^finalClass := t.toClass();
+            else
+                error(MCS_NOT_CLASS, identc^txt);
+            end
+            IDC^finalNs := null;
+        else
+            IDC^finalNs := null;
+            IDC^finalClass := IDC1^finalClass;
+        end
+    else
+        IDC^finalNs := ns;
+        IDC^finalClass := null;
+    end
 end
 } -- }}}
 
@@ -2424,7 +2524,17 @@ end
 HERITAGE -> ;
 
 -- Avec heritage, mais pas de multi.
-HERITAGE -> dpts identc IDC ;
+HERITAGE -> dpts identc #type IDC ;
+
+-- Gere la recuperation de la TDS du niveau courant.
+#type { -- {{{
+local
+    ns: TDS;
+do
+    ns := HERITAGE^tds.getNamespace(identc^txt, false);
+    IDC^currentNs := ns;
+end
+} -- }}}
 
 --
 --
