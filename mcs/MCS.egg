@@ -95,10 +95,11 @@ syn endl : Boolean for FX;
 syn toBool : Boolean for OPADD, OPMUL ;
 
 -- Permet de retourner une valeur pour savoir si il s'agit d'un scope publique.
-syn isPub : Boolean for ACCES, DEF ;
+syn isPub : Boolean for ACCES ;
+inh willBePub : Boolean for DEF ;
 
 -- Propagation de la classe
-inh classHere : CLASS for DEFS, DEF, HERITAGE ;
+inh classHere : CLASS for DEFS, DEF, HERITAGE, DECL ;
 
 -- Terminaux
 space separateur is    "[\r\n\t ]+";
@@ -278,6 +279,9 @@ ENTITE -> TYPE ident #prerecord DECL #record #code ;
 local
     v : VAR ;
 do
+    -- C'est une fonction
+    DECL^classHere := null;
+
     -- Verifier qu'aucune fonction/variable du meme nom n'est pas deja definie
     -- localement.
     v := ENTITE^tds.searchVar(ident^txt, false);
@@ -360,7 +364,11 @@ do
     -- Creation du type a partir du type de retour de la fonction.
     t := new FTYPE(DECL^typeLeft);
     -- Creation de la VAR representant la fonction.
-    f := new FCT(t, DECL^tds, DECL^name);
+    if DECL^classHere /= null then
+        f := new METH(DECL^classHere, t, DECL^tds, DECL^name);
+    else
+        f := new FCT(t, DECL^tds, DECL^name);
+    end
     -- Propagation de la VAR a DECL pour enregistrement dans la TDS (de la VAR ET du type associe).
     DECL^varF := f;
     -- Transmission de la VAR a FONCTION pour reellement generer la fonction et son type
@@ -2427,19 +2435,34 @@ HERITAGE -> dpts identc IDC ;
 --
 --
 ---- Fin de definition d'une classe.
-DEFS -> ;
+DEFS -> #nothing ;
+
+-- Il n'y a pas de code
+#nothing { -- {{{
+do
+    DEFS^code := "";
+end
+} -- }}}
 
 --
 --
 ---- Liste des membres d'une classe.
-DEFS -> ACCES #pub DEF DEFS ;
+DEFS -> ACCES #pub DEF DEFS #code ;
 
-#pub { --{{{
+-- Passe l'acces a la definition
+#pub { -- {{{
 local
 do
-    DEF^isPub := ACCES^isPub;
+    DEF^willBePub := ACCES^isPub;
 end
-} --}}}
+} -- }}}
+
+-- Passage du code
+#code { -- {{{
+do
+    DEFS^code := DEF^code + DEFS1^code;
+end
+} -- }}}
 
 --
 --
@@ -2450,6 +2473,9 @@ DEF  -> TYPE ident #prerecord DECL #record;
 local
     v : VAR ;
 do
+    -- C'est une methode.
+    DECL^classHere := DEF^classHere;
+
     -- Verifier qu'aucune fonction/variable du meme nom n'est pas deja definie
     -- localement.
     v := DEF^classHere.searchVar(ident^txt, false);
@@ -2472,14 +2498,16 @@ do
     -- Calcul du type de la variable/fonction.
     if DECL^varF = null then
         -- Enregistrement effectif de la variable dans la tds.
-        DEF^classHere.putVar(ident^txt, TYPE^type);
+        DEF^classHere.putVar(ident^txt, TYPE^type, DEF^willBePub);
     else
         t := DECL^varF.type();
         -- Enregistrement du type de la fonction dans la table des types.
-        DEF^classHere.putType(t.name(), t);
+        DEF^classHere.putType(t.name(), t, DEF^willBePub);
         -- Enregistrement effectif de la fonction dans la tds.
-        DEF^classHere.putVar(ident^txt, DECL^varF);
+        DEF^classHere.putVar(ident^txt, DECL^varF, DEF^willBePub);
     end
+
+    DEF^code := DECL^code;
 end
 } -- }}}
 
