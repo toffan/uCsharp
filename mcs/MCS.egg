@@ -791,7 +791,11 @@ local
 do
     h := INST^gen.getMemoryHelper();
     -- La valeur de l'expression E est inutile, il faut donc la depiler.
-    INST^code := E^rightCode + h.generateFree(E^type.size());
+    if E^type.size() != 0 then
+        INST^code := E^rightCode + h.generateFree(E^type.size());
+    else
+        INST^code := E^rightCode;
+    end
 end
 } -- }}}
 
