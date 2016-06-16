@@ -77,7 +77,8 @@ syn code : String for
          ENTITES, ENTITE, DECL, FONCTION,
          BLOC, INSTS, INST, AFFX, E, SIX,
          AX, OPREL, RX, OPADD, TX, OPMUL, OPUN,
-         ES, ESX ;
+         ES, ESX,
+         DEF, DEFS;
 
 -- Nom de l'ident a gauche d'une declaration.
 inh name : String for DECL, FX;
@@ -94,10 +95,10 @@ syn endl : Boolean for FX;
 syn toBool : Boolean for OPADD, OPMUL ;
 
 -- Permet de retourner une valeur pour savoir si il s'agit d'un scope publique.
-syn isPub : Boolean for ACCES ;
+syn isPub : Boolean for ACCES, DEF ;
 
--- Déclaration de la classe
-inh classHere : CLASS for DEFS, DEF ;
+-- Propagation de la classe
+inh classHere : CLASS for DEFS, DEF, HERITAGE ;
 
 -- Terminaux
 space separateur is    "[\r\n\t ]+";
@@ -2331,7 +2332,7 @@ end
 --
 ---- Definition d'une classe (peut etre en dehors d'un namespace).
 ENTITE ->
-    ACCES class identc #create HERITAGE aco #begin DEFS acf #cloture #code;
+    ACCES class identc #create HERITAGE aco DEFS acf #code ;
 global
     newClass: CLASS;
 
@@ -2346,29 +2347,26 @@ do
     else
         newClass := new CLASS(ENTITE^tds, identc^txt);
         ENTITE^tds.putType(newClass.name(), newClass);
+
+        -- Gestion de l'heritage
+        HERITAGE^classHere := newClass;
+
+        -- Passage de la classe courante aux definitions
+        DEFS^classHere := newClass;
     end
-end
-} -- }}}
-
--- Passage des paramètres requis à DEFS pour la génération
-#begin { -- {{{
-do
-    DEFS^classHere := newClass;
-end
-} -- }}}
-
-#cloture { -- {{{
-do
-    newClass.close();
-    -- Bloque la lecture d'attributs privés en dehors de la classe.
 end
 } -- }}}
 
 -- Generation de code pour la creation d'une classe.
 #code { -- {{{
 do
-    -- TODO: Creation de la classe.
-    ENTITE^code := "";
+    -- Bloque la lecture d'attributs prives en dehors de la classe.
+    newClass.close();
+
+    -- Propagation du code
+    ENTITE^code := DEFS^code;
+    -- TODO: Gestion du polymorphise (création de la vtable)
+    -- ENTITE^code := ENTITE^code + ... + newClass.dumpVTable() + ... ;
 end
 } -- }}}
 
@@ -2417,7 +2415,7 @@ end
 -- Sans heritage.
 HERITAGE -> ;
 
--- Avec heritage.
+-- Avec heritage, mais pas de multi.
 HERITAGE -> dpts identc IDC ;
 
 --
@@ -2434,19 +2432,19 @@ DEFS -> ;
 --
 --
 ---- Liste des membres d'une classe.
-DEFS -> ACCES DEF#def DEFS ;
+DEFS -> ACCES #pub DEF DEFS ;
 
-#def{ --{{{
+#pub { --{{{
 local
 do
-
+    DEF^isPub := ACCES^isPub;
 end
 } --}}}
 
 --
 --
 ---- Methode/Attribut d'une classe.
-DEF  -> TYPE ident#prerecord DECL #record;
+DEF  -> TYPE ident #prerecord DECL #record;
 
 #prerecord { -- {{{
 local
