@@ -2593,7 +2593,46 @@ end
 --
 --
 ---- Pointeur this.
-F -> this FX;
+F -> this #type1  FX #type2 #code;
+-- Retour  du pointeur this sur la tds courante
+global
+	var : VAR;
+#type1{ -- {{{
+do
+	
+	var := F^tds.searchVar(this^txt);
+	if(var /= null) then
+		FX^typeLeft := var.type();
+		FX^name := null;
+	else
+		error(MCS_NOT_METH);
+	end	
+end
+} -- }}}
+
+#type2{ -- {{{
+local
+do
+	F^type := FX^type;
+end
+} -- }}}
+
+
+#code{ -- {{{
+local
+	memH : MemoryHelperInterface;
+	type : TYPE;
+	addr : Address;
+	commonCode : String;
+do
+	memH := F^gen.getMemoryHelper();
+	type := var.type();
+	addr := var.addr();
+	commonCode := memH.generateStaticRead(addr.val(),type.size(),addr.ref());
+	F^rightCode := commonCode + FX^rightCode;
+	F^leftCode := commonCode + FX^leftCode;
+end
+} -- }}}
 
 --
 --
