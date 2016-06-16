@@ -5,11 +5,9 @@ _main:
     LOADL 3
     LOAD (1) 5[LB]
     LOAD (1) -1[ST]
-    LOADL 4
-    STOREI (1)
+    STORE (1) 4[LB]
     LOAD (1) -1[ST]
-    LOADL 3
-    STOREI (1)
+    STORE (1) 3[LB]
     POP (0) 1
 
     LOADL 0
