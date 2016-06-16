@@ -18,4 +18,6 @@ public class STRUCT extends TYPE {
         this.tds.putVar(id, type);
         this.size += type.size();
     }
+    
+    public TDS tds(){ return this.tds; }
 }
