@@ -1,5 +1,5 @@
 // NB. Ce programme ne sert qu'a illustrer les concepts de mCS
-// et ne calcule rien de particulier ! 
+// et ne calcule rien de particulier !
 
 // Le namespace System est en C# predefini et contient les classes
 // et les types de base
@@ -20,26 +20,30 @@ typedef struct {
   int x;
   int y;
   } Point;
-  
+
 int estRouge(int c){
   return c == 42;
   }
-  
+
 // les modes de passages de parametres en mCS sont plus riches qu'en mC
  void swap(ref int a, ref int b){
    int tmp = a;
    a = b;
    b = tmp;
    }
-   
+
 namespace Geometry {
   typedef struct {
     int x;
     int y;
     } Point;
    // sous-namespace : Geometry.A
+    class Poule {
+
+    }
    namespace A {
     // un point : le nom complet de cette classe est Geometry.A.Point2D
+
     class Point2D : Object{
       // attributs
       int x;
@@ -49,7 +53,7 @@ namespace Geometry {
         x = a;
         y = b;
         }
-      
+
       // methodes
       public int getX() {
         return x;
@@ -63,7 +67,7 @@ namespace Geometry {
       } // classe Point2D
     }
     // un autre sous-namespace
-    namespace B { 
+    namespace B {
       // un point colore sous-classe de Point2D.
       // le nom complet de cette classe est Geometry.B.Point2DCol
       public class Point2DCol:Geometry.A.Point2D{
@@ -86,7 +90,7 @@ namespace Geometry {
           base.afficher();
         // ...
         }
- 
+
       } // classe Point2DCol
     }
 
@@ -95,8 +99,11 @@ namespace Geometry {
       // ...
     }
 
+    using A;
+    using B;
+
   } // namespace Geometry
-  
+
 using Geometry;
 
 // point d'entree du programme
@@ -111,7 +118,7 @@ int main(){
     Point2DCol pc = null;
     pc = p; // incorrect
     p  = pc ; // correct
-    
+
     return 0;
 }
 

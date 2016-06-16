@@ -1,0 +1,34 @@
+
+namespace A {
+    int a() { return 4; }
+}
+
+namespace B
+{
+    int a() { return 5; }
+    using A;
+    int b() { return a(); }
+}
+
+namespace C
+{
+    int a() { return -5; }
+    int b() { return -6; }
+    using A;
+    int ci() { return a() * b(); }
+    using B;
+    int cj() { return a() * b(); }
+}
+
+using C;
+int main()
+{
+    int a1 = a();
+    int a2 = a();
+    int b1 = b();
+    int a3 = a();
+    int b2 = b();
+    int c1 = ci();
+    int c2 = cj();
+}
+

@@ -45,6 +45,8 @@ public class TDS {
      * @return tds table des symboles
      */
     public TDS getNamespace(String id, boolean create) {
+        this.lg.entry("NS: Recuperation de la TDS de " + id);
+
         TDS res = this.nsInside.get(id);
 
         // Dans une recherche montante avec succes, je renvoie mon resultat.
@@ -53,18 +55,21 @@ public class TDS {
 
         // Sinon, je cherche dans mon parent.
         if (res == null) {
-            res = this.parent.getNamespace(id, false);
+            if(parent != null) {
+                res = this.parent.getNamespace(id, false);
+            }
 
             // Si je suis dans une recherche montante, je renvoie mon resultat.
             if(!create) {
                 return res;
             }
 
-            // Sinon, je cree le namespace.
-            res = new TDS(this, false);
-            this.nsInside.put(id,res);
+            if(res == null) {
+                // Sinon, je cree le namespace.
+                res = new TDS(this, false);
+                this.nsInside.put(id,res);
+            }
         }
-
         return res;
     }
 
@@ -74,6 +79,7 @@ public class TDS {
      */
     // La recherche du ns est a faire separement avec un getNamespace( , false)
     public void use(TDS tds) {
+        this.lg.entry("NS: Ajout d'un using...");
         if(tds != null) {
             this.nsUsed.add(tds);
         }
@@ -181,10 +187,27 @@ public class TDS {
 
         TYPE res = this.types.get(id);
         if (res == null && go_global && parent != null) {
-            return this.parent.searchType(id, go_global);
-        } else {
-            return res;
+            res = this.parent.searchType(id, go_global);
         }
+
+        // La recherche dans les ns utilises est moins prioritaire sur tout.
+        if (res == null) {
+            for (TDS nsTds : this.nsUsed)
+            {
+                TYPE local = nsTds.searchType(id, false);
+
+                // Resolution ambigue
+                if (res != null && local != null && res != local) {
+                    throw new RuntimeException("Symbole " + id + " ambigu.");
+                }
+
+                // Resolution succes
+                if (res == null) {
+                    res = local;
+                }
+            }
+        }
+        return res;
     }
 
     /**
@@ -205,5 +228,4 @@ public class TDS {
     public void putType(String id, TYPE type) {
         putType(id, type, true);
     }
-
 }
