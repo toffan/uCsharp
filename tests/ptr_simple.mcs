@@ -1,0 +1,23 @@
+int* malloc(int size) {
+    int* addr;
+    asm {
+        LOAD %size
+        SUBR Malloc
+        STORE %addr
+    }
+    return addr;
+}
+
+typedef struct {
+    int x;
+    int y;
+} Point;
+
+int main() {
+    Point* p = (Point*) malloc(2);
+    p->x = 2;
+    (*p).y = 3;
+    int a = (*p).x;
+    int b = (p)->y;
+    return 0;
+}

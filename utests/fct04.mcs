@@ -1,0 +1,28 @@
+int* malloc(int size) {
+    int* addr;
+    asm {
+        LOAD %size
+        SUBR Malloc
+        STORE %addr
+    }
+    return addr;
+}
+
+int max(int a, int b) {
+    int c = 25;
+    int* p = malloc(1);
+    *p = 3;
+    if (a > b) {
+        *p = 2;
+        return a;
+    } else {
+        *p = 5;
+        return b;
+    }
+}
+
+int main() {
+    int d = 3;
+    int c = max(9, 3);
+    return d;
+}

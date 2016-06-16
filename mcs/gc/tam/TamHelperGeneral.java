@@ -59,6 +59,7 @@ public class TamHelperGeneral implements HelperGeneralInterface {
         String labelSinon = "ELSE_" + lbl;
         String labelFin = "ENDIF_" + lbl;
         res = "; if\n" + condition + "\n";
+        res += "    SUBR I2B\n";
         res += "    JUMPIF (0) " + labelSinon + "\n";
         res += codeIf + "\n"
                + "    JUMP " + labelFin + "\n";

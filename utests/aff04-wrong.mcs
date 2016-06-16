@@ -1,0 +1,4 @@
+int main() {
+    struct {int x;} 5 = 1;
+    return 0;
+}

@@ -8,7 +8,3 @@ mcs/egg
 #Eclipse files
 .classpath
 .project
-
-# itam
-workspace/
-.tmp*

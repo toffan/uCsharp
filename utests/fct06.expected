@@ -1,0 +1,94 @@
+JUMP __cmp
+_cmp:
+    LOAD (1) -2[LB]
+    LOAD (1) -1[LB]
+    SUBR ISub
+    LOADL 0
+    SUBR IGtr
+    SUBR I2B
+    JUMPIF (0) ELSE_1
+    LOADL 1
+    RETURN (1) 2
+    POP (0) 0
+    JUMP ENDIF_1
+ELSE_1:
+    LOAD (1) -2[LB]
+    LOAD (1) -1[LB]
+    SUBR ISub
+    LOADL 0
+    SUBR ILss
+    SUBR I2B
+    JUMPIF (0) ELSE_0
+    LOADL 1
+    LOADL -1
+    SUBR IMul
+    RETURN (1) 2
+    POP (0) 0
+    JUMP ENDIF_0
+ELSE_0:
+    LOADL 0
+    RETURN (1) 2
+    POP (0) 0
+ENDIF_0:
+    POP (0) 0
+ENDIF_1:
+    RETURN (0) 2
+__cmp:
+
+JUMP __max
+_max:
+    LOAD (1) -2[LB]
+    LOAD (1) -1[LB]
+    CALL (SB) _cmp
+    LOADL 1
+    SUBR IEq
+    SUBR I2B
+    JUMPIF (0) ELSE_2
+    LOAD (1) -2[LB]
+    RETURN (1) 2
+    POP (0) 0
+    JUMP ENDIF_2
+ELSE_2:
+    LOAD (1) -1[LB]
+    RETURN (1) 2
+    POP (0) 0
+ENDIF_2:
+    RETURN (0) 2
+__max:
+
+JUMP __abs
+_abs:
+    LOAD (1) -1[LB]
+    LOADL 0
+    SUBR IGtr
+    SUBR I2B
+    JUMPIF (0) ELSE_3
+    LOAD (1) -1[LB]
+    RETURN (1) 1
+    POP (0) 0
+    JUMP ENDIF_3
+ELSE_3:
+    LOAD (1) -1[LB]
+    LOADL -1
+    SUBR IMul
+    RETURN (1) 1
+    POP (0) 0
+ENDIF_3:
+    RETURN (0) 1
+__abs:
+
+JUMP __main
+_main:
+    LOADL 9
+    LOADL -1
+    SUBR IMul
+    CALL (SB) _abs
+    LOADL 3
+    CALL (SB) _abs
+    CALL (SB) _max
+
+    RETURN (1) 0
+    RETURN (0) 0
+__main:
+    CALL (SB) _main
+    HALT
