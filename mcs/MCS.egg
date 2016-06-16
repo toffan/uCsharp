@@ -2284,7 +2284,7 @@ ENTITE -> namespace identc #type aco ENTITES acf #code ;
 -- cree les ressources necessaires a son utilisation.
 #type { -- {{{
 do
-    ENTITES^tds := ENTITE^tds.createNamespace(identc^txt);
+    ENTITES^tds := ENTITE^tds.getNamespace(identc^txt, true);
 end
 } -- }}}
 
@@ -2430,7 +2430,7 @@ do
             IDC^finalClass := IDC1^finalClass;
         end
     else
-        IDC^finalNs := ns;
+        IDC^finalNs := IDC1^finalNs;
         IDC^finalClass := null;
     end
 end
@@ -2449,7 +2449,7 @@ global
 local
     t: TYPE;
 do
-    t := ENTITE^tds.searchType(identc^txt);
+    t := ENTITE^tds.searchType(identc^txt, false);
     if t /= null then
        error(MCS_TAE, identc^txt);
     else
@@ -2588,7 +2588,7 @@ do
 
     -- Verifier qu'aucune fonction/variable du meme nom n'est pas deja definie
     -- localement.
-    v := DEF^classHere.searchVar(ident^txt, false);
+    v := DEF^classHere.searchVar(ident^txt);
     if v /= null then
         error(MCS_DAE, ident^txt,DEF^classHere.name());
     else
@@ -2633,10 +2633,12 @@ local
 do
     -- Verifier qu'aucune fonction/variable du meme nom n'est pas deja definie
     -- localement.
-    v := DEF^classHere.searchVar(identc^txt, false);
+    v := DEF^classHere.searchVar(identc^txt);
     if v = null then
         error(MCS_CAE, identc^txt,DEF^classHere.name());
     end
+
+    PARFS^fct := null;
 end
 } -- }}}
 
@@ -2648,7 +2650,7 @@ local
     f : FTYPE;
 do
 
-    t := DEF^classHere.type();
+    t := DEF^classHere;
     -- Enregistrement du constructeur dans la tds.
     DEF^classHere.putType(t.name(), t, true);
     -- Enregistrement effectif de la fonction dans la tds.
@@ -2656,7 +2658,8 @@ do
     m := new METH(DEF^classHere,f, DEF^classHere.tds(),identc^txt);
     DEF^classHere.putVar(identc^txt, m, true);
 
-
+    DEF^code := "";
+    BLOC^fct := null;
 end
 } -- }}}
 
@@ -2665,7 +2668,15 @@ end
 --
 ---- Appel eventuel au constructeur de la classe parente.
 BASE -> ;
-BASE -> dpts base paro ES parf  ;
+BASE -> #garbage dpts base paro ES parf ;
+
+#garbage { -- {{{
+do
+    ES^tds := null;
+    ES^typeF := null;
+    ES^gen := null;
+end
+} -- }}}
 
 --
 --
@@ -2743,8 +2754,7 @@ global
     var : VAR;
 #type1{ -- {{{
 do
-
-    var := F^tds.searchVar(this^txt);
+    var := F^tds.searchVar("this", false);
     if(var /= null) then
         FX^typeLeft := var.type();
         FX^name := null;
@@ -2764,7 +2774,7 @@ end
 
 #code{ -- {{{
 local
-    memH : MemoryHelperInterface;
+    memH : HelperMemoryInterface;
     type : TYPE;
     addr : Address;
     commonCode : String;
@@ -2781,16 +2791,44 @@ end
 --
 --
 ---- Pointeur base (<=> super en java ?).
-F -> base FX;
+F -> #garbage base FX;
+
+#garbage { -- {{{
+do
+    F^type := null;
+    F^leftCode := null;
+    F^rightCode := null;
+    FX^typeLeft := null;
+    FX^name := "";
+end
+} -- }}}
 
 --
 --
 ---- Constante null (en minuscule -> pour les objets ?).
-F -> null2;
+F -> #garbage null2;
+
+#garbage { -- {{{
+do
+    F^type := null;
+    F^leftCode := null;
+    F^rightCode := null;
+end
+} -- }}}
 
 --
 --
 ---- Construction d'un objet.
-F -> new identc IDC paro ES parf ;
+F -> #garbage new identc IDC paro ES parf ;
+
+#garbage { -- {{{
+do
+    ES^typeF := null;
+    IDC^currentNs := null;
+    F^type := null;
+    F^leftCode := null;
+    F^rightCode := null;
+end
+} -- }}}
 
 end

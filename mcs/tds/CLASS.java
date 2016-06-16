@@ -62,13 +62,22 @@ public class CLASS extends STRUCT {
         this.putVar(id, type, true);
     }
 
-    public void putVar(String id, METH meth, boolean isPub) {
+    public void putType(String id, TYPE type, boolean isPub) {
+        this.tds.putType(id, type, isPub);
+        this.size += type.size();
+    }
+
+    public void putType(String id, TYPE type) {
+        this.putType(id, type, true);
+    }
+
+    public void putVar(String id, FCT meth, boolean isPub) {
         this.tds.putVar(id, meth, isPub);
 
         // TODO: Gestion du polymorphisme.
     }
 
-    public void putVar(String id, METH meth) {
+    public void putVar(String id, FCT meth) {
         this.putVar(id, meth, true);
     }
 }

@@ -5,6 +5,7 @@ public class TYPE {
     ///   Attributs   ///
     protected String name;
     protected int size;
+    protected boolean pub = true;
 
     ///   Constructeurs   ///
     public TYPE(String name, int size) {
@@ -34,4 +35,5 @@ public class TYPE {
     public int size() { return this.size; }
     public String name() { return this.name; }
     public void setName(String id) { this.name = id; }
+    public void setPub(boolean isPub) { this.pub = isPub; }
 }

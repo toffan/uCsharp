@@ -190,14 +190,20 @@ public class TDS {
     /**
      * Ajoute ou mets a jour un type
      */
-    public void putType(String id, TYPE type) {
+    public void putType(String id, TYPE type, boolean isPub) {
         // Si le type est anonyme (struct par exemple), on le nomme d'apres son
         // id.
         if (type.name().isEmpty()) {
             type.setName(id);
         }
+        type.setPub(isPub);
         this.lg.entry("ajout du TYPE '" + type.name() + "' de taille " +
                       type.size() + " en tant que '" + id + "'.");
         this.types.put(id, type);
     }
+
+    public void putType(String id, TYPE type) {
+        putType(id, type, true);
+    }
+
 }
