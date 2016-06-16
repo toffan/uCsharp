@@ -79,6 +79,11 @@ syn code : String for
 -- Nom de l'ident a gauche d'une declaration.
 inh name : String for DECL, FX;
 
+-- Adresse de la variable a gauche d'une declaration.
+inh addrLeft : Address for FX;
+-- Permet de savoir si la leftValue contient est une affectation dynamique.
+syn dynamicWrite : BOOLEAN for FX, F, T, R, A ;
+
 -- Code generant une adresse.
 syn leftCode : String for E, A, R, T, F, FX ;
 -- Code generant une valeur.
@@ -1018,7 +1023,11 @@ do
     if AFFX^type /= null then
         -- Affectation
         -- Duplication de AFFX^code sur la pile pour que le resultat d'une affectation soit la valeur affectee.
-        E^rightCode := AFFX^code + h.generateDuplicate(AFFX^type.size()) + A^leftCode + h.generateDynamicWrite(AFFX^type.size());
+        if A^dynamicWrite then
+            E^rightCode := AFFX^code + h.generateDuplicate(AFFX^type.size()) + A^leftCode + h.generateDynamicWrite(AFFX^type.size());
+        else
+            E^rightCode := AFFX^code + h.generateDuplicate(AFFX^type.size()) + A^leftCode;
+        end
         -- Une affectation est forcement une rightValue.
         E^leftCode := "";
     else
@@ -1092,6 +1101,7 @@ do
         -- Pas de comparaison, utilisation du type de R.
         A^type := R^type;
     end
+    A^dynamicWrite := R^dynamicWrite;
 end
 } -- }}}
 
@@ -1249,6 +1259,7 @@ do
     else
         R^type := T^type;
     end
+    R^dynamicWrite := T^dynamicWrite;
 end
 } -- }}}
 
@@ -1386,6 +1397,7 @@ do
     else
         T^type := F^type;
     end
+    T^dynamicWrite := F^dynamicWrite;
 end
 } -- }}}
 
@@ -1538,6 +1550,7 @@ F -> entier #type #code;
 local
 do
     F^type := F^tds.searchType("int", true);
+    F^dynamicWrite := false;
 end
 } -- }}}
 
@@ -1564,6 +1577,7 @@ F -> chaine #type #code ;
 local
 do
     F^type := F^tds.searchType("char*", true);
+    F^dynamicWrite := false;
 end
 } -- }}}
 
@@ -1590,6 +1604,7 @@ F -> caractere #type #code;
 local
 do
     F^type := F^tds.searchType("char", true);
+    F^dynamicWrite := false;
 end
 } -- }}}
 
@@ -1617,6 +1632,7 @@ F -> OPUN F #type #code ;
 local
 do
     F^type := F1^type;
+    F^dynamicWrite := false;
 end
 } -- }}}
 
@@ -1693,6 +1709,7 @@ do
     -- TODO: Verifier le bon fonctionnement :
     -- Type null compatible avec les autres dans la verification de type ?
     F^type := null;
+    F^dynamicWrite := false;
 end
 } -- }}}
 
@@ -1719,6 +1736,10 @@ local
 do
     FX^typeLeft := E^type;
     FX^name := null;
+    -- TODO: Ameliorer ce comportement en remplacant par
+    -- une information addrLeft provenant de E.
+    FX^addrLeft := null;
+
 end
 } -- }}}
 
@@ -1727,6 +1748,7 @@ end
 local
 do
     F^type := FX^type;
+    F^dynamicWrite := FX^dynamicWrite;
 end
 } -- }}}
 
@@ -1781,6 +1803,7 @@ do
     else
         F^type := TYPE^type;
     end
+    F^dynamicWrite := F1^dynamicWrite;
 end
 } -- }}}
 
@@ -1814,6 +1837,7 @@ do
         pt := p.ptype();
         F^type := pt;
     end
+    F^dynamicWrite := true;
 end
 } -- }}}
 
@@ -1848,6 +1872,8 @@ do
         error(MCS_VUN, ident^txt);
     else
         FX^typeLeft := v.type();
+        -- Passage de l'adresse courante pour l'enrgistrement statique.
+        FX^addrLeft := v.addr();
         FX^name := ident^txt;
     end
 end
@@ -1857,6 +1883,7 @@ end
 local
 do
     F^type := FX^type;
+    F^dynamicWrite := FX^dynamicWrite;
 end
 } -- }}}
 
@@ -1873,17 +1900,17 @@ do
     t := v.type();
     a := v.addr();
     if FX^endl then
-        -- Empilement de l'adresse de la variable.
-        F^leftCode := hg.generateConstante(F^tds.refAddr() + a.val());
+        -- Stockage dans la variable.
+        F^leftCode := hm.generateStaticWrite(a.val(), t.size(), a.ref());
         -- Empilement de la valeur de la variable.
         F^rightCode := hm.generateStaticRead(a.val(), t.size(), a.ref());
     else
         if t.isStruct() then
             -- La differenciation effective se fera lors la generation du code de FX.
-            -- Empilement de l'adresse de l'enregistrement puis de l'adresse du champ.
-            F^leftCode := hg.generateConstante(F^tds.refAddr() + a.val()) + FX^leftCode;
-            -- Empilement de l'adresse de l'enregistrement puis de la valeur du champ.
-            F^rightCode := hg.generateConstante(F^tds.refAddr() + a.val()) + FX^rightCode;
+            -- Traitement par FX a qui on a passe au prealable l'adresse de la variable courante.
+            F^leftCode := FX^leftCode;
+            -- Traitement par FX a qui on a passe au prealable l'adresse de la variable courante.
+            F^rightCode := FX^rightCode;
         elseif t.isPointer() then
             -- La differenciation effective se fera lors la generation du code de FX.
             -- Empilement de l'adresse de la zone pointee, puis de l'adresse du champ.
@@ -1920,6 +1947,8 @@ do
         -- Propagation du type.
         FX^type := FX^typeLeft;
     end
+    -- Pas d'ecriture dynamique ici.
+    FX^dynamicWrite := false;
 end
 } -- }}}
 
@@ -1945,6 +1974,7 @@ global
 #type1 { -- {{{
 local
     p : STRUCT;
+    t : TYPE;
 do
     if !(FX^typeLeft.isStruct()) then
         error(MCS_NOT_STRUCT, FX^typeLeft.name());
@@ -1954,7 +1984,14 @@ do
         if c = null then
             error(MCS_UNKNOWN_FIELD, ident^txt);
         else
-            FX1^typeLeft := c.type();
+            t := c.type();
+            FX1^typeLeft := t;
+            -- Passage de l'adresse courante pour l'enregistrement statique.
+            if FX^addrLeft /= null then
+                FX1^addrLeft := FX^addrLeft.next(t.size());
+            else
+                FX1^addrLeft := null;
+            end
         end
     end
 end
@@ -1965,6 +2002,13 @@ end
 local
 do
     FX^type := FX1^type;
+    if FX^addrLeft /= null then
+        -- Pas d'ecriture dynamique ici, peut etre plus bas.
+        FX^dynamicWrite := FX1^dynamicWrite;
+    else
+        -- Ecriture dynamique ici, besoin d'un dynamicWrite en amont.
+        FX^dynamicWrite := true;
+    end
 end
 } -- }}}
 
@@ -1990,23 +2034,45 @@ do
     -- Le code commun empile l'adresse du champ utilise.
     codeCommun := hg.generateConstante(a.val()) + hi.generateSum();
     if FX1^endl then
-        -- Empilement de l'adresse de la variable (adresse du champ).
-        FX^leftCode := codeCommun;
-        -- Empilement de la valeur de la variable (valeur du champ).
-        FX^rightCode := codeCommun + hm.generateDynamicRead(t.size());
+        if FX^addrLeft /= null then
+            -- Stockage dans la variable.
+            FX^leftCode := hm.generateStaticWrite(FX^addrLeft.val() + a.val(), t.size(), FX^addrLeft.ref());
+            -- Empilement de la valeur de la variable (valeur du champ).
+            FX^rightCode := hm.generateStaticRead(FX^addrLeft.val() + a.val(), t.size(), FX^addrLeft.ref());
+        else
+            -- Generation dynamique des adresses.
+            -- Empilement de l'adresse de la variable (adresse du champ).
+            FX^leftCode := codeCommun;
+            -- Empilement de la valeur de la variable (valeur du champ).
+            FX^rightCode := codeCommun + hm.generateDynamicRead(t.size());
+        end
     else
         if t.isStruct() then
             -- La differenciation effective se fera lors la generation du code de FX.
-            -- Empilement de l'adresse de l'enregistrement (premier niveau de champ) puis de l'adresse du champ.
-            FX^leftCode := codeCommun + FX1^leftCode;
-            -- Empilement de l'adresse de l'enregistrement (premier niveau de champ) puis de la valeur du champ.
-            FX^rightCode := codeCommun + FX1^rightCode;
+            if FX^addrLeft /= null then
+                -- Empilement de l'adresse de l'enregistrement (premier niveau de champ) puis de l'adresse du champ.
+                FX^leftCode := FX1^leftCode;
+                -- Empilement de l'adresse de l'enregistrement (premier niveau de champ) puis de la valeur du champ.
+                FX^rightCode := FX1^rightCode;
+            else
+                -- Empilement de l'adresse de l'enregistrement (premier niveau de champ) puis de l'adresse du champ.
+                FX^leftCode := codeCommun + FX1^leftCode;
+                -- Empilement de l'adresse de l'enregistrement (premier niveau de champ) puis de la valeur du champ.
+                FX^rightCode := codeCommun + FX1^rightCode;
+            end
         elseif t.isPointer() then
             -- La differenciation effective se fera lors la generation du code de FX.
-            -- Empilement de l'adresse de la zone pointee, puis de l'adresse du champ.
-            FX^leftCode := codeCommun + hm.generateDynamicRead(t.size()) + FX1^leftCode;
-            -- Empilement de l'adresse de la zone pointee puis de la valeur du champ.
-            FX^rightCode := codeCommun + hm.generateDynamicRead(t.size()) + FX1^rightCode;
+            if FX^addrLeft /= null then
+                -- Empilement de l'adresse de la zone pointee, puis de l'adresse du champ.
+                FX^leftCode := hm.generateStaticRead(FX^addrLeft.val() + a.val(), t.size(), FX^addrLeft.ref()) + FX1^leftCode;
+                -- Empilement de l'adresse de la zone pointee puis de la valeur du champ.
+                FX^rightCode := hm.generateStaticRead(FX^addrLeft.val() + a.val(), t.size(), FX^addrLeft.ref()) + FX1^rightCode;
+            else
+                -- Empilement de l'adresse de la zone pointee, puis de l'adresse du champ.
+                FX^leftCode := codeCommun + hm.generateDynamicRead(t.size()) + FX1^leftCode;
+                -- Empilement de l'adresse de la zone pointee puis de la valeur du champ.
+                FX^rightCode := codeCommun + hm.generateDynamicRead(t.size()) + FX1^rightCode;
+            end
         elseif t.isFType() then
             -- TODO: Verifier code genere correct dans toutes situations.
             FX^leftCode := FX1^leftCode;
@@ -2047,6 +2113,8 @@ do
                 error(MCS_UNKNOWN_FIELD);
             else
                 FX1^typeLeft := c.type();
+                -- Desactivation de l'enregistrement statique.
+                FX1^addrLeft := null;
             end
         end
     end
@@ -2058,6 +2126,8 @@ end
 local
 do
     FX^type := FX1^type;
+    -- Arrow => Ecriture dynamique (?), besoin d'un dynamicWrite en amont.
+    FX^dynamicWrite := true;
 end
 } -- }}}
 
@@ -2132,6 +2202,13 @@ end
 #type2 { -- {{{
 do
     FX^type := FX1^type;
+    if FX^addrLeft /= null then
+        -- Pas d'ecriture dynamique ici, peut etre plus bas.
+        FX^dynamicWrite := FX1^dynamicWrite;
+    else
+        -- Ecriture dynamique ici, besoin d'un dynamicWrite en amont.
+        FX^dynamicWrite := true;
+    end
 end
 } -- }}}
 
