@@ -1,0 +1,15 @@
+int max(int a, int b) {
+    int c = 25;
+    if (a > b) {
+        return a;
+        c = 3;
+    } else {
+        c = 8;
+        return b;
+    }
+}
+
+int main() {
+    int c = max(9, 3);
+    return 0;
+}

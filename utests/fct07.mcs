@@ -1,0 +1,28 @@
+typedef struct {int x; int y;} Point;
+typedef struct {Point* c; int r;} Cercle;
+typedef struct {Point a; Point b;} Segment;
+
+int* malloc(int size) {
+    int* addr;
+    asm {
+        LOAD %size
+        SUBR Malloc
+        STORE %addr
+    }
+    return addr;
+}
+
+void memset(int* p, int val) {
+    *p = val;
+}
+
+int main() {
+    int* p = malloc(1);
+    memset(p, 9);
+    Point* pt = (Point*) malloc(2);
+    memset((int*) pt, 8);
+    memset((int*) (((int) pt) + 1), 11);
+    memset(p, pt->y);
+
+    return 0;
+}

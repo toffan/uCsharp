@@ -1,0 +1,31 @@
+int cmp(int a, int b) {
+    if (a - b > 0) {
+        return 1;
+    } else {
+        if (a - b < 0) {
+            return -1;
+        } else {
+            return 0;
+        }
+    }
+}
+
+int max(int a, int b) {
+    if (cmp(a, b) == 1) {
+        return a;
+    } else {
+        return b;
+    }
+}
+
+int abs(int a) {
+    if (a > 0) {
+        return a;
+    } else {
+        return -a;
+    }
+}
+
+int main() {
+    return max(abs(-9), abs(3));
+}

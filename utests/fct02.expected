@@ -1,0 +1,42 @@
+JUMP __max
+_max:
+    LOADL 25
+    LOAD (1) -2[LB]
+    LOAD (1) -1[LB]
+    SUBR IGtr
+    SUBR I2B
+    JUMPIF (0) ELSE_0
+    LOAD (1) -2[LB]
+    RETURN (1) 2
+    LOADL 3
+    LOAD (1) -1[ST]
+    LOADL 8
+    STOREI (1)
+    POP (0) 1
+    POP (0) 0
+    JUMP ENDIF_0
+ELSE_0:
+    LOADL 8
+    LOAD (1) -1[ST]
+    LOADL 8
+    STOREI (1)
+    POP (0) 1
+    LOAD (1) -1[LB]
+    RETURN (1) 2
+    POP (0) 0
+ENDIF_0:
+    RETURN (0) 2
+__max:
+
+JUMP __main
+_main:
+    LOADL 9
+    LOADL 3
+    CALL (SB) _max
+
+    LOADL 0
+    RETURN (1) 0
+    RETURN (0) 0
+__main:
+    CALL (SB) _main
+    HALT
