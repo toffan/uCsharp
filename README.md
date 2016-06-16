@@ -12,12 +12,22 @@ Compilateur pour un sous ensemble du Csharp
 - Les opérations sur les entiers fonctionnent. 
 - récupération  de la valeur d'une affectation. On peut ainsi faire des affectiation en cascade
 - Les appels de fonctions
-- Les structs
-- les  appels de fonctions imbriquées
-- la gestion des chaines de caractères est réalisée via une suite de caractères. Le code relatif aux strings est généré mais il n'a pas été testé car la machine TAM ne le supporte pas.
+- Les structs & les pointeurs
+- Les  appels de fonctions imbriquées
+- La gestion des chaines de caractères est réalisée via une suite de caractères. Le code relatif aux strings est généré mais il n'a pas été testé car la machine TAM ne le supporte pas.
+- La définition de types personnalisés
+- Le casting statique entre types
 
-##Améliorations & limitations
-**optimisation** Il aurait été possible de faire des optimisations sur le code généré. Actuellement il n'y a aucun pré-calcul. Ainsi l'affectation a = 3+4 charge 3 puis 4 sur la pile et enfin somme les 2 termes. Cela pourrait être optimisé avec l'ajout d'un attribut constExpr qui indique si la valeur d'un facteur est connue à la compilation. Dans le cas d'une opération entre 2 consExpr valide, la valeur serait calculée à la compilation.
+##Améliorations possibles & limitations
+**Optimisation** 
+- Il aurait été possible de faire des optimisations sur le code généré. Actuellement il n'y a aucun pré-calcul. Ainsi l'affectation a = 3+4 charge 3 puis 4 sur la pile et enfin somme les 2 termes. Cela pourrait être optimisé avec l'ajout d'un attribut constExpr qui indique si la valeur d'un facteur est connue à la compilation. Dans le cas d'une opération entre 2 consExpr valide, la valeur serait calculée à la compilation.
+
+- Afin de pouvoir récuperer la valeur d'une affectation, celle-ci est dupliquée pour pouvoir être utilisé par la suite. Dans le cas où elle n'est pas utilisée, on pourrait éviter cette recopie.
+
+- Lorsque l'on sort d'un  bloc if, on dépile de la taille des variables déclarées à l'intérieur de ce bloc, même s'il n'y en a aucune. on a alors un POP 0. Cette optimisation serait facile à mettre en place via un test sur la taille des variables.
+
+**Limites** 
+- Faire des opérations sur le resultat d'une fonction dans la même instruction que son utilisation n'est pas garanti. On pourrait cependant interdire cette opération dans la grammaire pour renforcer le langage. _Ex: lecture d'un champ d'un struct issu d'une fonction : int xx = retourneXY()->x +3;_
 
 ##Tests
 Il est possible de tester la correction du code généré en exécutant la commande `make test`.
