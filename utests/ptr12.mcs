@@ -1,0 +1,27 @@
+typedef struct {int x; int y;} Point;
+typedef struct {Point* c; int r;} Cercle;
+typedef struct {Point a; Point b;} Segment;
+
+int* malloc(int size) {
+    int* addr;
+    asm {
+        LOAD %size
+        SUBR Malloc
+        STORE %addr
+    }
+    return addr;
+}
+
+int main() {
+    Point* pt1 = (Point*) malloc(2);
+    Cercle* c1 = (Cercle*) malloc(2);
+    pt1->y = 8;
+    (*pt1).x = 4;
+    c1->c = pt1;
+    Segment* s1 = (Segment*) malloc(4);
+    s1->a = *pt1;
+    s1->b.x = 1;
+    s1->b.y = s1->a.y;
+
+    return 0;
+}
