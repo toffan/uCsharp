@@ -16,11 +16,15 @@ public class TYPE {
     ///   Proxy InstanceOf   ///
     public boolean isStruct() { return (this instanceof STRUCT); }
 
+    public boolean isClass() { return (this instanceof CLASS); }
+
     public boolean isPointer() { return (this instanceof PTR); }
 
     public boolean isFType() { return (this instanceof FTYPE); }
 
     public STRUCT toStruct() { return (STRUCT) this; }
+
+    public CLASS toClass() { return (CLASS) this; }
 
     public PTR toPointer() { return (PTR) this; }
 
